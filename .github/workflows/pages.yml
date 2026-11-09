@@ -17,8 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      SITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || '/schreibatlas' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,7 +30,11 @@ jobs:
       - run: npm run validate
       - run: npm test
       - run: npm run build
+        env:
+          SITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || '/schreibatlas' }}
       - run: npm run test:e2e
+        env:
+          SITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || '/schreibatlas' }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/
