@@ -30,11 +30,7 @@ jobs:
       - run: npm run validate
       - run: npm test
       - run: npm run build
-        env:
-          SITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || '/schreibatlas' }}
       - run: npm run test:e2e
-        env:
-          SITE_BASE_PATH: ${{ vars.SITE_BASE_PATH || '/schreibatlas' }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/
