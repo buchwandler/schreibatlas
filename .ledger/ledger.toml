@@ -1,0 +1,18 @@
+schema_version = 3
+
+[project]
+uuid = "1d99a716-1ef2-4704-ba10-c589850d5c41"
+name = "schreibatlas"
+
+[ledgers.taskledger.mounts.data]
+storage = "external"
+root = "../ledger"
+
+[ledgers.taskledger.mounts.runtime]
+storage = "user-data"
+
+[ledgers.taskledger.mounts.logs]
+storage = "user-data"
+
+[ledgers.taskledger.mounts.indexes]
+storage = "cache"

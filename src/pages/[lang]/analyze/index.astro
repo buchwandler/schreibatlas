@@ -1,0 +1,160 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { messages, type Locale } from "../../../lib/i18n";
+import { loadContent, locales } from "../../../../tools/content.mjs";
+import type { ModelRecord } from "../../../../tools/content.mjs";
+
+export function getStaticPaths() {
+  const content = loadContent();
+  return locales.map((lang) => ({ params: { lang }, props: { models: content.models } }));
+}
+
+const { models } = Astro.props as { models: ModelRecord[] };
+const lang = Astro.params.lang as Locale;
+const copy = messages[lang];
+const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
+const clientCopy = {
+  statusIdle: copy.analysisStatusIdle,
+  statusNoFile: copy.analysisStatusNoFile,
+  offlineStatusReady: copy.offlineStatusReady,
+  offlineStatusIncomplete: copy.offlineStatusIncomplete,
+  offlineStatusUnavailable: copy.offlineStatusUnavailable,
+  statusProcessing: copy.analysisStatusProcessing,
+  statusComplete: copy.analysisStatusComplete,
+  statusExported: copy.analysisStatusExported,
+  statusExportError: copy.analysisStatusExportError,
+  statusFileType: copy.analysisStatusFileType,
+  statusFileSize: copy.analysisStatusFileSize,
+  statusDecodeError: copy.analysisStatusDecodeError,
+  statusExpected: copy.analysisStatusExpected,
+  statusDimensions: copy.analysisStatusDimensions,
+  expectedText: copy.analysisExpectedText,
+  selectedModel: copy.analysisModel,
+  worksheetReferenceReady: copy.analysisWorksheetReferenceReady,
+  worksheetNoReference: copy.analysisWorksheetNoReference,
+  worksheetBlankRow: copy.analysisWorksheetBlankRow,
+  worksheetNoInk: copy.analysisWorksheetNoInk,
+  worksheetReferenceInvalid: copy.analysisWorksheetReferenceInvalid,
+  worksheetRecognized: copy.analysisWorksheetRecognized,
+  worksheetUnavailable: copy.analysisWorksheetUnavailable,
+  worksheetLowConfidence: copy.analysisWorksheetLowConfidence,
+  worksheetWritingAvailable: copy.analysisWorksheetWritingAvailable,
+  worksheetWritingUnavailable: copy.analysisWorksheetWritingUnavailable,
+  worksheetRepeatedAvailable: copy.analysisWorksheetRepeatedAvailable,
+  statusCorners: copy.analysisStatusCorners,
+  rectifiedPreview: copy.analysisRectifiedPreview,
+  maskPreview: copy.analysisMaskPreview,
+  detectedLineCount: copy.analysisDetectedLineCount,
+  deskew: copy.analysisDeskew,
+  deskewConfidenceLow: copy.analysisDeskewConfidenceLow,
+  deskewConfidenceMedium: copy.analysisDeskewConfidenceMedium,
+  threshold: copy.analysisThreshold,
+  thresholdUnavailable: copy.analysisThresholdUnavailable,
+  foregroundPixels: copy.analysisForegroundPixels,
+  line: copy.analysisLine,
+  lineHeight: copy.analysisLineHeight,
+  slope: copy.analysisSlope,
+  writingWidth: copy.analysisWritingWidth,
+  baselineCandidate: copy.analysisBaselineCandidate,
+  baselineVariation: copy.analysisBaselineVariation,
+  baselineConfidenceLow: copy.analysisBaselineConfidenceLow,
+  baselineNote: copy.analysisBaselineNote,
+  lineSpacingUnavailable: copy.analysisLineSpacingUnavailable,
+  lineSpacing: copy.analysisLineSpacing,
+  noLines: copy.analysisNoLines,
+};
+---
+<BaseLayout lang={lang} title={copy.analysisTitle} description={copy.analysisDescription} canonicalPath={`/${lang}/analyze/`} section="analysis">
+  <div class="content-page photo-analysis-page" data-photo-analysis data-messages={JSON.stringify(clientCopy)}>
+    <header class="page-heading">
+      <p class="eyebrow">{copy.analysisNavigation}</p>
+      <h1>{copy.analysisTitle}</h1>
+      <p>{copy.analysisDescription}</p>
+      <p class="comparison-disclaimer">{copy.analysisPrivacy}</p>
+      <noscript><p role="note">{copy.analysisRequiresJavascript}</p></noscript>
+    </header>
+
+    <form class="analysis-controls" data-analysis-controls>
+      <label for="analysis-image">{copy.analysisImage}
+        <input id="analysis-image" type="file" accept="image/png,image/jpeg,image/webp" data-analysis-image />
+      </label>
+      <p class="analysis-input-help">{copy.analysisImageHelp}</p>
+      <label for="analysis-expected-text">{copy.analysisExpectedText}
+        <input id="analysis-expected-text" type="text" maxlength="300" data-analysis-expected-text />
+      </label>
+      <label for="analysis-worksheet-svg">{copy.analysisWorksheetFile}
+        <input id="analysis-worksheet-svg" type="file" accept="image/svg+xml,.svg" data-analysis-worksheet />
+      </label>
+      <p class="analysis-input-help">{copy.analysisWorksheetHelp}</p>
+      <p data-analysis-worksheet-reference-status role="status" aria-live="polite"></p>
+      <label for="analysis-model">{copy.analysisModel}
+        <select id="analysis-model" data-analysis-model>
+          {models.map((model) => {
+            return <option value={model.id} data-demo={String(model.demo)}>{localized(model.name)}{model.demo ? " · demo" : ""}</option>;
+          })}
+        </select>
+      </label>
+      <p class="analysis-crop-help">{copy.analysisCropHelp}</p>
+      <div class="analysis-actions">
+        <button type="button" data-analysis-reset-crop disabled>{copy.analysisResetCrop}</button>
+        <button type="button" data-analysis-run disabled>{copy.analysisRun}</button>
+        <button type="button" data-analysis-clear disabled>{copy.analysisClear}</button>
+        <button type="reset">{copy.analysisReset}</button>
+      </div>
+    </form>
+
+    <p class="analysis-status" data-analysis-status role="status" aria-live="polite">{copy.analysisStatusIdle}</p>
+    <p class="analysis-offline-status" data-offline-status role="status" aria-live="polite">{copy.offlineStatusPending}</p>
+    <section class="analysis-image-section" aria-labelledby="analysis-original-title">
+      <h2 id="analysis-original-title">{copy.analysisOriginalPreview}</h2>
+      <div class="analysis-image-frame" data-analysis-image-frame hidden>
+        <div class="analysis-image-wrap">
+          <img data-analysis-preview alt={copy.analysisOriginalPreview} />
+          <svg data-analysis-crop-overlay role="group" viewBox="0 0 1 1" preserveAspectRatio="none" aria-label={copy.analysisCropHelp}>
+            <polygon data-analysis-crop-polygon points="" />
+            <circle data-analysis-corner="0" tabindex="0" role="button" aria-label={copy.analysisCornerTopLeft} />
+            <circle data-analysis-corner="1" tabindex="0" role="button" aria-label={copy.analysisCornerTopRight} />
+            <circle data-analysis-corner="2" tabindex="0" role="button" aria-label={copy.analysisCornerBottomRight} />
+            <circle data-analysis-corner="3" tabindex="0" role="button" aria-label={copy.analysisCornerBottomLeft} />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="analysis-results" data-analysis-results aria-labelledby="analysis-results-title" hidden>
+      <h2 id="analysis-results-title">{copy.analysisResults}</h2>
+      <p data-analysis-context></p>
+      <p data-analysis-worksheet-result></p>
+      <div class="analysis-actions">
+        <button type="button" data-analysis-export-json disabled>{copy.analysisExportJson}</button>
+        <button type="button" data-analysis-export-overlay disabled>{copy.analysisExportOverlay}</button>
+      </div>
+      <dl class="analysis-summary">
+        <div><dt>{copy.analysisDetectedLineCount}</dt><dd data-analysis-line-count>0</dd></div>
+        <div><dt>{copy.analysisDeskew}</dt><dd data-analysis-deskew>0</dd></div>
+        <div><dt>{copy.analysisThreshold}</dt><dd data-analysis-threshold>0</dd></div>
+        <div><dt>{copy.analysisForegroundPixels}</dt><dd data-analysis-foreground>0</dd></div>
+        <div><dt>{copy.analysisWordGaps}</dt><dd data-analysis-word-gaps>{copy.analysisWordGapsUnavailable}</dd></div>
+      </dl>
+      <p data-analysis-line-spacing></p>
+      <figure class="analysis-preview-card">
+        <figcaption>{copy.analysisRectifiedPreview}</figcaption>
+        <canvas data-analysis-rectified role="img" aria-label={copy.analysisRectifiedPreview}></canvas>
+      </figure>
+      <figure class="analysis-preview-card">
+        <figcaption>{copy.analysisMaskPreview}</figcaption>
+        <canvas data-analysis-mask role="img" aria-label={copy.analysisMaskPreview}></canvas>
+      </figure>
+      <figure class="analysis-preview-card">
+        <figcaption>{copy.analysisOverlayPreview}</figcaption>
+        <canvas data-analysis-overlay role="img" aria-label={copy.analysisOverlayPreview}></canvas>
+      </figure>
+      <p>{copy.analysisBaselineNote}</p>
+      <ul data-analysis-lines></ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import "../../../scripts/photo-analysis";
+</script>

@@ -1,0 +1,118 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { messages, type Locale } from "../../../lib/i18n";
+import { withBase } from "../../../lib/routes";
+import { loadContent, locales } from "../../../../tools/content.mjs";
+import type { LanguageRecord, ModelRecord } from "../../../../tools/content.mjs";
+
+export function getStaticPaths() {
+  const content = loadContent();
+  return locales.map((lang) => ({ params: { lang }, props: { models: content.models, languages: content.languages } }));
+}
+
+const { models, languages } = Astro.props as { models: ModelRecord[]; languages: LanguageRecord[] };
+const lang = Astro.params.lang as Locale;
+const copy = messages[lang];
+const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
+const clientCopy = {
+  statusLoading: copy.writeStatusLoading,
+  statusReady: copy.writeStatusReady,
+  statusCaptured: copy.writeStatusCaptured,
+  statusError: copy.writeStatusError,
+  statusInvalidCharacter: copy.writeStatusInvalidCharacter,
+  statusReferenceLoading: copy.writeStatusReferenceLoading,
+  statusReferenceReady: copy.writeStatusReferenceReady,
+  statusNoReference: copy.writeStatusNoReference,
+  metricStrokes: copy.writeMetricStrokes,
+  metricSamples: copy.writeMetricSamples,
+  metricPathLength: copy.writeMetricPathLength,
+  metricWidth: copy.writeMetricWidth,
+  metricHeight: copy.writeMetricHeight,
+  metricDuration: copy.writeMetricDuration,
+  metricPressureSamples: copy.writeMetricPressureSamples,
+  metricNoPressure: copy.writeMetricNoPressure,
+  writeProvenance: copy.writeProvenance,
+  writeProvenanceEmpty: copy.writeProvenanceEmpty,
+};
+---
+<BaseLayout lang={lang} title={copy.writeTitle} description={copy.writeDescription} canonicalPath={`/${lang}/write/`} section="writing">
+  <div class="content-page writing-page" data-writing-page data-index-url={withBase("data/v1/index.json")} data-messages={JSON.stringify(clientCopy)}>
+    <header class="page-heading">
+      <p class="eyebrow">{copy.writeNavigation}</p>
+      <h1>{copy.writeTitle}</h1>
+      <p>{copy.writeDescription}</p>
+      <p class="comparison-disclaimer">{copy.writePrivacy}</p>
+      <p>{copy.writeReferenceDisclaimer}</p>
+    </header>
+
+    <form class="writing-controls" data-writing-controls>
+      <label for="writing-model">{copy.writeModel}
+        <select id="writing-model" data-writing-model>
+          {models.map((model) => {
+            const modelLanguages = model.languages.map((id) => languages.find((entry) => entry.id === id)).filter((entry): entry is LanguageRecord => Boolean(entry));
+            const direction = modelLanguages[0]?.direction ?? "ltr";
+            return <option value={model.id} data-sources={JSON.stringify(model.sources)} data-license={model.license} data-verification={model.status.verification} data-direction={direction}>{localized(model.name)}</option>;
+          })}
+        </select>
+      </label>
+      <label for="writing-character">{copy.writeCharacter}
+        <input id="writing-character" type="text" maxlength="32" data-writing-character />
+      </label>
+      <label class="writing-check" for="writing-reference">
+        <input id="writing-reference" type="checkbox" data-writing-reference-toggle />
+        <span>{copy.writeReferenceOverlay}</span>
+      </label>
+      <label for="writing-opacity">{copy.writeReferenceOpacity}
+        <input id="writing-opacity" type="range" min="0.05" max="0.5" step="0.05" value="0.2" data-writing-opacity />
+      </label>
+      <div class="writing-actions">
+        <button type="button" data-writing-clear disabled>{copy.writeClear}</button>
+        <button type="reset">{copy.writeReset}</button>
+        <button type="button" data-writing-export-json disabled>{copy.writeExportJson}</button>
+        <button type="button" data-writing-export-svg disabled>{copy.writeExportSvg}</button>
+      </div>
+    </form>
+
+    <p class="writing-status" data-writing-status role="status" aria-live="polite">{copy.writeStatusLoading}</p>
+    <section class="writing-surface-section" aria-labelledby="writing-surface-title">
+      <h2 id="writing-surface-title">{copy.writeSurfaceLabel}</h2>
+      <p id="writing-surface-help">{copy.writeSurfaceInstructions}</p>
+      <p>{copy.writeKeyboardInstructions}</p>
+      <div class="writing-surface-frame">
+        <svg data-writing-surface viewBox="0 0 1000 600" role="application" tabindex="0" aria-label={copy.writeSurfaceLabel} aria-describedby="writing-surface-help" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Space Escape">
+          <title>{copy.writeSurfaceLabel}</title>
+          <desc>{copy.writeSurfaceInstructions} {copy.writeKeyboardInstructions}</desc>
+          <rect class="writing-surface-background" x="0" y="0" width="1000" height="600" fill="white" stroke="#cbd5e1" stroke-width="2" />
+          <g data-writing-reference-layer aria-hidden="true"></g>
+          <g data-writing-capture aria-hidden="true"></g>
+          <circle class="writing-keyboard-cursor" data-writing-cursor cx="500" cy="300" r="8" fill="#0d3d68" opacity="0" aria-hidden="true" />
+        </svg>
+      </div>
+      <p class="writing-reference-note">{copy.writeReferenceDisclaimer}</p>
+    </section>
+
+    <section class="data-section writing-metrics" aria-labelledby="writing-metrics-title">
+      <h2 id="writing-metrics-title">{copy.writeMetricTitle}</h2>
+      <dl>
+        <div><dt>{copy.writeMetricStrokes}</dt><dd data-metric="strokeCount">0</dd></div>
+        <div><dt>{copy.writeMetricSamples}</dt><dd data-metric="sampleCount">0</dd></div>
+        <div><dt>{copy.writeMetricPathLength}</dt><dd data-metric="pathLength">0</dd></div>
+        <div><dt>{copy.writeMetricWidth}</dt><dd data-metric="width">0</dd></div>
+        <div><dt>{copy.writeMetricHeight}</dt><dd data-metric="height">0</dd></div>
+        <div><dt>{copy.writeMetricDuration}</dt><dd data-metric="durationMs">0</dd></div>
+        <div><dt>{copy.writeMetricPressureSamples}</dt><dd data-metric="pressureSampleCount">0</dd></div>
+      </dl>
+      <p data-writing-pressure-status>{copy.writeMetricNoPressure}</p>
+      <p>{copy.writeMetricsLimit}</p>
+    </section>
+
+    <section class="data-section writing-provenance" aria-labelledby="writing-provenance-title">
+      <h2 id="writing-provenance-title">{copy.writeProvenance}</h2>
+      <ul data-writing-provenance><li>{copy.writeProvenanceEmpty}</li></ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import "../../../scripts/writing-capture";
+</script>

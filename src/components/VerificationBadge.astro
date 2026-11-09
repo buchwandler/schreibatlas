@@ -1,0 +1,15 @@
+---
+import { messages, type Locale, type VerificationStatus } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+  status: VerificationStatus;
+}
+
+const { lang, status } = Astro.props;
+const copy = messages[lang].verification[status];
+---
+<div class={`verification-badge status-${status}`} aria-label={`${copy.label}. ${copy.explanation}`}>
+  <strong>{copy.label}</strong>
+  <p>{copy.explanation}</p>
+</div>

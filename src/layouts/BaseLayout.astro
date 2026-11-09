@@ -1,0 +1,76 @@
+---
+import "../../styles.css";
+import { messages, type Locale } from "../lib/i18n";
+
+interface Props {
+  lang: Locale;
+  title: string;
+  description: string;
+  canonicalPath: string;
+  section?: "home" | "explore" | "compare" | "practice" | "writing" | "analysis";
+}
+
+const { lang, title, description, canonicalPath, section } = Astro.props;
+const copy = messages[lang];
+const otherLocale: Locale = lang === "de" ? "en" : "de";
+const baseUrl = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const homeUrl = `${baseUrl}${lang}/`;
+const exploreUrl = `${baseUrl}${lang}/explore/`;
+const compareUrl = `${baseUrl}${lang}/compare/letters/`;
+const practiceUrl = `${baseUrl}${lang}/practice/`;
+const writingUrl = `${baseUrl}${lang}/write/`;
+const analysisUrl = `${baseUrl}${lang}/analyze/`;
+const localePath = canonicalPath.startsWith(`/${lang}/`) ? canonicalPath.slice(lang.length + 1) : "/";
+const alternateUrl = `${baseUrl}${otherLocale}${localePath}`;
+const site = Astro.site ?? new URL("https://schreibatlas.de");
+const canonicalUrl = new URL(canonicalPath, site).href;
+const germanUrl = new URL(`/de${localePath}`, site).href;
+const englishUrl = new URL(`/en${localePath}`, site).href;
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title} | Schreibatlas</title>
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="de" href={germanUrl} />
+    <link rel="alternate" hreflang="en" href={englishUrl} />
+    <link rel="alternate" hreflang="x-default" href={new URL("/", site).href} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{copy.skipToContent}</a>
+    <header class="site-header">
+      <a class="brand" href={homeUrl} aria-label={`Schreibatlas. ${copy.home}`}>
+        <span class="brand-name">Schreibatlas</span>
+        <span class="brand-description">{copy.project}</span>
+      </a>
+      <div class="header-actions">
+        <nav class="site-nav" aria-label={copy.primaryNavigation}>
+          <a href={homeUrl} aria-current={section === "home" ? "page" : undefined}>{copy.home}</a>
+          <a href={exploreUrl} aria-current={section === "explore" ? "page" : undefined}>{copy.exploreNavigation}</a>
+          <a href={compareUrl} aria-current={section === "compare" ? "page" : undefined}>{copy.compareTitle}</a>
+          <a href={practiceUrl} aria-current={section === "practice" ? "page" : undefined}>{copy.practiceNavigation}</a>
+          <a href={writingUrl} aria-current={section === "writing" ? "page" : undefined}>{copy.writeNavigation}</a>
+          <a href={analysisUrl} aria-current={section === "analysis" ? "page" : undefined}>{copy.analysisNavigation}</a>
+        </nav>
+        <nav class="language-nav" aria-label={copy.languageNavigation}>
+          <a href={alternateUrl} hreflang={otherLocale} lang={otherLocale}>{copy.switchLanguage}</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <span>{copy.footerLicense}</span>
+    </footer>
+    <script>
+      import "../scripts/offline";
+    </script>
+  </body>
+
+</html>

@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { messages } from "../lib/i18n";
+const copy = messages.en;
+const baseUrl = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+<BaseLayout lang="en" title={copy.landingTitle} description={copy.landingDescription} canonicalPath="/">
+  <section class="language-landing" aria-labelledby="language-title">
+    <p class="eyebrow">{copy.heroEyebrow}</p>
+    <h1 id="language-title">Schreibatlas</h1>
+    <p>{copy.landingPrompt}</p>
+    <nav aria-label={copy.languageNavigationShort}>
+      <a class="language-choice" href={`${baseUrl}de/`} lang="de">Deutsch</a>
+      <a class="language-choice" href={`${baseUrl}en/`} lang="en">English</a>
+    </nav>
+  </section>
+</BaseLayout>

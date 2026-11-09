@@ -1,0 +1,61 @@
+---
+interface StrokeDiagramStep {
+  order: number;
+  pen_down: boolean;
+  timing_ms?: number | null;
+  paths: string[];
+}
+
+interface Copy {
+  strokeDiagramTitle: string;
+  strokeAnimateOnce: string;
+  strokeAnimationInitial: string;
+  strokeAnimationReduced: string;
+  strokeAnimationComplete: string;
+  strokeAnimationError: string;
+  strokeTimingNote: string;
+  strokeRecordedTimingNote: string;
+  strokeAnimationPlaying: string;
+  strokeAnimationLabel: string;
+  strokeNumber: string;
+}
+
+interface Props {
+  id: string;
+  steps: StrokeDiagramStep[];
+  copy: Copy;
+}
+
+const { id, steps, copy } = Astro.props;
+const animationId = `${id}-animation`;
+const timingNote = steps.every((step) => typeof step.timing_ms === "number") ? copy.strokeRecordedTimingNote : copy.strokeTimingNote;
+---
+<div
+  class="stroke-renderer"
+  data-stroke-renderer
+  data-initial={copy.strokeAnimationInitial}
+  data-playing={copy.strokeAnimationPlaying}
+  data-reduced={copy.strokeAnimationReduced}
+  data-complete={copy.strokeAnimationComplete}
+  data-error={copy.strokeAnimationError}
+>
+  <h3 id={`${id}-title`}>{copy.strokeDiagramTitle}</h3>
+  <ol class="stroke-static-diagrams" aria-labelledby={`${id}-title`}>
+    {steps.map((step) => (
+      <li data-stroke-step data-pen-down={String(step.pen_down)} data-duration-ms={step.timing_ms ?? ""}>
+        <span>{copy.strokeNumber.replace("{number}", String(step.order))}</span>
+        <svg viewBox="0 0 1 1" aria-hidden="true">
+          {step.paths.map((path) => <path d={path} fill="none" stroke="currentColor" stroke-width="0.02" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray={step.pen_down ? undefined : "0.03 0.02"} />)}
+        </svg>
+      </li>
+    ))}
+  </ol>
+  <button type="button" data-stroke-play aria-controls={animationId} hidden>{copy.strokeAnimateOnce}</button>
+  <svg id={animationId} class="stroke-animation" viewBox="0 0 1 1" role="img" aria-label={copy.strokeAnimationLabel} data-stroke-animation data-visible="false"></svg>
+  <p data-stroke-status role="status" aria-live="polite">{copy.strokeAnimationInitial}</p>
+  <p class="stroke-timing-note">{timingNote}</p>
+</div>
+
+<script>
+  import "../scripts/stroke-renderer";
+</script>

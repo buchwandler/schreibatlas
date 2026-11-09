@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreibatlas.de/schema/v1/model.schema.json",
+  "type": "object",
+  "required": ["id", "name", "country", "languages", "status", "character_repertoire", "character_repertoire_complete", "reference_fonts", "sources", "license", "demo"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/modelId" },
+    "name": { "$ref": "common.schema.json#/$defs/localizedText" },
+    "country": { "oneOf": [{ "$ref": "common.schema.json#/$defs/countryId" }, { "type": "null" }] },
+    "languages": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/languageId" },
+      "uniqueItems": true
+    },
+    "classification": {
+      "type": ["object", "null"],
+      "properties": {
+        "joined": { "type": ["boolean", "null"] },
+        "slant": {
+          "type": ["object", "null"],
+          "required": ["kind", "nominal_degrees"],
+          "properties": {
+            "kind": { "type": "string", "enum": ["right", "left", "vertical", "unknown"] },
+            "nominal_degrees": { "type": ["number", "null"] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "period": {
+      "type": ["object", "null"],
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": ["integer", "null"] },
+        "to": { "type": ["integer", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "object",
+      "required": ["use", "verification"],
+      "properties": {
+        "use": { "type": "string", "enum": ["current", "historical", "current-or-historical", "unknown"] },
+        "verification": { "$ref": "common.schema.json#/$defs/verificationStatus" }
+      },
+      "additionalProperties": false
+    },
+    "character_repertoire": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/unicodeEntry" },
+      "uniqueItems": true
+    },
+    "character_repertoire_complete": { "type": "boolean" },
+    "metrics": { "$ref": "common.schema.json#/$defs/metrics" },
+    "reference_fonts": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/fontId" },
+      "uniqueItems": true
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/sourceId" },
+      "uniqueItems": true
+    },
+    "license": { "$ref": "common.schema.json#/$defs/licenseId" },
+    "demo": { "type": "boolean" },
+    "description": { "$ref": "common.schema.json#/$defs/localizedText" },
+    "educational_context": { "$ref": "common.schema.json#/$defs/localizedText" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "demo": { "const": true } }, "required": ["demo"] },
+      "then": { "properties": { "status": { "properties": { "verification": { "const": "draft" } } } } }
+    }
+  ],
+  "additionalProperties": false
+}

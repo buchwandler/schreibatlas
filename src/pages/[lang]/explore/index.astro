@@ -1,0 +1,125 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import VerificationBadge from "../../../components/VerificationBadge.astro";
+import { messages, type Locale } from "../../../lib/i18n";
+import { withBase } from "../../../lib/routes";
+import { loadContent, locales } from "../../../../tools/content.mjs";
+import type { Content } from "../../../../tools/content.mjs";
+
+export function getStaticPaths() {
+  const content = loadContent();
+  return locales.map((lang) => ({ params: { lang }, props: { lang, content } }));
+}
+
+const { lang, content } = Astro.props as { lang: Locale; content: Content };
+const { models, countries, languages } = content;
+const copy = messages[lang];
+const localized = (values: Record<string, string>) => values[lang] ?? values.en ?? values.de ?? copy.notRecorded;
+const verificationOptions = [...new Set(models.map((model) => model.status.verification))].sort().map((value) => ({ value, label: copy.verification[value].label }));
+const countryById = new Map(countries.map((country) => [country.id, country]));
+const languageById = new Map(languages.map((language) => [language.id, language]));
+const countryOptions = [...new Set(models.flatMap((model) => model.country ? [model.country] : []))].sort().flatMap((value) => {
+  const country = countryById.get(value);
+  return country ? [{ value, label: localized(country.name) }] : [];
+});
+const languageOptions = [...new Set(models.flatMap((model) => model.languages))].sort().flatMap((value) => {
+  const language = languageById.get(value);
+  return language ? [{ value, label: localized(language.name) }] : [];
+});
+const filterConfigs = [
+  { key: "status", label: copy.verificationFilter, options: verificationOptions },
+  { key: "country", label: copy.country, options: countryOptions },
+  { key: "language", label: copy.languages, options: languageOptions },
+].filter((filter) => filter.options.length > 1);
+---
+<BaseLayout lang={lang} title={copy.exploreTitle} description={copy.exploreDescription} canonicalPath={`/${lang}/explore/`} section="explore">
+  <div class="content-page">
+    <nav class="breadcrumbs" aria-label={copy.breadcrumbNavigation}>
+      <a href={withBase(`${lang}/`)}>{copy.home}</a>
+      <span aria-current="page">{copy.exploreNavigation}</span>
+    </nav>
+    <header class="page-heading">
+      <h1>{copy.exploreTitle}</h1>
+      <p>{copy.exploreIntro}</p>
+    </header>
+
+    {models.length > 0 ? (
+      <>
+        <div class="model-filters" role="search">
+          <label for="model-search">
+            {copy.modelSearchLabel}
+            <input id="model-search" type="search" placeholder={copy.modelSearchPlaceholder} autocomplete="off" />
+          </label>
+          {filterConfigs.map((filter) => (
+            <label>
+              {filter.label}
+              <select data-model-filter={filter.key}>
+                <option value="">{copy.allFilterOptions}</option>
+                {filter.options.map((option) => <option value={option.value}>{option.label}</option>)}
+              </select>
+            </label>
+          ))}
+        </div>
+        <p id="model-count" class="result-count" aria-live="polite" data-template={copy.modelCount}>{copy.modelCount.replace("{count}", String(models.length))}</p>
+        <p id="no-results" class="empty-state" hidden>{copy.noSearchResults}</p>
+        <div class="model-grid">
+          {models.map((model) => {
+            const name = model.name[lang] ?? model.name.en ?? model.name.de;
+            const description = model.description?.[lang] ?? model.description?.en ?? model.description?.de ?? "";
+            const searchText = [name, description, model.id, model.country ?? "", ...model.languages].join(" ");
+            return (
+              <article
+                class="model-card"
+                data-model-card
+                data-search={searchText}
+                data-status={model.status.verification}
+                data-country={model.country ?? ""}
+                data-language={model.languages.join(" ")}
+              >
+                <div class="model-card-heading">
+                  <h2><a href={withBase(`${lang}/models/${model.id}/`)}>{name}</a></h2>
+                  <code>{model.id}</code>
+                </div>
+                <VerificationBadge lang={lang} status={model.status.verification} />
+                {model.demo && <p class="demo-marker">{copy.demoTitle}</p>}
+                <p>{description || copy.notRecorded}</p>
+                <a class="text-link" href={withBase(`${lang}/models/${model.id}/`)}>{copy.viewModel}</a>
+              </article>
+            );
+          })}
+        </div>
+      </>
+    ) : (
+      <p class="empty-state">{copy.noModels}</p>
+    )}
+  </div>
+</BaseLayout>
+
+<script>
+  const search = document.querySelector<HTMLInputElement>("#model-search");
+  const filters = [...document.querySelectorAll<HTMLSelectElement>("[data-model-filter]")];
+  const cards = [...document.querySelectorAll<HTMLElement>("[data-model-card]")];
+  const resultCount = document.querySelector<HTMLElement>("#model-count");
+  const noResults = document.querySelector<HTMLElement>("#no-results");
+  const normalize = (value: string) => value.normalize("NFKC").toLocaleLowerCase();
+
+  const updateResults = () => {
+    const term = normalize(search?.value ?? "");
+    let visibleCount = 0;
+    for (const card of cards) {
+      const matchesSearch = normalize(card.dataset.search ?? "").includes(term);
+      const matchesFilters = filters.every((filter) => {
+        if (!filter.value) return true;
+        const key = filter.dataset.modelFilter as string;
+        return (card.dataset[key] ?? "").split(" ").includes(filter.value);
+      });
+      card.hidden = !(matchesSearch && matchesFilters);
+      if (!card.hidden) visibleCount += 1;
+    }
+    if (resultCount) resultCount.textContent = resultCount.dataset.template?.replace("{count}", String(visibleCount)) ?? String(visibleCount);
+    if (noResults) noResults.hidden = visibleCount > 0;
+  };
+
+  search?.addEventListener("input", updateResults);
+  filters.forEach((filter) => filter.addEventListener("change", updateResults));
+</script>

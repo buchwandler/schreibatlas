@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreibatlas.de/schema/v1/country.schema.json",
+  "type": "object",
+  "required": ["id", "name"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/countryId" },
+    "name": { "$ref": "common.schema.json#/$defs/localizedText" },
+    "languages": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/languageId" },
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false
+}

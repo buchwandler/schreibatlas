@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreibatlas.de/schema/v1/source.schema.json",
+  "type": "object",
+  "required": ["id", "kind", "title", "author", "publisher", "year", "locator", "url", "rights", "notes"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/sourceId" },
+    "kind": { "type": "string", "enum": ["publication", "project-placeholder"] },
+    "title": { "type": "string", "minLength": 1 },
+    "author": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "publisher": { "type": ["string", "null"] },
+    "year": { "type": ["integer", "null"] },
+    "locator": {
+      "type": ["object", "null"],
+      "properties": { "pages": { "type": "array", "items": { "type": "integer", "minimum": 1 } } },
+      "additionalProperties": false
+    },
+    "url": { "type": ["string", "null"] },
+    "rights": {
+      "type": "object",
+      "required": ["type", "license"],
+      "properties": {
+        "type": { "type": "string", "enum": ["citation-only", "project-original", "public-domain", "licensed", "unknown"] },
+        "license": { "oneOf": [{ "$ref": "common.schema.json#/$defs/licenseId" }, { "type": "null" }] }
+      },
+      "additionalProperties": false
+    },
+    "notes": { "type": ["string", "null"] }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "project-placeholder" } }, "required": ["kind"] },
+      "then": { "properties": { "notes": { "type": "string", "minLength": 1 } } }
+    }
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { messages } from "../../lib/i18n";
+const copy = messages.de;
+---
+<BaseLayout lang="de" title={copy.homeTitle} description={copy.homeDescription} canonicalPath="/de/" section="home">
+  <div class="home-page">
+    <section class="home-hero" aria-labelledby="home-title">
+      <p class="eyebrow">{copy.heroEyebrow}</p>
+      <h1 id="home-title">{copy.heroTitle}</h1>
+      <p class="home-intro">{copy.heroIntro}</p>
+    </section>
+
+    <section class="demo-callout" aria-labelledby="demo-title">
+      <h2 id="demo-title">{copy.demoTitle}</h2>
+      <p>{copy.demoDescription}</p>
+    </section>
+
+    <section id="pillars" class="home-section" aria-labelledby="pillars-title">
+      <h2 id="pillars-title">{copy.pillarsTitle}</h2>
+      <div class="pillar-grid">
+        {copy.pillars.map((pillar) => (
+          <article class="pillar-card">
+            <h3>{pillar.title}</h3>
+            <p>{pillar.description}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="home-section project-promises" aria-labelledby="promises-title">
+      <h2 id="promises-title">{copy.promisesTitle}</h2>
+      <ul>
+        {copy.promises.map((promise) => <li>{promise}</li>)}
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

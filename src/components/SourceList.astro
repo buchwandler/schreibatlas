@@ -1,0 +1,49 @@
+---
+import { messages, type Locale } from "../lib/i18n";
+
+interface Source {
+  id: string;
+  kind: string;
+  title: string;
+  author: string[];
+  publisher: string | null;
+  year: number | null;
+  locator: { pages?: number[] } | null;
+  url: string | null;
+  rights: { type: string; license: string | null };
+  notes: string | null;
+}
+
+interface Props {
+  lang: Locale;
+  sources: Source[];
+}
+
+const { lang, sources } = Astro.props;
+const copy = messages[lang];
+const safeUrl = (value: string | null) => value && /^https?:\/\//i.test(value) ? value : null;
+---
+<section class="data-section" aria-labelledby="sources-title">
+  <h2 id="sources-title">{copy.sources}</h2>
+  {sources.length > 0 ? (
+    <div class="source-list">
+      {sources.map((source) => (
+        <article class="source-card">
+          <h3>{source.title}</h3>
+          {source.kind === "project-placeholder" && <p class="source-kind">{copy.placeholderSource}</p>}
+          <dl class="metadata-list">
+            <dt>{copy.sourceAuthor}</dt><dd>{source.author.length ? source.author.join(", ") : copy.notRecorded}</dd>
+            <dt>{copy.sourcePublisher}</dt><dd>{source.publisher ?? copy.notRecorded}</dd>
+            <dt>{copy.sourceYear}</dt><dd>{source.year ?? copy.notRecorded}</dd>
+            <dt>{copy.sourcePages}</dt><dd>{source.locator?.pages?.join(", ") ?? copy.notRecorded}</dd>
+            <dt>{copy.licenseAttribution}</dt><dd>{source.rights.type} · {source.rights.license ?? copy.notRecorded}</dd>
+          </dl>
+          {source.notes && <p>{source.notes}</p>}
+          {safeUrl(source.url) && <a href={safeUrl(source.url)!} rel="external">{copy.sourceOpen}</a>}
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p class="empty-state">{copy.noSources}</p>
+  )}
+</section>

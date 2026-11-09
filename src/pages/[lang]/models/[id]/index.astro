@@ -1,0 +1,142 @@
+---
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import NormalizedGuidelines from "../../../../components/NormalizedGuidelines.astro";
+import BreadcrumbJsonLd from "../../../../components/BreadcrumbJsonLd.astro";
+import SourceList from "../../../../components/SourceList.astro";
+import VerificationBadge from "../../../../components/VerificationBadge.astro";
+import { messages, type Locale } from "../../../../lib/i18n";
+import { withBase } from "../../../../lib/routes";
+import { localizedGlyphPaths, localizedModelPaths, loadContent } from "../../../../../tools/content.mjs";
+import type { Content, FontRecord, ModelRecord, SourceRecord } from "../../../../../tools/content.mjs";
+
+export function getStaticPaths() {
+  const content = loadContent();
+  return localizedModelPaths(content.models).map(({ lang, id, model }) => ({
+    params: { lang, id },
+    props: { model, content },
+  }));
+}
+
+const { model, content } = Astro.props as { model: ModelRecord; content: Content };
+const lang = Astro.params.lang as Locale;
+const copy = messages[lang];
+const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
+const country = content.countries.find((entry) => entry.id === model.country);
+const languageNames = model.languages.map((id) => content.languages.find((entry) => entry.id === id)).filter((entry) => entry !== undefined).map((entry) => localized(entry.name));
+const modelSources = model.sources.flatMap((id) => content.sources.filter((source) => source.id === id)) as SourceRecord[];
+const modelFonts = model.reference_fonts.flatMap((id) => content.fonts.filter((font) => font.id === id)) as FontRecord[];
+const glyphs = content.glyphs.filter((glyph) => glyph.model === model.id);
+const glyphRoutes = localizedGlyphPaths(glyphs).filter((route) => route.lang === lang);
+const useLabels: Record<string, string> = {
+  current: copy.current,
+  historical: copy.historical,
+  "current-or-historical": copy.currentOrHistorical,
+  unknown: copy.unknown,
+};
+const useLabel = useLabels[model.status.use] ?? copy.notRecorded;
+const joinedLabel = model.classification?.joined === true ? copy.present : model.classification?.joined === false ? copy.absent : copy.notRecorded;
+const periodLabel = !model.period || (model.period.from === null && model.period.to === null)
+  ? copy.notRecorded
+  : `${model.period.from ?? "…"}–${model.period.to ?? "…"}`;
+const pageTitle = localized(model.name);
+const pageDescription = localized(model.description);
+const site = Astro.site ?? new URL("https://schreibatlas.de");
+const breadcrumbItems = [
+  { name: copy.home, url: new URL(`/${lang}/`, site).href },
+  { name: copy.exploreNavigation, url: new URL(`/${lang}/explore/`, site).href },
+  { name: pageTitle, url: new URL(`/${lang}/models/${model.id}/`, site).href },
+];
+---
+<BaseLayout lang={lang} title={pageTitle} description={pageDescription} canonicalPath={`/${lang}/models/${model.id}/`}>
+  <BreadcrumbJsonLd items={breadcrumbItems} />
+  <div class="content-page">
+    <nav class="breadcrumbs" aria-label={copy.breadcrumbNavigation}>
+      <a href={withBase(`${lang}/`)}>{copy.home}</a>
+      <span aria-hidden="true">/</span>
+      <a href={withBase(`${lang}/explore/`)}>{copy.exploreNavigation}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{pageTitle}</span>
+    </nav>
+
+    <header class="page-heading model-heading">
+      <p class="eyebrow">{copy.modelDetails} · <code>{model.id}</code></p>
+      <h1>{pageTitle}</h1>
+      <p>{pageDescription}</p>
+      <VerificationBadge lang={lang} status={model.status.verification} />
+      {model.demo && <p class="demo-marker">{copy.demoTitle}</p>}
+    </header>
+
+    <section class="data-section" aria-labelledby="identity-title">
+      <h2 id="identity-title">{copy.modelDetails}</h2>
+      <dl class="metadata-list detail-list">
+        <dt>{copy.country}</dt><dd>{country ? localized(country.name) : copy.notRecorded}</dd>
+        <dt>{copy.languages}</dt><dd>{languageNames.length ? languageNames.join(", ") : copy.notRecorded}</dd>
+        <dt>{copy.period}</dt><dd>{periodLabel}</dd>
+        <dt>{copy.useStatus}</dt><dd>{useLabel}</dd>
+        <dt>{copy.joined}</dt><dd>{joinedLabel}</dd>
+        <dt>{copy.education}</dt><dd>{localized(model.educational_context)}</dd>
+        <dt>{copy.slant}</dt><dd>{model.classification?.slant ? `${model.classification.slant.kind}${model.classification.slant.nominal_degrees === null ? "" : ` · ${model.classification.slant.nominal_degrees}°`}` : copy.notRecorded}</dd>
+      </dl>
+    </section>
+
+    <section class="data-section" aria-labelledby="repertoire-title">
+      <div class="section-heading-row">
+        <h2 id="repertoire-title">{copy.repertoire}</h2>
+        <a class="text-link" href={withBase(`${lang}/models/${model.id}/letters/`)}>{copy.viewRepertoire}</a>
+      </div>
+      <p>{model.character_repertoire_complete ? copy.repertoireComplete : copy.repertoireIncomplete}</p>
+      {model.character_repertoire.length > 0 ? (
+        <ul class="repertoire-list">
+          {model.character_repertoire.map((entry) => <li><code>{entry}</code></li>)}
+        </ul>
+      ) : (
+        <p class="empty-state">{copy.repertoireEmpty}</p>
+      )}
+      <h3>{copy.glyphRecords}</h3>
+      {glyphRoutes.length > 0 ? (
+        <ul class="glyph-link-list">
+          {glyphRoutes.map(({ slug, glyph }) => (
+            <li><a href={withBase(`${lang}/models/${model.id}/letters/${slug}/`)}><code>{glyph.character}</code> <span>{glyph.unicode.join(", ")}</span></a></li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty-state">{copy.noGlyphRecords}</p>
+      )}
+    </section>
+
+    <section class="data-section" aria-labelledby="guidelines-title">
+      <h2 id="guidelines-title">{copy.normalizedGuidelines}</h2>
+      <NormalizedGuidelines lang={lang} metrics={model.metrics} label={`${copy.normalizedGuidelines}: ${pageTitle}`} />
+    </section>
+
+    <section class="data-section" aria-labelledby="fonts-title">
+      <h2 id="fonts-title">{copy.fontInformation}</h2>
+      {modelFonts.length > 0 ? (
+        <div class="font-list">
+          {modelFonts.map((font) => (
+            <article class="font-card">
+              <h3>{font.name}</h3>
+              <p>{font.author}</p>
+              <dl class="metadata-list">
+                <dt>{copy.licenseAttribution}</dt><dd>{font.license}</dd>
+                <dt>{copy.fontCorrespondence}</dt><dd>{copy.fontDegree[font.correspondence.degree]}</dd>
+              </dl>
+              {font.correspondence.notes && <p>{font.correspondence.notes}</p>}
+              {font.project_url && /^https?:\/\//i.test(font.project_url) && <a href={font.project_url} rel="external">{font.name}</a>}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p class="empty-state">{copy.noFonts}</p>
+      )}
+    </section>
+
+    <section class="data-section license-section" aria-labelledby="license-title">
+      <h2 id="license-title">{copy.licenseAttribution}</h2>
+      <p><strong>{model.license}</strong></p>
+      {model.demo && <p>{copy.demoDescription}</p>}
+    </section>
+
+    <SourceList lang={lang} sources={modelSources} />
+  </div>
+</BaseLayout>

@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreibatlas.de/schema/v1/glyph.schema.json",
+  "type": "object",
+  "required": ["model", "character", "unicode", "forms", "metrics", "reference", "connections", "variants", "sources", "verification", "license"],
+  "properties": {
+    "model": { "$ref": "common.schema.json#/$defs/modelId" },
+    "character": { "type": "string", "minLength": 1 },
+    "unicode": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/codePoint" },
+      "uniqueItems": true
+    },
+    "forms": {
+      "type": "object",
+      "required": ["isolated", "contextual"],
+      "properties": {
+        "isolated": {
+          "type": "object",
+          "required": ["status"],
+          "properties": { "status": { "$ref": "common.schema.json#/$defs/verificationStatus" } },
+          "additionalProperties": false
+        },
+        "contextual": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["context", "status"],
+            "properties": {
+              "context": { "type": "string", "minLength": 1 },
+              "status": { "$ref": "common.schema.json#/$defs/verificationStatus" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "metrics": { "$ref": "common.schema.json#/$defs/metrics" },
+    "outline": {
+      "description": "Optional final-form vector outline in SVG user units. This is not stroke-order or movement data.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["path", "view_box", "baseline", "x_height"],
+          "properties": {
+            "path": { "type": "string", "minLength": 1, "pattern": "^[MmZzLlHhVvCcSsQqTtAa0-9eE+., -]+$" },
+            "view_box": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+            "baseline": { "type": "number", "description": "Baseline y-coordinate in SVG user units." },
+            "x_height": { "type": "number", "description": "x-height y-coordinate in SVG user units, above the baseline." },
+            "fill_rule": { "enum": ["nonzero", "evenodd"] }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "reference": {
+      "type": "object",
+      "required": ["font", "glyph_name"],
+      "properties": {
+        "font": { "oneOf": [{ "$ref": "common.schema.json#/$defs/fontId" }, { "type": "null" }] },
+        "glyph_name": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "connections": {
+      "type": "object",
+      "required": ["entry", "exit"],
+      "properties": {
+        "entry": { "$ref": "#/$defs/connection" },
+        "exit": { "$ref": "#/$defs/connection" }
+      },
+      "additionalProperties": false
+    },
+    "variants": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/sourceId" },
+      "uniqueItems": true
+    },
+    "verification": { "$ref": "common.schema.json#/$defs/verificationStatus" },
+    "license": { "$ref": "common.schema.json#/$defs/licenseId" }
+  },
+  "$defs": {
+    "connection": {
+      "type": "object",
+      "required": ["present"],
+      "properties": { "present": { "type": ["boolean", "null"] } },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "verification": { "enum": ["source-backed", "reviewed", "verified"] } }, "required": ["verification"] },
+      "then": { "properties": { "sources": { "minItems": 1 } } }
+    },
+    {
+      "if": { "properties": { "outline": { "type": "object" } }, "required": ["outline"] },
+      "then": { "properties": { "sources": { "minItems": 1 } } }
+    }
+  ],
+  "additionalProperties": false
+}

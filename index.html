@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Schreibatlas MVP – Buchstaben entdecken, vergleichen und Schreibanweisungen dokumentieren." />
+  <title>Schreibatlas – MVP</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Buchwandler · Open handwriting reference</p>
+      <h1>Schreibatlas</h1>
+      <p class="tagline">Buchstaben entdecken · Formen vergleichen · Schreiben dokumentieren</p>
+    </div>
+    <a class="github-link" href="https://github.com/buchwandler/schreibatlas" target="_blank" rel="noreferrer">GitHub</a>
+  </header>
+
+  <main>
+    <section class="notice" aria-label="MVP Hinweis">
+      <strong>MVP / Demo-Daten.</strong>
+      Die Schriftmodelle und Schreibanweisungen in dieser Version sind Platzhalter zur Demonstration der Oberfläche und Datenstruktur. Sie sind noch keine verifizierten schulischen Schreibnormen.
+    </section>
+
+    <nav class="tabs" aria-label="Bereiche">
+      <button class="tab active" data-tab="explorer">Alphabet</button>
+      <button class="tab" data-tab="compare">Vergleich</button>
+      <button class="tab" data-tab="about">Über das MVP</button>
+    </nav>
+
+    <section id="explorer" class="panel active">
+      <div class="toolbar">
+        <label>
+          Schriftmodell
+          <select id="modelSelect"></select>
+        </label>
+        <label>
+          Zeichenart
+          <select id="caseSelect">
+            <option value="lower">Kleinbuchstaben</option>
+            <option value="upper">Großbuchstaben</option>
+            <option value="both">Beide</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="alphabet-layout">
+        <aside>
+          <h2>Alphabet</h2>
+          <div id="alphabetGrid" class="alphabet-grid" aria-label="Alphabet"></div>
+        </aside>
+
+        <article class="letter-card">
+          <div class="letter-card-head">
+            <div>
+              <p id="modelMeta" class="meta"></p>
+              <h2 id="letterTitle">a</h2>
+            </div>
+            <button id="copyLink" class="secondary">Link kopieren</button>
+          </div>
+
+          <div class="guide-stage" aria-label="Buchstabenansicht">
+            <div class="guideline ascender"></div>
+            <div class="guideline xheight"></div>
+            <div class="guideline baseline"></div>
+            <div class="guideline descender"></div>
+            <div id="glyphPreview" class="glyph-preview">a</div>
+          </div>
+
+          <div class="instruction-grid">
+            <section>
+              <h3>Schreibanweisung</h3>
+              <ol id="instructionList"></ol>
+            </section>
+            <section>
+              <h3>Metadaten</h3>
+              <dl id="metadataList" class="metadata-list"></dl>
+            </section>
+          </div>
+
+          <section class="source-box">
+            <h3>Quellen & Prüfstatus</h3>
+            <p id="sourceText"></p>
+          </section>
+        </article>
+      </div>
+    </section>
+
+    <section id="compare" class="panel">
+      <div class="toolbar compare-toolbar">
+        <label>
+          Buchstabe
+          <select id="compareLetter"></select>
+        </label>
+        <label>
+          Ansicht
+          <select id="compareCase">
+            <option value="lower">klein</option>
+            <option value="upper">groß</option>
+          </select>
+        </label>
+      </div>
+      <div id="comparisonGrid" class="comparison-grid"></div>
+    </section>
+
+    <section id="about" class="panel prose">
+      <h2>Was dieses MVP zeigt</h2>
+      <p>Das MVP ist absichtlich ohne Backend und ohne Framework gebaut. Es kann direkt per GitHub Pages ausgeliefert werden. Daten, UI und Lizenzen liegen gemeinsam im Repository.</p>
+      <ul>
+        <li>vollständiges A–Z / a–z Alphabet in der Oberfläche,</li>
+        <li>modellbezogene Buchstabenansicht,</li>
+        <li>Schreibanweisungen pro Buchstabe,</li>
+        <li>Seitenvergleich mehrerer Schriftmodelle,</li>
+        <li>Quellen- und Prüfstatus im Datenmodell,</li>
+        <li>GitHub-Pages-Deployment via GitHub Actions.</li>
+      </ul>
+      <h2>Nächster Datenausbau</h2>
+      <p>Die Demo-Modelle sollten durch echte, belegte Schriftmodelle ersetzt werden. Besonders wichtig sind SVG-Strokepfade, Quellenangaben pro Zeichen, Varianten und ein Review-Status.</p>
+    </section>
+  </main>
+
+  <footer>
+    <span>Schreibatlas · Content: CC BY-SA 4.0 · Software: Apache-2.0</span>
+  </footer>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>

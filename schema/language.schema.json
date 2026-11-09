@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreibatlas.de/schema/v1/language.schema.json",
+  "type": "object",
+  "required": ["id", "name"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/languageId" },
+    "name": { "$ref": "common.schema.json#/$defs/localizedText" },
+    "script": { "type": ["string", "null"], "pattern": "^[A-Z][a-z]{3}$" },
+    "direction": { "type": "string", "enum": ["ltr", "rtl", "vertical"] }
+  },
+  "additionalProperties": false
+}

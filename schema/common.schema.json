@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreibatlas.de/schema/v1/common.schema.json",
+  "$defs": {
+    "localizedText": {
+      "type": "object",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[a-z]{2,3}(?:-[A-Za-z0-9]+)*$": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["draft", "inferred", "source-backed", "reviewed", "verified", "deprecated"]
+    },
+    "licenseId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9.+-]*$"
+    },
+    "countryId": { "type": "string", "pattern": "^[A-Z]{2}$" },
+    "languageId": { "type": "string", "pattern": "^[a-z]{2,3}(?:-[A-Za-z0-9]+)*$" },
+    "modelId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "sourceId": { "type": "string", "pattern": "^src-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "fontId": { "type": "string", "pattern": "^font-[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "codePoint": { "type": "string", "pattern": "^U\\+[0-9A-F]{4,6}$" },
+    "unicodeEntry": { "type": "string", "pattern": "^U\\+[0-9A-F]{4,6}(?:-U\\+[0-9A-F]{4,6})?$" },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "baseline": { "type": ["number", "null"] },
+        "x_height": { "type": ["number", "null"] },
+        "ascender": { "type": ["number", "null"] },
+        "descender": { "type": ["number", "null"] },
+        "cap_height": { "type": ["number", "null"] },
+        "nominal_slant": { "type": ["number", "null"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

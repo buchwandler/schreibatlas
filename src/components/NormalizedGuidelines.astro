@@ -1,0 +1,48 @@
+---
+import { messages, type Locale } from "../lib/i18n";
+
+interface Metrics {
+  baseline?: number | null;
+  x_height?: number | null;
+  cap_height?: number | null;
+  ascender?: number | null;
+  descender?: number | null;
+}
+
+interface Props {
+  lang: Locale;
+  metrics: Metrics | null;
+  label: string;
+}
+
+const { lang, metrics, label } = Astro.props;
+const copy = messages[lang];
+const rows = metrics ? [
+  [copy.baseline, metrics.baseline, "#244f70"],
+  [copy.xHeight, metrics.x_height, "#1c5d99"],
+  [copy.capHeight, metrics.cap_height, "#6a5c90"],
+  [copy.ascender, metrics.ascender, "#8c5835"],
+  [copy.descender, metrics.descender, "#7b4650"],
+].filter((row) => typeof row[1] === "number") : [];
+const baseline = metrics?.baseline;
+const xHeight = metrics?.x_height;
+const available = typeof baseline === "number" && typeof xHeight === "number" && baseline !== xHeight;
+const values = rows.map((row) => row[1] as number);
+const min = Math.min(...values, 0) - 0.2;
+const max = Math.max(...values, 1) + 0.2;
+const yFor = (value: number) => 225 - ((value - min) / (max - min)) * 185;
+---
+{available ? (
+  <svg class="guideline-stage" viewBox="0 0 420 255" role="img" aria-label={label}>
+    <rect x="0" y="0" width="420" height="255" rx="12" fill="#fff" />
+    {rows.map(([name, value, color]) => (
+      <g>
+        <line x1="118" x2="398" y1={yFor(value as number)} y2={yFor(value as number)} stroke={color as string} stroke-width="2" />
+        <text x="12" y={yFor(value as number) - 4} fill="#1d1d1b" font-size="12">{name}</text>
+        <text x="405" y={yFor(value as number) - 4} text-anchor="end" fill="#1d1d1b" font-size="11">{(value as number).toFixed(2)}</text>
+      </g>
+    ))}
+  </svg>
+) : (
+  <p class="empty-state">{copy.noGuidelineMetrics}</p>
+)}

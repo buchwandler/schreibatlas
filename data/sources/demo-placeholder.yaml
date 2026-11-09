@@ -1,0 +1,13 @@
+id: src-demo-placeholder
+kind: project-placeholder
+title: Synthetic Schreibatlas UI examples, not handwriting evidence
+author:
+  - Schreibatlas project
+publisher: Schreibatlas project
+year: null
+locator: null
+url: null
+rights:
+  type: project-original
+  license: CC-BY-SA-4.0
+notes: This record documents only synthetic demonstration records. It is not evidence for handwriting forms, handwriting standards, or stroke order.

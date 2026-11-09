@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreibatlas.de/schema/v1/font.schema.json",
+  "type": "object",
+  "required": ["id", "name", "author", "project_url", "license", "files", "correspondence", "sources"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/fontId" },
+    "name": { "type": "string", "minLength": 1 },
+    "author": { "type": "string", "minLength": 1 },
+    "project_url": { "type": ["string", "null"] },
+    "license": { "$ref": "common.schema.json#/$defs/licenseId" },
+    "files": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "calibration": {
+      "description": "Measured font x-height as a fraction of em, required for shared baseline/x-height rendering.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["x_height_em"],
+          "properties": {
+            "x_height_em": { "type": "number", "exclusiveMinimum": 0 },
+            "ascender_em": { "type": ["number", "null"] },
+            "descender_em": { "type": ["number", "null"] }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "correspondence": {
+      "type": "object",
+      "required": ["model", "degree", "notes"],
+      "properties": {
+        "model": { "oneOf": [{ "$ref": "common.schema.json#/$defs/modelId" }, { "type": "null" }] },
+        "degree": { "type": "string", "enum": ["complete", "partial", "visual-only", "unknown"] },
+        "notes": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/sourceId" },
+      "uniqueItems": true
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "calibration": { "type": "object" } }, "required": ["calibration"] },
+      "then": {
+        "properties": {
+          "correspondence": { "properties": { "model": { "not": { "type": "null" } } } },
+          "sources": { "minItems": 1 }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

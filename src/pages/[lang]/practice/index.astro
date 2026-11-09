@@ -1,0 +1,132 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { messages, type Locale } from "../../../lib/i18n";
+import { withBase } from "../../../lib/routes";
+import { loadContent, locales } from "../../../../tools/content.mjs";
+import type { LanguageRecord, ModelRecord } from "../../../../tools/content.mjs";
+
+export function getStaticPaths() {
+  const content = loadContent();
+  return locales.map((lang) => ({ params: { lang }, props: { models: content.models, languages: content.languages } }));
+}
+
+const { models, languages } = Astro.props as { models: ModelRecord[]; languages: LanguageRecord[] };
+const lang = Astro.params.lang as Locale;
+const copy = messages[lang];
+const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
+const clientCopy = {
+  svgTitle: copy.practiceSvgTitle,
+  promptPrefix: copy.practicePromptPrefix,
+  modelLabel: copy.practiceModel,
+  reference: copy.practiceReference,
+  trace: copy.practiceTrace,
+  blank: copy.practiceBlank,
+  baselineLabel: copy.practiceGuideBaselineLabel,
+  xHeightLabel: copy.practiceGuideXHeightLabel,
+  textPromptNote: copy.practiceTextPromptNote,
+  guideLegend: copy.practiceGuideLegend,
+  loading: copy.practiceLoading,
+  ready: copy.practiceReady,
+  noModels: copy.practiceNoModels,
+  noOutlines: copy.practiceNoOutlines,
+  missingOutlines: copy.practiceMissingOutlines,
+  overflow: copy.practiceOverflow,
+  error: copy.practiceStatusError,
+  provenance: copy.practiceProvenance,
+  copyLinkSuccess: copy.practiceCopyLinkSuccess,
+  copyLinkError: copy.practiceCopyLinkError,
+  sourceCredits: copy.practiceSourceCredits,
+  verification: copy.verification,
+};
+---
+<BaseLayout lang={lang} title={copy.practiceTitle} description={copy.practiceDescription} canonicalPath={`/${lang}/practice/`} section="practice">
+  <div class="content-page practice-page" data-worksheet data-index-url={withBase("data/v1/index.json")} data-messages={JSON.stringify(clientCopy)}>
+    <header class="page-heading">
+      <p class="eyebrow">{copy.practiceNavigation}</p>
+      <h1>{copy.practiceTitle}</h1>
+      <p>{copy.practiceDescription}</p>
+      <p class="comparison-disclaimer">{copy.practiceTextPromptNote} {copy.practiceContextLimit}</p>
+      <p>{copy.practicePrivacy}</p>
+    </header>
+
+    <form class="worksheet-controls" data-worksheet-controls>
+      <label for="worksheet-model">{copy.practiceModel}
+        <select id="worksheet-model" data-model-select>
+          {models.map((model) => {
+            const modelLanguages = model.languages.map((id) => languages.find((entry) => entry.id === id)).filter((entry): entry is LanguageRecord => Boolean(entry));
+            const direction = modelLanguages[0]?.direction ?? "ltr";
+            return <option value={model.id} data-sources={JSON.stringify(model.sources)} data-license={model.license} data-verification={model.status.verification} data-demo={String(model.demo)} data-direction={direction}>{localized(model.name)}</option>;
+          })}
+        </select>
+      </label>
+      <label for="worksheet-text">{copy.practiceText}
+        <input id="worksheet-text" type="text" maxlength="48" data-text-input />
+      </label>
+      <label for="worksheet-paper">{copy.practicePaper}
+        <select id="worksheet-paper" data-paper-select>
+          <option value="A4">{copy.practiceA4}</option>
+          <option value="Letter">{copy.practiceLetter}</option>
+        </select>
+      </label>
+      <label for="worksheet-margin">{copy.practiceMargin}
+        <select id="worksheet-margin" data-margin-select>
+          <option value="8">8</option><option value="12">12</option><option value="16">16</option>
+        </select>
+      </label>
+      <label for="worksheet-row-height">{copy.practiceRowHeight}
+        <select id="worksheet-row-height" data-row-height-select>
+          <option value="16">16</option><option value="18">18</option><option value="20">20</option>
+        </select>
+      </label>
+      <label for="worksheet-guides">{copy.practiceGuides}
+        <select id="worksheet-guides" data-guides-select>
+          <option value="none">{copy.practiceGuidesNone}</option>
+          <option value="baseline">{copy.practiceGuidesBaseline}</option>
+          <option value="baseline-xheight">{copy.practiceGuidesBaselineXheight}</option>
+        </select>
+      </label>
+      <label class="worksheet-check" for="worksheet-reference">
+        <input id="worksheet-reference" type="checkbox" data-reference-checkbox />
+        <span>{copy.practiceReferenceRow}</span>
+      </label>
+      <label for="worksheet-tracing">{copy.practiceTracingRows}
+        <select id="worksheet-tracing" data-tracing-select>
+          <option value="0">0</option><option value="1">1</option><option value="2">2</option>
+        </select>
+      </label>
+      <label for="worksheet-blank">{copy.practiceBlankRows}
+        <select id="worksheet-blank" data-blank-select>
+          <option value="1">1</option><option value="2">2</option>
+        </select>
+      </label>
+      <label for="worksheet-repetitions">{copy.practiceRepetitions}
+        <select id="worksheet-repetitions" data-repetitions-select>
+          <option value="1">1</option><option value="2">2</option>
+        </select>
+      </label>
+      <div class="worksheet-share">
+        <label for="worksheet-link">{copy.practiceSettingsLink}
+          <input id="worksheet-link" type="url" readonly data-settings-link />
+        </label>
+        <button type="button" data-copy-link>{copy.practiceCopyLink}</button>
+      </div>
+      <div class="worksheet-actions">
+        <button type="button" data-export-svg disabled>{copy.practiceExportSvg}</button>
+        <button type="button" data-print-sheet disabled>{copy.practicePrint}</button>
+      </div>
+    </form>
+
+    <p class="worksheet-status" data-worksheet-status role="status" aria-live="polite">{copy.practiceLoading}</p>
+    <section class="worksheet-output" aria-label={copy.practiceTitle}>
+      <div data-worksheet-output></div>
+    </section>
+    <section class="data-section worksheet-provenance" aria-labelledby="worksheet-provenance-title">
+      <h2 id="worksheet-provenance-title">{copy.practiceProvenance}</h2>
+      <ul data-worksheet-provenance></ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import "../../../scripts/worksheet";
+</script>

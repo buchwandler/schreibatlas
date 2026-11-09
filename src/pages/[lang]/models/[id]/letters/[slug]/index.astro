@@ -1,0 +1,168 @@
+---
+import BaseLayout from "../../../../../../layouts/BaseLayout.astro";
+import BreadcrumbJsonLd from "../../../../../../components/BreadcrumbJsonLd.astro";
+import NormalizedGuidelines from "../../../../../../components/NormalizedGuidelines.astro";
+import SourceList from "../../../../../../components/SourceList.astro";
+import VerificationBadge from "../../../../../../components/VerificationBadge.astro";
+import StrokeRenderer from "../../../../../../components/StrokeRenderer.astro";
+import { messages, type Locale } from "../../../../../../lib/i18n";
+import { withBase } from "../../../../../../lib/routes";
+import { localizedGlyphPaths, loadContent } from "../../../../../../../tools/content.mjs";
+import type { Content, FontRecord, GlyphRecord, ModelRecord, SourceRecord, StrokeRecord } from "../../../../../../../tools/content.mjs";
+
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { parseStrokeSvg } from "../../../../../../../tools/stroke-assets.mjs";
+export function getStaticPaths() {
+  const content = loadContent();
+  return localizedGlyphPaths(content.glyphs).map(({ lang, id, slug, glyph }) => ({
+    params: { lang, id, slug },
+    props: { glyph, content },
+  }));
+}
+
+const { glyph, content } = Astro.props as { glyph: GlyphRecord; content: Content };
+const lang = Astro.params.lang as Locale;
+const copy = messages[lang];
+const model = content.models.find((entry) => entry.id === glyph.model) as ModelRecord;
+const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
+const modelName = localized(model.name);
+const slug = Astro.params.slug;
+const title = `${copy.letterTitle} ${glyph.character} · ${modelName}`;
+const stroke = content.strokes.find((entry) => entry.model === glyph.model && entry.character === glyph.character) as StrokeRecord | undefined;
+const strokeDiagramSteps = stroke ? [...stroke.strokes].sort((left, right) => left.order - right.order).map((step) => ({
+  ...step,
+  paths: parseStrokeSvg(readFileSync(resolve(process.cwd(), step.file), "utf8"), step.file).paths,
+})) : [];
+const font = content.fonts.find((entry) => entry.id === glyph.reference.font) as FontRecord | undefined;
+const sourceIds = [...new Set([...glyph.sources, ...(stroke?.sources ?? []), ...(font?.sources ?? [])])];
+const sourceMap = new Map(content.sources.map((source) => [source.id, source]));
+const sources = sourceIds.flatMap((id) => sourceMap.has(id) ? [sourceMap.get(id)!] : []) as SourceRecord[];
+const site = Astro.site ?? new URL("https://schreibatlas.de");
+const breadcrumbItems = [
+  { name: copy.home, url: new URL(`/${lang}/`, site).href },
+  { name: copy.exploreNavigation, url: new URL(`/${lang}/explore/`, site).href },
+  { name: modelName, url: new URL(`/${lang}/models/${model.id}/`, site).href },
+  { name: copy.repertoire, url: new URL(`/${lang}/models/${model.id}/letters/`, site).href },
+  { name: glyph.character, url: new URL(`/${lang}/models/${model.id}/letters/${slug}/`, site).href },
+];
+const connectionText = (present: boolean | null) => present === null ? copy.unknown : present ? copy.present : copy.absent;
+const directionText: Record<string, string> = { forward: copy.forward, reverse: copy.reverse, unknown: copy.unknown };
+---
+<BaseLayout lang={lang} title={title} description={`${copy.letterTitle} ${glyph.character} in ${modelName}.`} canonicalPath={`/${lang}/models/${model.id}/letters/${slug}/`}>
+  <BreadcrumbJsonLd items={breadcrumbItems} />
+  <div class="content-page">
+    <nav class="breadcrumbs" aria-label={copy.breadcrumbNavigation}>
+      <a href={withBase(`${lang}/`)}>{copy.home}</a>
+      <span aria-hidden="true">/</span>
+      <a href={withBase(`${lang}/explore/`)}>{copy.exploreNavigation}</a>
+      <span aria-hidden="true">/</span>
+      <a href={withBase(`${lang}/models/${model.id}/`)}>{modelName}</a>
+      <span aria-hidden="true">/</span>
+      <a href={withBase(`${lang}/models/${model.id}/letters/`)}>{copy.repertoire}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page"><code>{glyph.unicode.join(", ")}</code></span>
+    </nav>
+
+    <header class="page-heading letter-heading">
+      <p class="eyebrow">{copy.letterTitle} · {modelName}</p>
+      <h1>{title}</h1>
+      <VerificationBadge lang={lang} status={glyph.verification} />
+      {model.demo && <p class="demo-marker">{copy.demoTitle}</p>}
+    </header>
+
+    <section class="data-section glyph-record" aria-labelledby="character-title">
+      <h2 id="character-title">{copy.character}</h2>
+      <p class="character-display" aria-label={`${copy.character}: ${glyph.character}`}>{glyph.character}</p>
+      <p>{copy.unicodeOnly}</p>
+      <dl class="metadata-list">
+        <dt>{copy.codePoints}</dt><dd><code>{glyph.unicode.join(", ")}</code></dd>
+        <dt>{copy.licenseAttribution}</dt><dd>{glyph.license}</dd>
+      </dl>
+    </section>
+
+    <section class="data-section" aria-labelledby="guidelines-title">
+      <h2 id="guidelines-title">{copy.normalizedGuidelines}</h2>
+      <NormalizedGuidelines lang={lang} metrics={glyph.metrics} label={`${copy.normalizedGuidelines}: ${glyph.character}`} />
+    </section>
+
+    <section class="data-section" aria-labelledby="forms-title">
+      <h2 id="forms-title">{copy.glyphForms}</h2>
+      <div class="detail-grid">
+        <article class="detail-card">
+          <h3>{copy.isolatedForm}</h3>
+          <VerificationBadge lang={lang} status={glyph.forms.isolated.status} />
+        </article>
+        <article class="detail-card">
+          <h3>{copy.contextualForms}</h3>
+          {glyph.forms.contextual.length > 0 ? (
+            <ul>{glyph.forms.contextual.map((form) => <li>{form.context} · {messages[lang].verification[form.status].label}</li>)}</ul>
+          ) : (
+            <p class="empty-state">{copy.noContextualForms}</p>
+          )}
+        </article>
+      </div>
+    </section>
+
+    <section class="data-section" aria-labelledby="connections-title">
+      <h2 id="connections-title">{copy.connections}</h2>
+      <dl class="metadata-list">
+        <dt>{copy.entryConnection}</dt><dd>{connectionText(glyph.connections.entry.present)}</dd>
+        <dt>{copy.exitConnection}</dt><dd>{connectionText(glyph.connections.exit.present)}</dd>
+      </dl>
+    </section>
+
+    <section class="data-section" aria-labelledby="variants-title">
+      <h2 id="variants-title">{copy.variants}</h2>
+      {glyph.variants.length > 0 ? <ul>{glyph.variants.map((variant) => <li>{variant}</li>)}</ul> : <p class="empty-state">{copy.noVariants}</p>}
+    </section>
+
+    <section class="data-section" aria-labelledby="strokes-title">
+      <h2 id="strokes-title">{copy.strokeInstructions}</h2>
+      {stroke ? (
+        <>
+          <VerificationBadge lang={lang} status={stroke.verification} />
+          <StrokeRenderer id={`stroke-${model.id}-${slug}`} steps={strokeDiagramSteps} copy={copy} />
+          <ol class="stroke-steps">
+            {stroke.strokes.map((step) => (
+              <li>
+                <strong>{copy.strokeNumber.replace("{number}", String(step.order))}</strong>
+                <span>{copy.direction}: {step.direction ? directionText[step.direction] ?? step.direction : copy.unknown}</span>
+                <span>{copy.penContact}: {step.pen_down ? copy.penDown : copy.penUp}</span>
+                <span>{copy.start}: [{step.start.join(", ")}] · {copy.end}: [{step.end.join(", ")}]</span>
+              </li>
+            ))}
+          </ol>
+          <p>{copy.licenseAttribution}: {stroke.license}</p>
+        </>
+      ) : (
+        <p class="empty-state">{copy.noStrokeInstructions}</p>
+      )}
+    </section>
+
+    <section class="data-section" aria-labelledby="font-title">
+      <h2 id="font-title">{copy.fontInformation}</h2>
+      {font ? (
+        <article class="font-card">
+          <h3>{font.name}</h3>
+          <p>{font.author}</p>
+          <dl class="metadata-list">
+            <dt>{copy.licenseAttribution}</dt><dd>{font.license}</dd>
+            <dt>{copy.fontCorrespondence}</dt><dd>{copy.fontDegree[font.correspondence.degree]}</dd>
+            <dt>{copy.character}</dt><dd>{glyph.reference.glyph_name ?? copy.notRecorded}</dd>
+          </dl>
+          {font.correspondence.notes && <p>{font.correspondence.notes}</p>}
+          {font.project_url && /^https?:\/\//i.test(font.project_url) && <a href={font.project_url} rel="external">{font.name}</a>}
+        </article>
+      ) : (
+        <p class="empty-state">{copy.noFonts}</p>
+      )}
+    </section>
+
+    <SourceList lang={lang} sources={sources} />
+    <p class="page-return-links">
+      <a class="text-link" href={withBase(`${lang}/models/${model.id}/`)}>{modelName}</a>
+      <a class="text-link" href={withBase(`${lang}/models/${model.id}/letters/`)}>{copy.viewRepertoire}</a>
+    </p>
+  </div>
+</BaseLayout>

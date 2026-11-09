@@ -1,0 +1,23 @@
+id: demo-classic
+name:
+  de: Demo Kursiv
+  en: Demo Cursive
+country: null
+languages: []
+classification: null
+period:
+  from: null
+  to: null
+status:
+  use: unknown
+  verification: draft
+character_repertoire: []
+character_repertoire_complete: false
+reference_fonts: []
+sources:
+  - src-demo-placeholder
+license: CC-BY-SA-4.0
+demo: true
+description:
+  de: Synthetischer UI-Platzhalter ohne belegte handschriftliche Formen.
+  en: Synthetic UI placeholder with no source-backed handwriting forms.
