@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 const markerFormat = "schreibatlas-fiducial";
 const maxMarkerScanPixels = 2_000_000;
 const shapeGridSize = 20;

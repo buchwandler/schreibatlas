@@ -29,7 +29,8 @@
             "required": ["context", "status"],
             "properties": {
               "context": { "type": "string", "minLength": 1 },
-              "status": { "$ref": "common.schema.json#/$defs/verificationStatus" }
+              "status": { "$ref": "common.schema.json#/$defs/verificationStatus" },
+              "outline": { "$ref": "#/properties/outline" }
             },
             "additionalProperties": false
           }

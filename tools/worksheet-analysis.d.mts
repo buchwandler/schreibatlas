@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import type { ImagePoint } from "./photo-analysis.mjs";
 
 export interface WorksheetMarkerResult {

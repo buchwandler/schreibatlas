@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: Apache-2.0
+name: Dataset release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Stable dataset version in X.Y.Z form
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run validate
+      - run: npm run build:data
+      - name: Package versioned dataset
+        run: node tools/package-data-release.mjs "$DATA_VERSION" release-assets
+        env:
+          DATA_VERSION: ${{ inputs.version }}
+      - name: Publish dataset release
+        run: |
+          gh release create "data-v${DATA_VERSION}" \
+            "release-assets/schreibatlas-data-v${DATA_VERSION}.zip" \
+            "release-assets/schreibatlas-data-v${DATA_VERSION}.zip.sha256" \
+            --target "$GITHUB_SHA" \
+            --title "Schreibatlas data ${DATA_VERSION}" \
+            --notes "Partial research corpus. Review the included dataset manifest and per-record scope, provenance, correspondence, and license limits. This release does not claim complete handwriting repertoires or movement evidence."
+        env:
+          DATA_VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ github.token }}

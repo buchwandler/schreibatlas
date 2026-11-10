@@ -1,2 +1,3 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
 kind: documentation-only
 notes: Canonical records are stored under data/countries, data/languages, data/models, data/glyphs, data/sources, and data/fonts. This root file is not a dataset record.

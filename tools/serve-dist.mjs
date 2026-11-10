@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";

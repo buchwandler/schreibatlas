@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { fontSizeForXHeight, sharedViewBox } from "../../tools/geometry.mjs";
 import type { Metrics } from "../../tools/content.mjs";
 import type { ShapedRun } from "./text-shaper";
@@ -21,6 +22,7 @@ export interface NormalizedTextStageOptions {
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
+const lineSpacing = 1.5;
 function svgElement(name: string, attributes: Record<string, string> = {}) {
   const element = document.createElementNS(svgNamespace, name);
   for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
@@ -35,16 +37,21 @@ function textBounds(layer: NormalizedTextLayer) {
   context.font = `${fontSize}px "${layer.run.fontFamily}"`;
   context.direction = layer.run.direction ?? "ltr";
   context.textAlign = "start";
-  const metrics = context.measureText(layer.run.text);
-  const left = Number.isFinite(metrics.actualBoundingBoxLeft) ? metrics.actualBoundingBoxLeft : 0;
-  const right = Number.isFinite(metrics.actualBoundingBoxRight) ? metrics.actualBoundingBoxRight : metrics.width;
-  const ascent = Number.isFinite(metrics.actualBoundingBoxAscent) ? metrics.actualBoundingBoxAscent : 1;
-  const descent = Number.isFinite(metrics.actualBoundingBoxDescent) ? metrics.actualBoundingBoxDescent : 0;
+  const lines = layer.run.text.split(/\r\n?|\n/);
+  const bounds = lines.map((line, index) => {
+    const metrics = context.measureText(line);
+    const left = Number.isFinite(metrics.actualBoundingBoxLeft) ? metrics.actualBoundingBoxLeft : 0;
+    const right = Number.isFinite(metrics.actualBoundingBoxRight) ? metrics.actualBoundingBoxRight : metrics.width;
+    const ascent = Number.isFinite(metrics.actualBoundingBoxAscent) ? metrics.actualBoundingBoxAscent : 1;
+    const descent = Number.isFinite(metrics.actualBoundingBoxDescent) ? metrics.actualBoundingBoxDescent : 0;
+    const offset = index * lineSpacing;
+    return { minX: -left, maxX: right, minY: -descent - offset, maxY: ascent - offset };
+  });
   return {
-    minX: -left,
-    maxX: right,
-    minY: -descent,
-    maxY: ascent,
+    minX: Math.min(...bounds.map(({ minX }) => minX)),
+    maxX: Math.max(...bounds.map(({ maxX }) => maxX)),
+    minY: Math.min(...bounds.map(({ minY }) => minY)),
+    maxY: Math.max(...bounds.map(({ maxY }) => maxY)),
   };
 }
 
@@ -71,20 +78,23 @@ function makeFigure(layers: NormalizedTextLayer[], index: number, viewBox: Retur
   for (let layerIndex = first; layerIndex < last; layerIndex += 1) {
     const layer = layers[layerIndex];
     const fontSize = fontSizeForXHeight(layer.xHeightEm);
-    const text = svgElement("text", {
-      x: "0",
-      y: "0",
-      "font-family": layer.run.fontFamily,
-      "font-size": String(fontSize),
-      "font-kerning": "normal",
-      direction: layer.run.direction ?? "ltr",
-      "text-anchor": layer.run.direction === "rtl" ? "end" : "start",
-      "fill": layer.color,
-      "fill-opacity": options.mode === "overlay" && layerIndex === 1 ? String(options.opacity) : "1",
-      lang: layer.run.language ?? "",
+    layer.run.text.split(/\r\n?|\n/).forEach((line, lineIndex) => {
+      const text = svgElement("text", {
+        x: "0",
+        y: String(-lineIndex * lineSpacing),
+        "data-text-line": String(lineIndex),
+        "font-family": layer.run.fontFamily,
+        "font-size": String(fontSize),
+        "font-kerning": "normal",
+        direction: layer.run.direction ?? "ltr",
+        "text-anchor": layer.run.direction === "rtl" ? "end" : "start",
+        "fill": layer.color,
+        "fill-opacity": options.mode === "overlay" && layerIndex === 1 ? String(options.opacity) : "1",
+        lang: layer.run.language ?? "",
+      });
+      text.textContent = line;
+      world.append(text);
     });
-    text.textContent = layer.run.text;
-    world.append(text);
   }
   svg.append(world);
   figure.append(svg);

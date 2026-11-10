@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -26,11 +27,19 @@ test("versioned JSON exports are deterministic and respect the deployment base p
   assert.equal(index.schemaVersion, 1);
   assert.equal(index.datasetVersion, "0.1.0");
   assert.equal(index.models, "/schreibatlas/data/v1/models.json");
+  assert.equal(index.countries, "/schreibatlas/data/v1/countries.json");
+  assert.equal(index.languages, "/schreibatlas/data/v1/languages.json");
   assert.equal(index.sources, "/schreibatlas/data/v1/sources.json");
   assert.equal(index.fonts, "/schreibatlas/data/v1/fonts.json");
   assert.equal(index.glyphs, "/schreibatlas/data/v1/glyphs.json");
   assert.equal(index.strokes, "/schreibatlas/data/v1/strokes.json");
   assert.ok(existsSync(join(firstOutput, "models/demo-round.json")));
+  assert.ok(first.files.includes("countries.json"));
+  assert.ok(first.files.includes("languages.json"));
+  const countries = JSON.parse(readFileSync(join(firstOutput, "countries.json"), "utf8"));
+  const languages = JSON.parse(readFileSync(join(firstOutput, "languages.json"), "utf8"));
+  assert.deepEqual(countries.map(({ id }) => id), ["DE"]);
+  assert.deepEqual(languages.map(({ id }) => id), ["de"]);
 
   const modelIndex = JSON.parse(readFileSync(join(firstOutput, "models.json"), "utf8"));
   assert.equal(modelIndex.find((model) => model.id === "demo-round").url, "/schreibatlas/data/v1/models/demo-round.json");
@@ -42,6 +51,8 @@ test("glyph exports use Unicode code-point route slugs", (t) => {
   const root = join(temporary, "project");
   cpSync(join(projectRoot, "schema"), join(root, "schema"), { recursive: true });
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
+  cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
+  cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
 
   const modelPath = join(root, "data/models/demo-round/model.yaml");
@@ -69,7 +80,7 @@ test("glyph exports use Unicode code-point route slugs", (t) => {
   assert.ok(result.files.includes("glyphs/demo-round/u00df.json"));
   assert.equal(JSON.parse(readFileSync(join(output, "glyphs/demo-round/u00df.json"), "utf8")).character, "ß");
   const glyphIndex = JSON.parse(readFileSync(join(output, "glyphs.json"), "utf8"));
-  assert.deepEqual(glyphIndex, [{
+  assert.deepEqual(glyphIndex.filter(({ model }) => model === "demo-round"), [{
     model: "demo-round",
     character: "ß",
     unicode: ["U+00DF"],
@@ -85,6 +96,8 @@ test("font assets are copied into their local versioned API endpoint", (t) => {
   const root = join(temporary, "project");
   cpSync(join(projectRoot, "schema"), join(root, "schema"), { recursive: true });
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
+  cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
+  cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
   const modelPath = join(root, "data/models/demo-round/model.yaml");
   const model = parse(readFileSync(modelPath, "utf8"));
@@ -113,6 +126,11 @@ test("font assets are copied into their local versioned API endpoint", (t) => {
   assert.equal(fonts[0].file_urls[0], "/schreibatlas/data/v1/assets/fonts/font-fixture/1-reference.woff2");
   assert.deepEqual(readFileSync(join(output, "assets/fonts/font-fixture/1-reference.woff2")), asset);
   assert.ok(result.files.includes("assets/fonts/font-fixture/1-reference.woff2"));
+  const volksschrift = fonts.find(({ id }) => id === "font-volksschrift");
+  const licenseUrl = "/schreibatlas/data/v1/assets/fonts/font-volksschrift/OFL-1.1-Volksschrift.txt";
+  assert.equal(volksschrift.license_file_url, licenseUrl);
+  assert.equal(readFileSync(join(output, "assets/fonts/font-volksschrift/OFL-1.1-Volksschrift.txt"), "utf8"), readFileSync(join(root, "licenses/OFL-1.1-Volksschrift.txt"), "utf8"));
+  assert.ok(result.files.includes("assets/fonts/font-volksschrift/OFL-1.1-Volksschrift.txt"));
 });
 
 test("generated API links must resolve to files under their versioned endpoint", () => {
@@ -145,6 +163,8 @@ test("stroke records and normalized SVG assets are exported under local Unicode 
   const root = join(temporary, "project");
   cpSync(join(projectRoot, "schema"), join(root, "schema"), { recursive: true });
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
+  cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
+  cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
   const modelPath = join(root, "data/models/demo-round/model.yaml");
   const model = parse(readFileSync(modelPath, "utf8"));

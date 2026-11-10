@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 document.addEventListener("DOMContentLoaded", () => {
   const notice = document.querySelector(".notice");
   if (notice) {

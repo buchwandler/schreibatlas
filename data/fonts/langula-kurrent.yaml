@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: font-langula-kurrent
+name: Langula Kurrent
+author: "Langula, based on Peter Wiegel's Greifswalder Deutsche Schrift"
+project_url: "https://langula.app/en/old-german-script/fonts/"
+license: OFL-1.1
+files:
+  - "assets/fonts/langula-kurrent/LangulaKurrent-Regular.ttf"
+license_file: licenses/OFL-1.1-Langula-Kurrent.txt
+calibration:
+  x_height_em: 0.400390625
+  x_height_method: "Lowercase x glyph bounding box yMax 820 / unitsPerEm 2048. The bundled OS/2.sxHeight is 1315/2048 and does not match this glyph measurement, so it is not used."
+correspondence:
+  model: de-kurrent-loth-1866
+  degree: visual-only
+  notes: "Modern font based on Greifswalder Deutsche Schrift (2009/2010). No direct correspondence to Loth's 1866 chart is established; this is a visual comparison aid only, not an exact reconstruction or evidence of historical handwriting movement."
+sources:
+  - src-langula-kurrent-font

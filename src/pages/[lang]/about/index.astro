@@ -1,0 +1,93 @@
+---
+// SPDX-License-Identifier: Apache-2.0
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import BreadcrumbJsonLd from "../../../components/BreadcrumbJsonLd.astro";
+import SourceList from "../../../components/SourceList.astro";
+import { messages, type Locale } from "../../../lib/i18n";
+import { withBase } from "../../../lib/routes";
+import { loadContent, locales } from "../../../../tools/content.mjs";
+import type { Content, FontRecord } from "../../../../tools/content.mjs";
+
+export function getStaticPaths() {
+  const content = loadContent();
+  return locales.map((lang) => ({ params: { lang }, props: { lang, content } }));
+}
+
+const { lang, content } = Astro.props as { lang: Locale; content: Content };
+const copy = messages[lang];
+const sources = [...content.sources].sort((left, right) => left.id.localeCompare(right.id));
+const fonts = [...content.fonts].sort((left, right) => left.id.localeCompare(right.id));
+const fontLicenseUrl = (font: FontRecord) => {
+  if (font.license_file_url) return font.license_file_url;
+  const filename = font.license_file?.split("/").at(-1);
+  return filename ? withBase(`data/v1/assets/fonts/${font.id}/${filename}`) : null;
+};
+const site = Astro.site ?? new URL("https://schreibatlas.de");
+const breadcrumbItems = [
+  { name: copy.home, url: new URL(`/${lang}/`, site).href },
+  { name: copy.licensingAbout, url: new URL(`/${lang}/about/`, site).href },
+];
+---
+<BaseLayout lang={lang} title={copy.aboutTitle} description={copy.aboutDescription} canonicalPath={`/${lang}/about/`}>
+  <BreadcrumbJsonLd items={breadcrumbItems} />
+  <div class="content-page">
+    <nav class="breadcrumbs" aria-label={copy.breadcrumbNavigation}>
+      <a href={withBase(`${lang}/`)}>{copy.home}</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">{copy.licensingAbout}</span>
+    </nav>
+    <header class="page-heading">
+      <h1>{copy.aboutTitle}</h1>
+      <p>{copy.aboutIntro}</p>
+    </header>
+
+    <section class="data-section" aria-labelledby="software-license-title">
+      <h2 id="software-license-title">{copy.softwareLicense}</h2>
+      <p>{copy.softwareLicenseDescription}</p>
+      <p><a href="https://www.apache.org/licenses/LICENSE-2.0" rel="external">Apache License 2.0</a></p>
+    </section>
+
+    <section class="data-section" aria-labelledby="content-license-title">
+      <h2 id="content-license-title">{copy.contentLicense}</h2>
+      <p>{copy.contentLicenseDescription}</p>
+      <p><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="external">Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)</a></p>
+    </section>
+
+    <section class="data-section" aria-labelledby="third-party-title">
+      <h2 id="third-party-title">{copy.thirdPartyLicenses}</h2>
+      <p>{copy.thirdPartyLicensesDescription}</p>
+      {fonts.length > 0 ? (
+        <div class="font-list">
+          {fonts.map((font) => (
+            <article class="font-card">
+              <h3>{font.name}</h3>
+              <p>{font.author}</p>
+              <dl class="metadata-list">
+                <dt>{copy.licenseAttribution}</dt><dd>{font.license}</dd>
+                <dt>{copy.fontCorrespondence}</dt><dd>{copy.fontDegree[font.correspondence.degree]}</dd>
+                <dt>{copy.modelDetails}</dt><dd><code>{font.correspondence.model ?? copy.notRecorded}</code></dd>
+              </dl>
+              {font.correspondence.notes && <p>{font.correspondence.notes}</p>}
+              {font.license_file && fontLicenseUrl(font) && <p><strong>{copy.licenseFile}:</strong> <a href={fontLicenseUrl(font)}>{font.license_file}</a></p>}
+              {font.project_url && /^https?:\/\//i.test(font.project_url) && <p><a href={font.project_url} rel="external">{font.name}</a></p>}
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p class="empty-state">{copy.noRegisteredFonts}</p>
+      )}
+    </section>
+
+    <section class="data-section" aria-labelledby="public-data-title">
+      <h2 id="public-data-title">{copy.publicData}</h2>
+      <p>{copy.publicDataDescription}</p>
+      <ul class="api-link-list">
+        <li><a href={withBase("data/v1/index.json")}>{copy.apiIndex}</a></li>
+        <li><a href={withBase("data/v1/countries.json")}>{copy.countryData}</a></li>
+        <li><a href={withBase("data/v1/languages.json")}>{copy.languageData}</a></li>
+      </ul>
+    </section>
+
+    <SourceList lang={lang} sources={sources} />
+  </div>
+</BaseLayout>

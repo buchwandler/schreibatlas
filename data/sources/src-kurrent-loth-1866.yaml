@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: src-kurrent-loth-1866
+kind: publication
+title: "Deutsche Kurrentschrift chart derived from Der Damen-Briefsteller"
+author:
+  - Andreas Praefcke
+  - Martin Kozák
+publisher: null
+year: 2010
+locator: null
+url: "https://commons.wikimedia.org/wiki/File:Deutsche_Kurrentschrift.svg"
+rights:
+  type: citation-only
+  license: null
+notes: "Commons identifies this 2010 vector chart as a retouched derivative of the alphabet plate in Loth's 1866 Der Damen-Briefsteller. It shows A-Z, a-z, lower-case umlauts, long s, ß, and several ligatures; uppercase umlauts are represented as Ae, Oe, and Ue. This record is citation-only and does not claim a redistribution license for the derivative chart."

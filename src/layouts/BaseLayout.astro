@@ -1,4 +1,5 @@
 ---
+// SPDX-License-Identifier: Apache-2.0
 import "../../styles.css";
 import { messages, type Locale } from "../lib/i18n";
 
@@ -22,6 +23,7 @@ const compareUrl = `${baseUrl}${lang}/compare/letters/`;
 const practiceUrl = `${baseUrl}${lang}/practice/`;
 const writingUrl = `${baseUrl}${lang}/write/`;
 const analysisUrl = `${baseUrl}${lang}/analyze/`;
+const aboutUrl = `${baseUrl}${lang}/about/`;
 const localePath = canonicalPath.startsWith(`/${lang}/`) ? canonicalPath.slice(lang.length + 1) : "/";
 const alternateUrl = `${baseUrl}${otherLocale}${localePath}`;
 const site = Astro.site ?? new URL("https://schreibatlas.de");
@@ -44,7 +46,7 @@ const englishUrl = new URL(`/en${localePath}`, site).href;
   <body>
     <a class="skip-link" href="#main">{copy.skipToContent}</a>
     <header class="site-header">
-      <a class="brand" href={homeUrl} aria-label={`Schreibatlas. ${copy.home}`}>
+      <a class="brand" href={homeUrl}>
         <span class="brand-name">Schreibatlas</span>
         <span class="brand-description">{copy.project}</span>
       </a>
@@ -67,6 +69,7 @@ const englishUrl = new URL(`/en${localePath}`, site).href;
     </main>
     <footer class="site-footer">
       <span>{copy.footerLicense}</span>
+      <a href={aboutUrl}>{copy.licensingAbout}</a>
     </footer>
     <script>
       import "../scripts/offline";

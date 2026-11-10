@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { glyphRouteSlug } from "./unicode.mjs";
 import { validateDataset } from "./validate-data.mjs";
 

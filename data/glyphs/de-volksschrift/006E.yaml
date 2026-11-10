@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+model: de-volksschrift
+character: n
+unicode: [U+006E]
+forms:
+  isolated:
+    status: source-backed
+  contextual: []
+metrics:
+  baseline: null
+  x_height: null
+  ascender: null
+  descender: null
+outline:
+  path: "M0 -201Q-14 -201 -23 -209.5Q-32 -218 -32 -232Q-32 -236 -30.5 -241Q-29 -246 -25 -250L-26 -248L46 -364L45 -363Q53 -379 71 -379Q83 -379 92 -369Q101 -359 101 -348V-107Q124 -142 145 -177.5Q166 -213 189 -248L261 -364Q271 -379 287 -379Q299 -379 308 -369Q317 -359 317 -348V-107Q340 -142 361 -177.5Q382 -213 405 -248Q410 -255 415.5 -259Q421 -263 430 -263Q443 -263 452 -253Q461 -243 461 -232Q461 -229 460 -224.5Q459 -220 457 -216L314 15L315 14Q311 21 302.5 26Q294 31 287 31Q274 31 265 21.5Q256 12 256 0V-239Q236 -206 215 -172Q194 -138 173 -106L98 15L99 14Q95 21 87 26Q79 31 71 31Q58 31 49 21.5Q40 12 40 0V-240Q35 -232 32 -227.5Q29 -223 25 -216L26 -217Q22 -209 15 -205Q8 -201 0 -201Z"
+  view_box: [-32, -379, 493, 410]
+  baseline: 0
+  x_height: -368
+reference:
+  font: font-volksschrift
+  glyph_name: n
+connections:
+  entry:
+    present: null
+  exit:
+    present: null
+variants: []
+sources: [src-volksschrift-font]
+verification: source-backed
+license: OFL-1.1

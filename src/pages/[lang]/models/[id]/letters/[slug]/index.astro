@@ -1,7 +1,9 @@
 ---
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../../../../layouts/BaseLayout.astro";
 import BreadcrumbJsonLd from "../../../../../../components/BreadcrumbJsonLd.astro";
 import NormalizedGuidelines from "../../../../../../components/NormalizedGuidelines.astro";
+import GlyphOutline from "../../../../../../components/GlyphOutline.astro";
 import SourceList from "../../../../../../components/SourceList.astro";
 import VerificationBadge from "../../../../../../components/VerificationBadge.astro";
 import StrokeRenderer from "../../../../../../components/StrokeRenderer.astro";
@@ -35,9 +37,11 @@ const strokeDiagramSteps = stroke ? [...stroke.strokes].sort((left, right) => le
   paths: parseStrokeSvg(readFileSync(resolve(process.cwd(), step.file), "utf8"), step.file).paths,
 })) : [];
 const font = content.fonts.find((entry) => entry.id === glyph.reference.font) as FontRecord | undefined;
-const sourceIds = [...new Set([...glyph.sources, ...(stroke?.sources ?? []), ...(font?.sources ?? [])])];
+const sourceIds = [...new Set([...model.sources, ...glyph.sources, ...(stroke?.sources ?? []), ...(font?.sources ?? [])])];
 const sourceMap = new Map(content.sources.map((source) => [source.id, source]));
 const sources = sourceIds.flatMap((id) => sourceMap.has(id) ? [sourceMap.get(id)!] : []) as SourceRecord[];
+const fontLicenseFilename = font?.license_file?.split("/").at(-1);
+const fontLicenseUrl = font?.license_file_url ?? (font && fontLicenseFilename ? withBase(`data/v1/assets/fonts/${font.id}/${fontLicenseFilename}`) : null);
 const site = Astro.site ?? new URL("https://schreibatlas.de");
 const breadcrumbItems = [
   { name: copy.home, url: new URL(`/${lang}/`, site).href },
@@ -75,6 +79,7 @@ const directionText: Record<string, string> = { forward: copy.forward, reverse: 
       <h2 id="character-title">{copy.character}</h2>
       <p class="character-display" aria-label={`${copy.character}: ${glyph.character}`}>{glyph.character}</p>
       <p>{copy.unicodeOnly}</p>
+      <GlyphOutline lang={lang} outline={glyph.outline} label={`${copy.letterTitle} ${glyph.character} · ${modelName}`} id={`letter-${model.id}-${slug}`} />
       <dl class="metadata-list">
         <dt>{copy.codePoints}</dt><dd><code>{glyph.unicode.join(", ")}</code></dd>
         <dt>{copy.licenseAttribution}</dt><dd>{glyph.license}</dd>
@@ -96,7 +101,10 @@ const directionText: Record<string, string> = { forward: copy.forward, reverse: 
         <article class="detail-card">
           <h3>{copy.contextualForms}</h3>
           {glyph.forms.contextual.length > 0 ? (
-            <ul>{glyph.forms.contextual.map((form) => <li>{form.context} · {messages[lang].verification[form.status].label}</li>)}</ul>
+            <ul>{glyph.forms.contextual.map((form, index) => <li>
+              <p>{form.context} · {messages[lang].verification[form.status].label}</p>
+              {form.outline ? <GlyphOutline lang={lang} outline={form.outline} label={`${copy.contextualForms} ${form.context} · ${glyph.character}`} id={`context-${model.id}-${slug}-${index}`} /> : <p class="empty-state">{copy.noVectorOutline}</p>}
+            </li>)}</ul>
           ) : (
             <p class="empty-state">{copy.noContextualForms}</p>
           )}
@@ -151,6 +159,7 @@ const directionText: Record<string, string> = { forward: copy.forward, reverse: 
             <dt>{copy.fontCorrespondence}</dt><dd>{copy.fontDegree[font.correspondence.degree]}</dd>
             <dt>{copy.character}</dt><dd>{glyph.reference.glyph_name ?? copy.notRecorded}</dd>
           </dl>
+          {font.license_file && fontLicenseUrl && <p><strong>{copy.licenseFile}:</strong> <a href={fontLicenseUrl}>{font.license_file}</a></p>}
           {font.correspondence.notes && <p>{font.correspondence.notes}</p>}
           {font.project_url && /^https?:\/\//i.test(font.project_url) && <a href={font.project_url} rel="external">{font.name}</a>}
         </article>

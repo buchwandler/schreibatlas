@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: de-kurrent-loth-1866
+name:
+  de: Kurrentschrift nach Loth (1866)
+  en: Kurrent script after Loth (1866)
+country: DE
+languages:
+  - de
+classification: null
+period:
+  from: 1866
+  to: 1866
+status:
+  use: historical
+  verification: source-backed
+character_repertoire:
+  - U+0041-U+005A
+  - U+0061-U+007A
+  - U+00DF
+  - U+00E4
+  - U+00F6
+  - U+00FC
+  - U+017F
+character_repertoire_complete: false
+reference_fonts:
+  - font-langula-kurrent
+sources:
+  - src-kurrent-loth-1866
+  - src-loth-book-1866
+license: CC-BY-SA-4.0
+demo: false
+description:
+  de: "Modellbeschreibung nach der Alphabettafel zu Loths Der Damen-Briefsteller von 1866. Großumlaute erscheinen dort als Ae, Oe und Ue; Ligaturen sind keine einzelnen Unicode-Glyphen."
+  en: "Model record based on the alphabet chart for Loth's 1866 Der Damen-Briefsteller. Capital umlauts are shown as Ae, Oe, and Ue; ligatures are not individual Unicode glyphs."

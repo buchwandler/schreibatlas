@@ -1,4 +1,5 @@
 ---
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import NormalizedGuidelines from "../../../../components/NormalizedGuidelines.astro";
 import BreadcrumbJsonLd from "../../../../components/BreadcrumbJsonLd.astro";
@@ -23,10 +24,11 @@ const copy = messages[lang];
 const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
 const country = content.countries.find((entry) => entry.id === model.country);
 const languageNames = model.languages.map((id) => content.languages.find((entry) => entry.id === id)).filter((entry) => entry !== undefined).map((entry) => localized(entry.name));
-const modelSources = model.sources.flatMap((id) => content.sources.filter((source) => source.id === id)) as SourceRecord[];
 const modelFonts = model.reference_fonts.flatMap((id) => content.fonts.filter((font) => font.id === id)) as FontRecord[];
 const glyphs = content.glyphs.filter((glyph) => glyph.model === model.id);
 const glyphRoutes = localizedGlyphPaths(glyphs).filter((route) => route.lang === lang);
+const sourceIds = [...new Set([...model.sources, ...glyphs.flatMap((glyph) => glyph.sources), ...modelFonts.flatMap((font) => font.sources)])];
+const modelSources = sourceIds.flatMap((id) => content.sources.filter((source) => source.id === id)) as SourceRecord[];
 const useLabels: Record<string, string> = {
   current: copy.current,
   historical: copy.historical,
@@ -40,6 +42,11 @@ const periodLabel = !model.period || (model.period.from === null && model.period
   : `${model.period.from ?? "…"}–${model.period.to ?? "…"}`;
 const pageTitle = localized(model.name);
 const pageDescription = localized(model.description);
+const fontLicenseUrl = (font: FontRecord) => {
+  if (font.license_file_url) return font.license_file_url;
+  const filename = font.license_file?.split("/").at(-1);
+  return filename ? withBase(`data/v1/assets/fonts/${font.id}/${filename}`) : null;
+};
 const site = Astro.site ?? new URL("https://schreibatlas.de");
 const breadcrumbItems = [
   { name: copy.home, url: new URL(`/${lang}/`, site).href },
@@ -96,7 +103,14 @@ const breadcrumbItems = [
       {glyphRoutes.length > 0 ? (
         <ul class="glyph-link-list">
           {glyphRoutes.map(({ slug, glyph }) => (
-            <li><a href={withBase(`${lang}/models/${model.id}/letters/${slug}/`)}><code>{glyph.character}</code> <span>{glyph.unicode.join(", ")}</span></a></li>
+            <li>
+              <a href={withBase(`${lang}/models/${model.id}/letters/${slug}/`)}>
+                <span class="glyph-text-label">{glyph.character}</span>
+                <span class="unicode-label">{copy.unicodeLabel}</span>
+                <code>{glyph.unicode.join(", ")}</code>
+              </a>
+              <VerificationBadge lang={lang} status={glyph.verification} />
+            </li>
           ))}
         </ul>
       ) : (
@@ -121,6 +135,7 @@ const breadcrumbItems = [
                 <dt>{copy.licenseAttribution}</dt><dd>{font.license}</dd>
                 <dt>{copy.fontCorrespondence}</dt><dd>{copy.fontDegree[font.correspondence.degree]}</dd>
               </dl>
+              {font.license_file && fontLicenseUrl(font) && <p><strong>{copy.licenseFile}:</strong> <a href={fontLicenseUrl(font)}>{font.license_file}</a></p>}
               {font.correspondence.notes && <p>{font.correspondence.notes}</p>}
               {font.project_url && /^https?:\/\//i.test(font.project_url) && <a href={font.project_url} rel="external">{font.name}</a>}
             </article>

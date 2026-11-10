@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export type Locale = "de" | "en";
 export type VerificationStatus = "draft" | "inferred" | "source-backed" | "reviewed" | "verified" | "deprecated";
 export type LocalizedText = Record<string, string>;
@@ -55,7 +56,7 @@ export interface GlyphRecord {
   model: string;
   character: string;
   unicode: string[];
-  forms: { isolated: { status: VerificationStatus }; contextual: { context: string; status: VerificationStatus }[] };
+  forms: { isolated: { status: VerificationStatus }; contextual: { context: string; status: VerificationStatus; outline?: GlyphOutline | null }[] };
   metrics: Metrics;
   outline?: GlyphOutline | null;
   reference: { font: string | null; glyph_name: string | null };
@@ -86,7 +87,9 @@ export interface FontRecord {
   project_url: string | null;
   license: string;
   files: string[];
-  calibration?: { x_height_em: number; ascender_em?: number | null; descender_em?: number | null } | null;
+  license_file?: string | null;
+  license_file_url?: string | null;
+  calibration?: { x_height_em: number; x_height_method?: string; ascender_em?: number | null; descender_em?: number | null } | null;
   file_urls?: string[];
   correspondence: { model: string | null; degree: "complete" | "partial" | "visual-only" | "unknown"; notes: string | null };
   sources: string[];

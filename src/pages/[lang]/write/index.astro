@@ -1,4 +1,5 @@
 ---
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { messages, type Locale } from "../../../lib/i18n";
 import { withBase } from "../../../lib/routes";
@@ -33,6 +34,27 @@ const clientCopy = {
   metricNoPressure: copy.writeMetricNoPressure,
   writeProvenance: copy.writeProvenance,
   writeProvenanceEmpty: copy.writeProvenanceEmpty,
+  writeMovementTitle: copy.writeMovementTitle,
+  writeMovementNote: copy.writeMovementNote,
+  writeMovementCompare: copy.writeMovementCompare,
+  writeMovementLoading: copy.writeMovementLoading,
+  writeMovementUnavailable: copy.writeMovementUnavailable,
+  writeMovementNoCapture: copy.writeMovementNoCapture,
+  writeMovementReferenceReady: copy.writeMovementReferenceReady,
+  writeMovementError: copy.writeMovementError,
+  writeMovementResultReady: copy.writeMovementResultReady,
+  writeMovementComplete: copy.writeMovementComplete,
+  writeMovementStart: copy.writeMovementStart,
+  writeMovementDirection: copy.writeMovementDirection,
+  writeMovementOrder: copy.writeMovementOrder,
+  writeMovementPenLifts: copy.writeMovementPenLifts,
+  writeMovementRhythm: copy.writeMovementRhythm,
+  writeMovementSources: copy.writeMovementSources,
+  writeMovementConfidence: copy.writeMovementConfidence,
+  writeMovementMatch: copy.writeMovementMatch,
+  writeMovementDifferent: copy.writeMovementDifferent,
+  writeMovementUncertain: copy.writeMovementUncertain,
+  writeMovementUnavailableState: copy.writeMovementUnavailableState,
 };
 ---
 <BaseLayout lang={lang} title={copy.writeTitle} description={copy.writeDescription} canonicalPath={`/${lang}/write/`} section="writing">
@@ -51,7 +73,7 @@ const clientCopy = {
           {models.map((model) => {
             const modelLanguages = model.languages.map((id) => languages.find((entry) => entry.id === id)).filter((entry): entry is LanguageRecord => Boolean(entry));
             const direction = modelLanguages[0]?.direction ?? "ltr";
-            return <option value={model.id} data-sources={JSON.stringify(model.sources)} data-license={model.license} data-verification={model.status.verification} data-direction={direction}>{localized(model.name)}</option>;
+            return <option value={model.id} data-sources={JSON.stringify(model.sources)} data-license={model.license} data-verification={model.status.verification} data-demo={String(model.demo)} data-direction={direction}>{localized(model.name)}</option>;
           })}
         </select>
       </label>
@@ -104,6 +126,23 @@ const clientCopy = {
       </dl>
       <p data-writing-pressure-status>{copy.writeMetricNoPressure}</p>
       <p>{copy.writeMetricsLimit}</p>
+    </section>
+
+    <section class="data-section movement-comparison" aria-labelledby="movement-comparison-title">
+      <h2 id="movement-comparison-title">{copy.writeMovementTitle}</h2>
+      <p>{copy.writeMovementNote}</p>
+      <button type="button" data-movement-compare disabled>{copy.writeMovementCompare}</button>
+      <p data-movement-status role="status" aria-live="polite">{copy.writeMovementUnavailable}</p>
+      <h3 data-movement-sources-title hidden>{copy.writeMovementSources}</h3>
+      <ul data-movement-sources hidden></ul>
+      <dl data-movement-results hidden>
+        <div><dt>{copy.writeMovementStart}</dt><dd data-movement-result="start"></dd></div>
+        <div><dt>{copy.writeMovementDirection}</dt><dd data-movement-result="direction"></dd></div>
+        <div><dt>{copy.writeMovementOrder}</dt><dd data-movement-result="order"></dd></div>
+        <div><dt>{copy.writeMovementPenLifts}</dt><dd data-movement-result="penLifts"></dd></div>
+        <div><dt>{copy.writeMovementRhythm}</dt><dd data-movement-result="rhythm"></dd></div>
+      </dl>
+      <p data-movement-result-note hidden>{copy.writeMovementResultReady}</p>
     </section>
 
     <section class="data-section writing-provenance" aria-labelledby="writing-provenance-title">

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
 import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -15,6 +16,8 @@ function fixtureRoot(t) {
   const root = mkdtempSync(join(tmpdir(), "schreibatlas-data-"));
   cpSync(join(projectRoot, "schema"), join(root, "schema"), { recursive: true });
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
+  cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
+  cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   return root;
@@ -156,6 +159,23 @@ test("vector outlines require a baseline below their x-height", (t) => {
   assertDiagnostic(root, "outline baseline must be below its x-height");
 });
 
+
+test("contextual outlines require a source reference and valid normalized baseline geometry", (t) => {
+  const root = fixtureRoot(t);
+  const context = { context: "before e", status: "draft", outline: { path: "M 0 100 L 50 0 Z", view_box: [0, 0, 50, 100], baseline: 50, x_height: 50 } };
+  writeYaml(root, "data/glyphs/demo-round/0061.yaml", glyphRecord({
+    sources: ["src-demo-placeholder"],
+    forms: { isolated: { status: "draft" }, contextual: [context] },
+  }));
+  assertDiagnostic(root, "contextual outline baseline must be below its x-height");
+
+  context.outline.baseline = 100;
+  writeYaml(root, "data/glyphs/demo-round/0061.yaml", glyphRecord({
+    forms: { isolated: { status: "draft" }, contextual: [context] },
+  }));
+  assertDiagnostic(root, "contextual outlines require at least one source reference");
+});
+
 test("invalid SPDX license identifiers are rejected", (t) => {
   const root = fixtureRoot(t);
   const model = readYaml(root, demoModelPath);
@@ -234,4 +254,59 @@ test("stroke SVG assets reject active elements and non-normalized geometry", (t)
   addStrokeFixture(root, { svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 2"><script>alert(1)</script></svg>' });
   assertDiagnostic(root, "may contain only SVG path elements");
   assertDiagnostic(root, 'must use normalized viewBox="0 0 1 1"');
+});
+
+test("non-demo models cannot cite project placeholder sources", (t) => {
+  const root = fixtureRoot(t);
+  const model = readYaml(root, demoModelPath);
+  model.demo = false;
+  model.status.verification = "draft";
+  model.sources = ["src-demo-placeholder"];
+  writeYaml(root, demoModelPath, model);
+  assertDiagnostic(root, 'non-demo record cannot cite placeholder source "src-demo-placeholder"');
+});
+
+test("source-backed model claims require non-placeholder evidence", (t) => {
+  const root = fixtureRoot(t);
+  const model = readYaml(root, demoModelPath);
+  model.demo = false;
+  model.status.verification = "verified";
+  model.sources = ["src-demo-placeholder"];
+  writeYaml(root, demoModelPath, model);
+  assertDiagnostic(root, "verified verification requires at least one non-placeholder source");
+});
+
+test("source-backed glyph claims require non-placeholder evidence", (t) => {
+  const root = fixtureRoot(t);
+  const model = readYaml(root, demoModelPath);
+  model.character_repertoire = ["U+0061"];
+  writeYaml(root, demoModelPath, model);
+  writeYaml(root, "data/glyphs/demo-round/0061.yaml", glyphRecord({
+    sources: ["src-demo-placeholder"],
+    verification: "source-backed",
+  }));
+  assertDiagnostic(root, "source-backed verification requires at least one non-placeholder source");
+});
+
+test("German model records declare their complete source-supported character repertoires", () => {
+  const repertoires = {
+    "de-volksschrift": ["U+0041-U+005A", "U+0061-U+007A", "U+00C4", "U+00D6", "U+00DC", "U+00DF", "U+00E4", "U+00F6", "U+00FC", "U+017F"],
+    "de-kurrent-loth-1866": ["U+0041-U+005A", "U+0061-U+007A", "U+00DF", "U+00E4", "U+00F6", "U+00FC", "U+017F"],
+  };
+  for (const [id, repertoire] of Object.entries(repertoires)) {
+    const model = readYaml(projectRoot, `data/models/${id}/model.yaml`);
+    assert.deepEqual(model.character_repertoire, repertoire, id);
+    assert.equal(model.character_repertoire_complete, false, id);
+  }
+});
+
+test("Volksschrift includes at least ten sourced final-form font outlines", () => {
+  const { errors, records } = validateDataset();
+  assert.deepEqual(errors, []);
+  const outlines = records.glyphs.filter(({ value }) => value.model === "de-volksschrift"
+    && value.outline
+    && value.verification === "source-backed"
+    && value.forms.isolated.status === "source-backed"
+    && value.sources.length > 0);
+  assert.ok(outlines.length >= 10, `expected at least ten sourced outlines, found ${outlines.length}`);
 });

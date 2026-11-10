@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export const worksheetPapers = {
   A4: { width: 210, height: 297 },
   Letter: { width: 215.9, height: 279.4 },
@@ -14,6 +15,13 @@ export const worksheetDefaults = {
   blankRows: 2,
   repetitions: 1,
 };
+
+export const worksheetPresets = [
+  { id: "volksschrift-blume", model: "de-volksschrift", text: "blume" },
+  { id: "volksschrift-lesen", model: "de-volksschrift", text: "lesen" },
+  { id: "volksschrift-sonne", model: "de-volksschrift", text: "sonne" },
+  { id: "volksschrift-limo", model: "de-volksschrift", text: "limo" },
+];
 
 
 export const worksheetMarker = {

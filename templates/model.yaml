@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Draft starter only. Replace the source, scope, and all placeholder text.
+id: replace-me
+name:
+  de: Replace with a sourced German name
+  en: Replace with a sourced English name
+country: null
+languages: []
+status:
+  use: unknown
+  verification: draft
+character_repertoire: []
+character_repertoire_complete: false
+reference_fonts: []
+sources:
+  - src-replace-me
+license: CC-BY-SA-4.0
+demo: false
+description:
+  en: Replace with a source-backed description and scope limits.

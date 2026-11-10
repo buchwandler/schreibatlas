@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Third-party notices
 
 No third-party fonts, images, or other bundled assets are currently included in the generated site. The prototype uses system fonts and browser-provided APIs.

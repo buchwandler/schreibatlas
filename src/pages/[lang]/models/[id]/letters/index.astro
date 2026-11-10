@@ -1,7 +1,9 @@
 ---
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../../../layouts/BaseLayout.astro";
 import BreadcrumbJsonLd from "../../../../../components/BreadcrumbJsonLd.astro";
 import SourceList from "../../../../../components/SourceList.astro";
+import GlyphOutline from "../../../../../components/GlyphOutline.astro";
 import VerificationBadge from "../../../../../components/VerificationBadge.astro";
 import { messages, type Locale } from "../../../../../lib/i18n";
 import { withBase } from "../../../../../lib/routes";
@@ -24,7 +26,8 @@ const modelName = localized(model.name);
 const title = `${copy.repertoire}: ${modelName}`;
 const glyphRoutes = localizedGlyphPaths(content.glyphs.filter((glyph) => glyph.model === model.id)).filter((route) => route.lang === lang);
 const sourceMap = new Map(content.sources.map((source) => [source.id, source]));
-const sources = model.sources.flatMap((id) => sourceMap.has(id) ? [sourceMap.get(id)!] : []);
+const sourceIds = [...new Set([...model.sources, ...model.reference_fonts.flatMap((id) => content.fonts.find((font) => font.id === id)?.sources ?? []), ...glyphRoutes.flatMap(({ glyph }) => glyph.sources)])];
+const sources = sourceIds.flatMap((id) => sourceMap.has(id) ? [sourceMap.get(id)!] : []);
 const site = Astro.site ?? new URL("https://schreibatlas.de");
 const breadcrumbItems = [
   { name: copy.home, url: new URL(`/${lang}/`, site).href },
@@ -68,14 +71,16 @@ const breadcrumbItems = [
     <section class="data-section" aria-labelledby="glyphs-title">
       <h2 id="glyphs-title">{copy.glyphRecords}</h2>
       {glyphRoutes.length > 0 ? (
-        <ul class="glyph-link-list">
+        <ul class="glyph-card-grid">
           {glyphRoutes.map(({ slug, glyph }) => (
-            <li>
-              <a href={withBase(`${lang}/models/${model.id}/letters/${slug}/`)}>
-                <span class="glyph-text-label" aria-hidden="true">{glyph.character}</span>
+            <li class="glyph-card" data-glyph-card>
+              <a class="glyph-card-link" href={withBase(`${lang}/models/${model.id}/letters/${slug}/`)}>
+                <span class="glyph-text-label">{glyph.character}</span>
+                <span class="unicode-label">{copy.unicodeLabel}</span>
                 <code>{glyph.unicode.join(", ")}</code>
-                <VerificationBadge lang={lang} status={glyph.verification} />
               </a>
+              <VerificationBadge lang={lang} status={glyph.verification} />
+              <GlyphOutline lang={lang} outline={glyph.outline} label={`${copy.letterTitle} ${glyph.character}`} id={`repertoire-${model.id}-${slug}`} />
             </li>
           ))}
         </ul>

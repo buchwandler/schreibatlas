@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { normalizeOutline, sharedViewBox } from "../../tools/geometry.mjs";
 import type { GlyphOutline, Metrics } from "../../tools/content.mjs";
 

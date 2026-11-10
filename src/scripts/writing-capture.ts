@@ -1,6 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
 import { normalizeOutline } from "../../tools/geometry.mjs";
+import { compareVerifiedStrokes } from "../../tools/stroke-comparison.mjs";
+import type { MovementComparisonResult } from "../../tools/stroke-comparison.mjs";
 import { measureCapture, splitCaptureStrokes, type WritingSample } from "../../tools/writing-capture.mjs";
-import type { GlyphRecord, SourceRecord } from "../../tools/content.mjs";
+import type { GlyphRecord, SourceRecord, StrokeRecord } from "../../tools/content.mjs";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 
@@ -8,11 +11,19 @@ interface ApiIndex {
   datasetVersion: string;
   glyphs: string;
   sources: string;
+  strokes: string;
 }
 
 interface GlyphIndexEntry {
   model: string;
   character: string;
+  url: string;
+}
+
+interface StrokeIndexEntry {
+  model: string;
+  character: string;
+  verification: string;
   url: string;
 }
 
@@ -35,6 +46,27 @@ interface WritingMessages {
   metricNoPressure: string;
   writeProvenance: string;
   writeProvenanceEmpty: string;
+  writeMovementTitle: string;
+  writeMovementNote: string;
+  writeMovementCompare: string;
+  writeMovementLoading: string;
+  writeMovementUnavailable: string;
+  writeMovementNoCapture: string;
+  writeMovementReferenceReady: string;
+  writeMovementError: string;
+  writeMovementResultReady: string;
+  writeMovementComplete: string;
+  writeMovementStart: string;
+  writeMovementDirection: string;
+  writeMovementOrder: string;
+  writeMovementPenLifts: string;
+  writeMovementRhythm: string;
+  writeMovementSources: string;
+  writeMovementConfidence: string;
+  writeMovementMatch: string;
+  writeMovementDifferent: string;
+  writeMovementUncertain: string;
+  writeMovementUnavailableState: string;
 }
 
 interface ModelSelection {
@@ -60,15 +92,32 @@ async function initializeWritingCapture(container: HTMLElement): Promise<void> {
   const clearButton = container.querySelector<HTMLButtonElement>("[data-writing-clear]");
   const exportJsonButton = container.querySelector<HTMLButtonElement>("[data-writing-export-json]");
   const exportSvgButton = container.querySelector<HTMLButtonElement>("[data-writing-export-svg]");
+  const movementCompareButton = container.querySelector<HTMLButtonElement>("[data-movement-compare]");
+  const movementStatus = container.querySelector<HTMLElement>("[data-movement-status]");
+  const movementSources = container.querySelector<HTMLUListElement>("[data-movement-sources]");
+  const movementSourcesTitle = container.querySelector<HTMLElement>("[data-movement-sources-title]");
+  const movementResults = container.querySelector<HTMLDListElement>("[data-movement-results]");
+  const movementResultNote = container.querySelector<HTMLElement>("[data-movement-result-note]");
+  const movementResultElements = new Map([...container.querySelectorAll<HTMLElement>("[data-movement-result]")].map((element) => [element.dataset.movementResult ?? "", element]));
   const provenance = container.querySelector<HTMLUListElement>("[data-writing-provenance]");
   const pressureStatus = container.querySelector<HTMLElement>("[data-writing-pressure-status]");
   const metricElements = [...container.querySelectorAll<HTMLElement>("[data-metric]")];
-  if (!form || !modelSelect || !characterInput || !referenceCheckbox || !opacityInput || !surface || !referenceLayer || !captureLayer || !keyboardCursor || !status || !clearButton || !exportJsonButton || !exportSvgButton || !provenance || !pressureStatus) return;
+  if (
+    !form || !modelSelect || !characterInput || !referenceCheckbox || !opacityInput || !surface || !referenceLayer || !captureLayer
+    || !keyboardCursor || !status || !clearButton || !exportJsonButton || !exportSvgButton || !provenance || !pressureStatus
+    || !movementCompareButton || !movementStatus || !movementSources || !movementResults || !movementResultNote || movementResultElements.size !== 5
+  ) return;
 
   const copy = JSON.parse(container.dataset.messages ?? "{}") as WritingMessages;
   const samples: WritingSample[] = [];
   const glyphCache = new Map<string, Promise<GlyphRecord | null>>();
   const sourceById = new Map<string, SourceRecord>();
+  const strokeCache = new Map<string, Promise<StrokeRecord | null>>();
+  let strokeIndex: StrokeIndexEntry[] = [];
+  let referenceStrokeRecord: StrokeRecord | null = null;
+  let referenceMovementPaths = new Map<number, { x: number; y: number }[]>();
+  let movementComparison: MovementComparisonResult | null = null;
+  let movementReferenceVersion = 0;
   let glyphIndex: GlyphIndexEntry[] = [];
   let datasetVersion = "";
   let localDataAvailable = false;
@@ -187,6 +236,101 @@ async function initializeWritingCapture(container: HTMLElement): Promise<void> {
     status.textContent = copy.statusReferenceReady;
   };
 
+
+  const clearMovementReference = (message: string) => {
+    referenceStrokeRecord = null;
+    referenceMovementPaths = new Map();
+    movementComparison = null;
+    movementCompareButton.disabled = true;
+    movementSources.replaceChildren();
+    movementSources.hidden = true;
+    movementResults.hidden = true;
+    if (movementSourcesTitle) movementSourcesTitle.hidden = true;
+    movementResultNote.hidden = true;
+    movementStatus.textContent = message;
+  };
+
+  const renderMovementComparison = (result: MovementComparisonResult) => {
+    const labels: Record<string, string> = {
+      start: copy.writeMovementStart,
+      direction: copy.writeMovementDirection,
+      order: copy.writeMovementOrder,
+      penLifts: copy.writeMovementPenLifts,
+      rhythm: copy.writeMovementRhythm,
+    };
+    const states: Record<string, string> = {
+      match: copy.writeMovementMatch,
+      different: copy.writeMovementDifferent,
+      uncertain: copy.writeMovementUncertain,
+      unavailable: copy.writeMovementUnavailableState,
+    };
+    for (const [name, element] of movementResultElements) {
+      const observation = result.observations[name as keyof MovementComparisonResult["observations"]];
+      if (!observation) continue;
+      element.dataset.status = observation.status;
+      const confidence = observation.confidence === null ? "" : ` · ${copy.writeMovementConfidence} ${Math.round(observation.confidence * 100)}%`;
+      element.textContent = `${states[observation.status]}${confidence}`;
+      element.setAttribute("aria-label", `${labels[name]}: ${element.textContent}`);
+    }
+    movementResults.hidden = false;
+    movementResultNote.hidden = false;
+    movementStatus.textContent = result.available ? copy.writeMovementComplete : copy.writeMovementUnavailable;
+  };
+
+  const updateMovementReference = async () => {
+    const version = ++movementReferenceVersion;
+    clearMovementReference(copy.writeMovementLoading);
+    const character = oneGrapheme(characterInput.value);
+    const model = selectedModel();
+    if (!localDataAvailable || !character || !model || model.demo) {
+      clearMovementReference(copy.writeMovementUnavailable);
+      return;
+    }
+    const entry = strokeIndex.find((item) => item.model === model.id && item.character === character);
+    if (!entry || entry.verification !== "verified") {
+      clearMovementReference(copy.writeMovementUnavailable);
+      return;
+    }
+
+    try {
+      if (!strokeCache.has(entry.url)) strokeCache.set(entry.url, localJson<StrokeRecord>(entry.url).catch(() => null));
+      const record = await strokeCache.get(entry.url)!;
+      if (version !== movementReferenceVersion) return;
+      if (!record || record.model !== model.id || record.character !== character || record.verification !== "verified"
+        || record.sources.length === 0 || record.sources.some((sourceId) => !sourceById.has(sourceId))) {
+        clearMovementReference(copy.writeMovementUnavailable);
+        return;
+      }
+      const orderedStrokes = [...record.strokes].sort((left, right) => left.order - right.order);
+      const downStrokes = orderedStrokes.filter((stroke) => stroke.pen_down);
+      if (!downStrokes.length) {
+        clearMovementReference(copy.writeMovementUnavailable);
+        return;
+      }
+      const pathEntries = await Promise.all(downStrokes.map(async (stroke) => {
+        if (!stroke.file_url) throw new Error("Verified stroke data has no local geometry URL.");
+        return [stroke.order, await sampleStrokeAsset(stroke.file_url)] as const;
+      }));
+      if (version !== movementReferenceVersion) return;
+
+      referenceStrokeRecord = record;
+      referenceMovementPaths = new Map(pathEntries);
+      movementSources.replaceChildren();
+      for (const sourceId of record.sources) {
+        const source = sourceById.get(sourceId)!;
+        const author = source.author.length ? ` · ${source.author.join(", ")}` : "";
+        const item = document.createElement("li");
+        item.textContent = `${source.title}${author} · ${source.rights.license ?? record.license}`;
+        movementSources.append(item);
+      }
+      movementSources.hidden = false;
+      if (movementSourcesTitle) movementSourcesTitle.hidden = false;
+      movementCompareButton.disabled = samples.length === 0;
+      movementStatus.textContent = samples.length ? copy.writeMovementReferenceReady : copy.writeMovementNoCapture;
+    } catch {
+      if (version === movementReferenceVersion) clearMovementReference(copy.writeMovementError);
+    }
+  };
   const renderCapture = () => {
     captureLayer.replaceChildren();
     for (const stroke of splitCaptureStrokes(samples)) {
@@ -235,8 +379,31 @@ async function initializeWritingCapture(container: HTMLElement): Promise<void> {
     clearButton.disabled = samples.length === 0;
     exportJsonButton.disabled = samples.length === 0;
     exportSvgButton.disabled = samples.length === 0;
+    movementComparison = null;
+    movementResults.hidden = true;
+    movementResultNote.hidden = true;
+    movementCompareButton.disabled = !referenceStrokeRecord || samples.length === 0;
+    movementStatus.textContent = referenceStrokeRecord
+      ? (samples.length ? copy.writeMovementReferenceReady : copy.writeMovementNoCapture)
+      : copy.writeMovementUnavailable;
     if (samples.length) status.textContent = localize(copy.statusCaptured, { strokes: String(metrics.strokeCount), samples: String(metrics.sampleCount) });
   };
+
+  movementCompareButton.addEventListener("click", () => {
+    if (!referenceStrokeRecord || !samples.length) return;
+    const capturedStrokes = splitCaptureStrokes(samples).map((stroke) => stroke.map((point) => ({ x: point.x / 600, y: point.y / 600, t: point.t })));
+    const reference = {
+      verification: referenceStrokeRecord.verification,
+      sources: referenceStrokeRecord.sources,
+      strokes: [...referenceStrokeRecord.strokes].sort((left, right) => left.order - right.order).map((stroke) => ({
+        penDown: stroke.pen_down,
+        points: stroke.pen_down ? referenceMovementPaths.get(stroke.order) ?? [] : [],
+        timingMs: stroke.timing_ms ?? null,
+      })),
+    };
+    movementComparison = compareVerifiedStrokes(reference, capturedStrokes);
+    renderMovementComparison(movementComparison);
+  });
 
   const sample = (x: number, y: number, time: number, pointerType: string, penDown: boolean, pressure?: number) => {
     if (penDown && captureStartedAt === null) captureStartedAt = time;
@@ -360,6 +527,14 @@ async function initializeWritingCapture(container: HTMLElement): Promise<void> {
         license: referenceGlyph.license,
         model: referenceGlyph.model,
       } : null,
+      movementReference: referenceStrokeRecord ? {
+        character: referenceStrokeRecord.character,
+        model: referenceStrokeRecord.model,
+        verification: referenceStrokeRecord.verification,
+        sources: referenceStrokeRecord.sources,
+        license: referenceStrokeRecord.license,
+      } : null,
+      movementComparison,
       samples,
       metrics: measureCapture(samples),
     };
@@ -391,7 +566,10 @@ async function initializeWritingCapture(container: HTMLElement): Promise<void> {
     activePointerId = null;
     updateCursor(500, 300);
     renderCapture();
-    window.setTimeout(() => void updateReference(), 0);
+    window.setTimeout(() => {
+      void updateReference();
+      void updateMovementReference();
+    }, 0);
   });
 
   exportJsonButton.addEventListener("click", () => {
@@ -412,8 +590,14 @@ async function initializeWritingCapture(container: HTMLElement): Promise<void> {
     download(new Blob([svg], { type: "image/svg+xml" }), "schreibatlas-capture.svg");
   });
 
-  characterInput.addEventListener("input", () => void updateReference());
-  modelSelect.addEventListener("change", () => void updateReference());
+  characterInput.addEventListener("input", () => {
+    void updateReference();
+    void updateMovementReference();
+  });
+  modelSelect.addEventListener("change", () => {
+    void updateReference();
+    void updateMovementReference();
+  });
   referenceCheckbox.addEventListener("change", () => void updateReference());
   opacityInput.addEventListener("input", () => {
     referenceLayer.querySelector<SVGPathElement>("path")?.setAttribute("fill-opacity", opacityInput.value);
@@ -424,16 +608,55 @@ async function initializeWritingCapture(container: HTMLElement): Promise<void> {
     if (!indexUrl) throw new Error("Missing local writing data index.");
     const index = await localJson<ApiIndex>(indexUrl);
     datasetVersion = index.datasetVersion;
-    const [entries, sources] = await Promise.all([
+    const [entries, sources, strokes] = await Promise.all([
       localJson<GlyphIndexEntry[]>(index.glyphs),
       localJson<SourceRecord[]>(index.sources),
+      localJson<StrokeIndexEntry[]>(index.strokes),
     ]);
     glyphIndex = entries;
+    strokeIndex = strokes;
     localDataAvailable = true;
     for (const source of sources) sourceById.set(source.id, source);
     status.textContent = copy.statusReady;
     await updateReference();
+    await updateMovementReference();
   } catch {
     status.textContent = copy.statusError;
+  }
+}
+
+
+async function sampleStrokeAsset(fileUrl: string): Promise<{ x: number; y: number }[]> {
+  const url = new URL(fileUrl, location.href);
+  if (url.origin !== location.origin) throw new Error("Stroke geometry must stay same-origin.");
+  const response = await fetch(url, { credentials: "same-origin" });
+  if (!response.ok) throw new Error(`Local stroke geometry request failed: ${response.status}`);
+  const parsed = new DOMParser().parseFromString(await response.text(), "image/svg+xml");
+  const root = parsed.documentElement;
+  const viewBox = root.getAttribute("viewBox")?.trim().split(/[\s,]+/).map(Number) ?? [];
+  if (parsed.querySelector("parsererror") || root.localName !== "svg" || viewBox.length !== 4 || viewBox.some((value, index) => value !== [0, 0, 1, 1][index])) {
+    throw new Error("Stroke geometry does not use the normalized SVG coordinate system.");
+  }
+  const sourcePaths = root.querySelectorAll("path[d]");
+  if (sourcePaths.length !== 1) throw new Error("Each recorded stroke must have one path for movement comparison.");
+  const pathData = sourcePaths[0].getAttribute("d");
+  if (!pathData) throw new Error("Recorded stroke path data is empty.");
+
+  const measuringSvg = document.createElementNS(svgNamespace, "svg");
+  measuringSvg.setAttribute("viewBox", "0 0 1 1");
+  measuringSvg.style.cssText = "position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;visibility:hidden";
+  const path = document.createElementNS(svgNamespace, "path");
+  path.setAttribute("d", pathData);
+  measuringSvg.append(path);
+  document.body.append(measuringSvg);
+  try {
+    const length = path.getTotalLength();
+    if (!Number.isFinite(length) || length <= 0) throw new Error("Recorded stroke path has no measurable length.");
+    return Array.from({ length: 33 }, (_value, index) => {
+      const point = path.getPointAtLength((length * index) / 32);
+      return { x: point.x, y: point.y };
+    });
+  } finally {
+    measuringSvg.remove();
   }
 }

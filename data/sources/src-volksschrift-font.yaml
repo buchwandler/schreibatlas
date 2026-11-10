@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: src-volksschrift-font
+kind: publication
+title: "Volksschrift UNZ1# font software package"
+author:
+  - Peter Wiegel
+  - CAT-Fonts
+publisher: CAT-Fonts
+year: 2015
+locator: null
+url: "https://www.peter-wiegel.de/Fonts/Volksschrift.zip"
+rights:
+  type: licensed
+  license: OFL-1.1
+notes: "Downloaded from the designer's official page. The unmodified package contains the original font and its OFL 1.1 license, including Reserved Font Name Volksschrift UNZ1#. The font outlines are a digital interpretation with partial correspondence, not primary handwritten samples."

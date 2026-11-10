@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { renderNormalizedTextStage } from "../lib/normalized-text-stage";
 import { BrowserTextShaper } from "../lib/text-shaper";
 import type { FontRecord, Metrics, SourceRecord } from "../../tools/content.mjs";
@@ -48,6 +49,8 @@ interface Messages {
   sourceNotes: string;
   sourceOpen: string;
   fontCorrespondence: string;
+  fontCalibration: string;
+  sentenceSample: string;
 }
 
 const page = document.querySelector<HTMLElement>("[data-word-comparison]");
@@ -128,6 +131,11 @@ if (page) {
       const licenseLine = document.createElement("p");
       licenseLine.textContent = `${messages.licenseAttribution}: ${font.license}`;
       card.append(licenseLine);
+      if (font.calibration) {
+        const calibrationLine = document.createElement("p");
+        calibrationLine.textContent = `${messages.fontCalibration}: ${font.calibration.x_height_em} em${font.calibration.x_height_method ? ` · ${font.calibration.x_height_method}` : ""}`;
+        card.append(calibrationLine);
+      }
       const sourceRecords = font.sources.flatMap((id) => sourceById.has(id) ? [sourceById.get(id)!] : []);
       if (sourceRecords.length === 0) {
         const empty = document.createElement("p");
@@ -280,5 +288,9 @@ if (page) {
     });
   }
   input.addEventListener("input", () => void renderComparison());
+  page.querySelector<HTMLButtonElement>("[data-sentence-sample]")?.addEventListener("click", () => {
+    input.value = messages.sentenceSample;
+    void renderComparison();
+  });
   void initialize();
 }

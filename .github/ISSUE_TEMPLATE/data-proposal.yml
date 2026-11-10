@@ -1,0 +1,42 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+name: Propose source-backed data
+description: Propose a model, glyph, contextual form, font, or source with evidence.
+title: "[Data] "
+body:
+  - type: markdown
+    attributes:
+      value: Do not attach user handwriting or photographs. A public URL does not imply redistribution permission.
+  - type: textarea
+    id: claim
+    attributes:
+      label: Exact claim or record proposed
+      description: State the model, form, font, or data field and its intended scope.
+    validations:
+      required: true
+  - type: input
+    id: source-url
+    attributes:
+      label: Source URL
+      description: Use a stable URL when available.
+    validations:
+      required: true
+  - type: input
+    id: locator
+    attributes:
+      label: Page, figure, or other precise locator
+    validations:
+      required: true
+  - type: textarea
+    id: rights
+    attributes:
+      label: Rights and redistribution evidence
+      description: State the exact license or why redistribution is permitted. Separate citation rights from asset rights.
+    validations:
+      required: true
+  - type: textarea
+    id: limits
+    attributes:
+      label: Scope and uncertainty
+      description: Record what the source does not establish, including repertoire and movement limits.
+    validations:
+      required: true

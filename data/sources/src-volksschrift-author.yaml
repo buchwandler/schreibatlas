@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: src-volksschrift-author
+kind: publication
+title: "Volksschrift font and historical description"
+author:
+  - Peter Wiegel
+publisher: CAT-Fonts
+year: null
+locator: null
+url: "https://www.peter-wiegel.de/Volksschrift.html"
+rights:
+  type: citation-only
+  license: null
+notes: "The designer describes the computerized Volksschrift as an interpretation based on the German Volksschrift and states that this school script was used from the early 1930s. Treat those historical details as the designer's account, not as an independent scholarly review."

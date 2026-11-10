@@ -1,4 +1,5 @@
 ---
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import VerificationBadge from "../../../components/VerificationBadge.astro";
 import { messages, type Locale } from "../../../lib/i18n";
@@ -15,6 +16,12 @@ const { lang, content } = Astro.props as { lang: Locale; content: Content };
 const { models, countries, languages } = content;
 const copy = messages[lang];
 const localized = (values: Record<string, string>) => values[lang] ?? values.en ?? values.de ?? copy.notRecorded;
+const useLabels: Record<string, string> = {
+  current: copy.current,
+  historical: copy.historical,
+  "current-or-historical": copy.currentOrHistorical,
+  unknown: copy.unknown,
+};
 const verificationOptions = [...new Set(models.map((model) => model.status.verification))].sort().map((value) => ({ value, label: copy.verification[value].label }));
 const countryById = new Map(countries.map((country) => [country.id, country]));
 const languageById = new Map(languages.map((language) => [language.id, language]));
@@ -26,10 +33,17 @@ const languageOptions = [...new Set(models.flatMap((model) => model.languages))]
   const language = languageById.get(value);
   return language ? [{ value, label: localized(language.name) }] : [];
 });
+const useOptions = [...new Set(models.map((model) => model.status.use))].sort().map((value) => ({ value, label: useLabels[value] ?? copy.notRecorded }));
+const joinedOptions = [...new Set(models.map((model) => model.classification?.joined === true ? "joined" : model.classification?.joined === false ? "unjoined" : "unknown"))].sort().map((value) => ({
+  value,
+  label: value === "joined" ? copy.present : value === "unjoined" ? copy.absent : copy.notRecorded,
+}));
 const filterConfigs = [
   { key: "status", label: copy.verificationFilter, options: verificationOptions },
   { key: "country", label: copy.country, options: countryOptions },
   { key: "language", label: copy.languages, options: languageOptions },
+  { key: "use", label: copy.useStatus, options: useOptions },
+  { key: "joined", label: copy.joined, options: joinedOptions },
 ].filter((filter) => filter.options.length > 1);
 ---
 <BaseLayout lang={lang} title={copy.exploreTitle} description={copy.exploreDescription} canonicalPath={`/${lang}/explore/`} section="explore">
@@ -67,6 +81,18 @@ const filterConfigs = [
             const name = model.name[lang] ?? model.name.en ?? model.name.de;
             const description = model.description?.[lang] ?? model.description?.en ?? model.description?.de ?? "";
             const searchText = [name, description, model.id, model.country ?? "", ...model.languages].join(" ");
+            const country = countryById.get(model.country ?? "");
+            const modelLanguageNames = model.languages.flatMap((id) => {
+              const language = languageById.get(id);
+              return language ? [localized(language.name)] : [];
+            });
+            const joined = model.classification?.joined;
+            const metadata = [
+              country ? `${copy.country}: ${localized(country.name)}` : null,
+              modelLanguageNames.length ? `${copy.languages}: ${modelLanguageNames.join(", ")}` : null,
+              model.status.use !== "unknown" ? `${copy.useStatus}: ${useLabels[model.status.use] ?? copy.notRecorded}` : null,
+              typeof joined === "boolean" ? `${copy.joined}: ${joined ? copy.present : copy.absent}` : null,
+            ].filter((value): value is string => value !== null);
             return (
               <article
                 class="model-card"
@@ -75,6 +101,8 @@ const filterConfigs = [
                 data-status={model.status.verification}
                 data-country={model.country ?? ""}
                 data-language={model.languages.join(" ")}
+                data-use={model.status.use}
+                data-joined={model.classification?.joined === true ? "joined" : model.classification?.joined === false ? "unjoined" : "unknown"}
               >
                 <div class="model-card-heading">
                   <h2><a href={withBase(`${lang}/models/${model.id}/`)}>{name}</a></h2>
@@ -83,6 +111,7 @@ const filterConfigs = [
                 <VerificationBadge lang={lang} status={model.status.verification} />
                 {model.demo && <p class="demo-marker">{copy.demoTitle}</p>}
                 <p>{description || copy.notRecorded}</p>
+                {metadata.length > 0 && <ul class="model-card-metadata">{metadata.map((item) => <li>{item}</li>)}</ul>}
                 <a class="text-link" href={withBase(`${lang}/models/${model.id}/`)}>{copy.viewModel}</a>
               </article>
             );

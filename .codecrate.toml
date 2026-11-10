@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 [codecrate]
 output = "context_schreibatlas.md"
 keep_docstrings = true
@@ -28,6 +29,16 @@ include = [
   "**/*.mjs",
   "**/*.cjs",
   "LICENSE",
+  "LICENSE-*",
+  "CNAME",
+  "**/*.woff2",
+  "**/*.woff",
+  "**/*.ttf",
+  "**/*.otf",
+  "**/*.png",
+  "**/*.jpg",
+  "**/*.jpeg",
+  "**/*.webp",
 ]
 split_max_chars = 0
 layout = "full"

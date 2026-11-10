@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+model: de-volksschrift
+character: l
+unicode: [U+006C]
+forms:
+  isolated:
+    status: source-backed
+  contextual: []
+metrics:
+  baseline: null
+  x_height: null
+  ascender: null
+  descender: null
+outline:
+  path: "M254 -263Q265 -263 275 -253Q285 -243 285 -232Q285 -228 284.5 -223.5Q284 -219 279 -214L280 -216L157 -17Q144 3 127 16.5Q110 30 84 30Q50 30 31 5Q12 -20 12 -51V-208Q9 -207 1 -207Q-12 -207 -21 -215.5Q-30 -224 -30 -238Q-30 -242 -26.5 -250.5Q-23 -259 -17.5 -269Q-12 -279 -5.5 -288.5Q1 -298 6 -306L5 -305Q7 -308 8.5 -310Q10 -312 12 -315V-477Q12 -486 11.5 -495Q11 -504 11 -514Q10 -523 10 -535Q10 -547 10 -556Q10 -586 14 -616.5Q18 -647 30 -671.5Q42 -696 65.5 -711.5Q89 -727 128 -727Q175 -727 201 -701Q227 -675 227 -628Q227 -606 220.5 -579.5Q214 -553 204 -527Q194 -501 182 -476.5Q170 -452 159 -434L74 -297V-51Q74 -45 77 -38Q80 -31 85 -31Q90 -31 95.5 -37.5Q101 -44 105 -49Q134 -96 167 -148.5Q200 -201 229 -248L228 -247Q236 -263 254 -263ZM74 -413Q89 -437 105 -464Q121 -491 134.5 -519Q148 -547 156.5 -575Q165 -603 165 -629Q165 -665 128 -665Q108 -665 96.5 -654Q85 -643 79.5 -626.5Q74 -610 72.5 -591Q71 -572 71 -556Q71 -545 71 -535.5Q71 -526 72 -515Q73 -504 73.5 -494Q74 -484 74 -473Z"
+  view_box: [-30, -727, 315, 757]
+  baseline: 0
+  x_height: -368
+reference:
+  font: font-volksschrift
+  glyph_name: l
+connections:
+  entry:
+    present: null
+  exit:
+    present: null
+variants: []
+sources: [src-volksschrift-font]
+verification: source-backed
+license: OFL-1.1

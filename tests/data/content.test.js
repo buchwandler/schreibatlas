@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
 import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -16,6 +17,8 @@ test("validated YAML drives localized model and Unicode glyph routes", (t) => {
   const root = join(temporary, "project");
   cpSync(join(projectRoot, "schema"), join(root, "schema"), { recursive: true });
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
+  cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
+  cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
 
   const modelPath = join(root, "data/models/demo-round/model.yaml");
@@ -37,7 +40,7 @@ test("validated YAML drives localized model and Unicode glyph routes", (t) => {
     "de/demo-round",
     "en/demo-round",
   ]);
-  assert.deepEqual(localizedGlyphPaths(content.glyphs).map(({ lang, id, slug }) => `${lang}/${id}/${slug}`), [
+  assert.deepEqual(localizedGlyphPaths(content.glyphs).filter(({ id }) => id === "demo-round").map(({ lang, id, slug }) => `${lang}/${id}/${slug}`), [
     "de/demo-round/u00df",
     "en/demo-round/u00df",
   ]);

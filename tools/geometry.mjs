@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export function normalizePoint(outline, x, y) {
   const height = outline.baseline - outline.x_height;
   if (height <= 0) throw new Error("Outline baseline must be below its x-height in SVG coordinates.");

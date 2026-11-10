@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+model: de-kurrent-loth-1866
+character: A
+unicode: [U+0041]
+forms:
+  isolated:
+    status: source-backed
+  contextual: []
+metrics:
+  baseline: null
+  x_height: null
+  ascender: null
+  descender: null
+outline: null
+reference:
+  font: null
+  glyph_name: null
+connections:
+  entry:
+    present: null
+  exit:
+    present: null
+variants: []
+sources: [src-kurrent-loth-1866]
+verification: source-backed
+license: CC-BY-SA-4.0

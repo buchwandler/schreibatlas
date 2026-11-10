@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
 import { isValidQuadrilateral, type ImagePoint, type PhotoAnalysisResult } from "../../tools/photo-analysis.mjs";
 import type { WorksheetMarkerResult, WorksheetWritingResult } from "../../tools/worksheet-analysis.mjs";
+import { BrowserTextShaper, type TextDirection } from "../lib/text-shaper";
+import { fitReferenceText, measureReferenceWordSpacing, type PhotoReferenceFit, type PhotoReferenceLine } from "../../tools/photo-reference.mjs";
+import type { FontRecord, SourceRecord } from "../../tools/content.mjs";
 
 interface AnalysisMessages {
   statusIdle: string;
@@ -50,6 +54,46 @@ interface AnalysisMessages {
   worksheetWritingAvailable: string;
   worksheetWritingUnavailable: string;
   worksheetRepeatedAvailable: string;
+  referenceSection: string;
+  referenceUnavailable: string;
+  referenceFontUnavailable: string;
+  referenceFitUnavailable: string;
+  referenceFitLow: string;
+  referenceFitMedium: string;
+  referenceComparisonNote: string;
+  referenceSources: string;
+  referenceView: string;
+  referenceViewReference: string;
+  referenceViewOverlay: string;
+  referenceViewDifference: string;
+  referenceScaleX: string;
+  referenceScaleY: string;
+  referenceResidual: string;
+  referenceWordSpacing: string;
+  referenceWordSpacingUnavailable: string;
+}
+
+interface FontExport extends FontRecord {
+  file_urls?: string[];
+}
+
+interface DataIndex {
+  fonts: string;
+  sources: string;
+}
+
+interface ReferenceLayout {
+  font: FontExport;
+  fontFamily: string;
+  fontSize: number;
+  direction: TextDirection;
+  lines: PhotoReferenceLine[];
+}
+
+interface ReferenceComparisonData {
+  font: { id: string; name: string; license: string; licenseFileUrl: string | null; fileUrls: string[]; correspondence: FontRecord["correspondence"]; sources: SourceRecord[] };
+  fit: PhotoReferenceFit;
+  wordSpacing: ReturnType<typeof measureReferenceWordSpacing>;
 }
 
 type WorksheetReferenceMetadata = {
@@ -84,7 +128,7 @@ type ResultMessage = Omit<PhotoAnalysisResult, "preview" | "mask"> & WorksheetAn
   mask: ArrayBuffer;
 };
 
-type StoredAnalysis = Omit<PhotoAnalysisResult, "preview" | "mask"> & WorksheetAnalysisDetails;
+type StoredAnalysis = PhotoAnalysisResult & WorksheetAnalysisDetails & { referenceComparison: ReferenceComparisonData | null };
 type WorkerMessage =
   | { type: "progress"; requestId: number; stage: string }
   | { type: "error"; requestId: number; message: string }
@@ -126,7 +170,7 @@ function initializePhotoAnalysis(container: HTMLElement): void {
   const imageInput = container.querySelector<HTMLInputElement>("[data-analysis-image]");
   const worksheetInput = container.querySelector<HTMLInputElement>("[data-analysis-worksheet]");
   const worksheetReferenceStatus = container.querySelector<HTMLElement>("[data-analysis-worksheet-reference-status]");
-  const expectedTextInput = container.querySelector<HTMLInputElement>("[data-analysis-expected-text]");
+  const expectedTextInput = container.querySelector<HTMLTextAreaElement>("[data-analysis-expected-text]");
   const modelSelect = container.querySelector<HTMLSelectElement>("[data-analysis-model]");
   const imageFrame = container.querySelector<HTMLElement>("[data-analysis-image-frame]");
   const preview = container.querySelector<HTMLImageElement>("[data-analysis-preview]");
@@ -152,7 +196,29 @@ function initializePhotoAnalysis(container: HTMLElement): void {
   const maskCanvas = container.querySelector<HTMLCanvasElement>("[data-analysis-mask]");
   const offlineStatus = container.querySelector<HTMLElement>("[data-offline-status]");
   const overlayCanvas = container.querySelector<HTMLCanvasElement>("[data-analysis-overlay]");
-  if (!form || !imageInput || !worksheetInput || !worksheetReferenceStatus || !worksheetResultOutput || !expectedTextInput || !modelSelect || !imageFrame || !preview || !cropOverlay || !cropPolygon || !status || !resetCropButton || !runButton || !clearButton || !exportJsonButton || !exportOverlayButton || !results || !analysisContext || !lineCount || !deskewOutput || !thresholdOutput || !foregroundOutput || !lineSpacingOutput || !lineList || !rectifiedCanvas || !maskCanvas || !overlayCanvas || cornerHandles.length !== 4) return;
+  const wordGapsOutput = container.querySelector<HTMLElement>("[data-analysis-word-gaps]");
+  const referenceStatus = container.querySelector<HTMLElement>("[data-analysis-reference-status]");
+  const referenceFontOutput = container.querySelector<HTMLElement>("[data-analysis-reference-font]");
+  const referenceSourcesTitle = container.querySelector<HTMLElement>("[data-analysis-reference-sources-title]");
+  const referenceSources = container.querySelector<HTMLUListElement>("[data-analysis-reference-sources]");
+  const referenceViewSelect = container.querySelector<HTMLSelectElement>("[data-analysis-reference-view]");
+  const referenceFigure = container.querySelector<HTMLElement>("[data-analysis-reference-figure]");
+  const referenceCanvas = container.querySelector<HTMLCanvasElement>("[data-analysis-reference-canvas]");
+  const referenceCaption = container.querySelector<HTMLElement>("[data-analysis-reference-caption]");
+  const referenceMetrics = container.querySelector<HTMLElement>("[data-analysis-reference-metrics]");
+  const referenceScaleX = container.querySelector<HTMLElement>("[data-analysis-reference-scale-x]");
+  const referenceScaleY = container.querySelector<HTMLElement>("[data-analysis-reference-scale-y]");
+  const referenceResidual = container.querySelector<HTMLElement>("[data-analysis-reference-residual]");
+  const referenceWordSpacing = container.querySelector<HTMLElement>("[data-analysis-reference-word-spacing]");
+  if (
+    !form || !imageInput || !worksheetInput || !worksheetReferenceStatus || !worksheetResultOutput || !expectedTextInput || !modelSelect
+    || !imageFrame || !preview || !cropOverlay || !cropPolygon || !status || !resetCropButton || !runButton || !clearButton
+    || !exportJsonButton || !exportOverlayButton || !results || !analysisContext || !lineCount || !deskewOutput || !thresholdOutput
+    || !foregroundOutput || !lineSpacingOutput || !lineList || !rectifiedCanvas || !maskCanvas || !overlayCanvas || !wordGapsOutput
+    || !referenceStatus || !referenceFontOutput || !referenceSourcesTitle || !referenceSources || !referenceViewSelect
+    || !referenceFigure || !referenceCanvas || !referenceCaption || !referenceMetrics || !referenceScaleX || !referenceScaleY
+    || !referenceResidual || !referenceWordSpacing || cornerHandles.length !== 4
+  ) return;
 
   const copy = JSON.parse(container.dataset.messages ?? "{}") as AnalysisMessages;
   const maxFileBytes = 20 * 1024 * 1024;
@@ -170,8 +236,114 @@ function initializePhotoAnalysis(container: HTMLElement): void {
   let offlineWorker: Worker | null = null;
   const downloadUrls = new Set<string>();
   let latestAnalysis: StoredAnalysis | null = null;
+  const fontById = new Map<string, FontExport>();
+  const sourceById = new Map<string, SourceRecord>();
+  const familyByFontId = new Map<string, string>();
+  const loadedFontPromises = new Map<string, Promise<string>>();
+  const shaper = new BrowserTextShaper(familyByFontId);
+  let referenceLayout: ReferenceLayout | null = null;
+  let referenceFit: PhotoReferenceFit | null = null;
+  let referenceDataFailed = false;
 
   const format = new Intl.NumberFormat(document.documentElement.lang, { maximumFractionDigits: 1 });
+  const localUrl = (value: string) => {
+    const url = new URL(value, location.href);
+    if (url.origin !== location.origin) throw new Error("Photo reference data must stay same-origin.");
+    return url.href;
+  };
+
+  const referenceDataPromise = (async () => {
+    try {
+      if (!container.dataset.indexUrl) throw new Error("Missing local data index.");
+      const indexResponse = await fetch(localUrl(container.dataset.indexUrl), { credentials: "same-origin" });
+      if (!indexResponse.ok) throw new Error("Local data index request failed.");
+      const index = await indexResponse.json() as DataIndex;
+      const [fontResponse, sourceResponse] = await Promise.all([
+        fetch(localUrl(index.fonts), { credentials: "same-origin" }),
+        fetch(localUrl(index.sources), { credentials: "same-origin" }),
+      ]);
+      if (!fontResponse.ok || !sourceResponse.ok) throw new Error("Local font or source request failed.");
+      const [fonts, sources] = await Promise.all([fontResponse.json(), sourceResponse.json()]) as [FontExport[], SourceRecord[]];
+      for (const font of fonts) fontById.set(font.id, font);
+      for (const source of sources) sourceById.set(source.id, source);
+    } catch {
+      referenceDataFailed = true;
+    }
+  })();
+
+  const loadReferenceFont = async (font: FontExport) => {
+    if (!font.file_urls?.length) throw new Error("The reference font has no local asset.");
+    let pending = loadedFontPromises.get(font.id);
+    if (!pending) {
+      const family = `schreibatlas-photo-${font.id}`;
+      const sources = font.file_urls.map((url) => `url(\"${localUrl(url)}\")`).join(", ");
+      pending = new FontFace(family, sources).load().then((face) => {
+        document.fonts.add(face);
+        familyByFontId.set(font.id, family);
+        return family;
+      });
+      loadedFontPromises.set(font.id, pending);
+    }
+    return pending;
+  };
+
+  const selectedReferenceFont = () => {
+    const option = modelSelect.selectedOptions[0];
+    let fontIds: string[];
+    try {
+      fontIds = JSON.parse(option?.dataset.referenceFonts ?? "[]") as string[];
+    } catch {
+      return null;
+    }
+    return fontIds.map((id) => fontById.get(id)).find((font) => Boolean(font
+      && font.correspondence.model === modelSelect.value
+      && font.file_urls?.length
+      && font.calibration
+      && Number.isFinite(font.calibration.x_height_em)
+      && font.calibration.x_height_em > 0)) ?? null;
+  };
+
+  const shapeReferenceText = async (font: FontExport, text: string): Promise<ReferenceLayout> => {
+    const option = modelSelect.selectedOptions[0];
+    const direction: TextDirection = option?.dataset.direction === "rtl" ? "rtl" : "ltr";
+    if (direction === "rtl") throw new Error("RTL reference fitting is not implemented.");
+    const language = option?.dataset.language ?? undefined;
+    await loadReferenceFont(font);
+    const run = await shaper.shape({ text, fontId: font.id, language, direction });
+    const fontSize = 40 / font.calibration!.x_height_em;
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Reference text metrics are unavailable.");
+    context.font = `${fontSize}px \"${run.fontFamily}\"`;
+    context.direction = direction;
+    const lineTexts = text.trim().split(/\r\n?|\n/);
+    if (lineTexts.some((line) => !line.trim())) throw new Error("Blank reference text lines are not aligned.");
+    const lineSpacing = fontSize * 1.5;
+    const lines = lineTexts.map((lineText, lineIndex) => {
+      const metrics = context.measureText(lineText);
+      const left = Number.isFinite(metrics.actualBoundingBoxLeft) ? metrics.actualBoundingBoxLeft : 0;
+      const right = Number.isFinite(metrics.actualBoundingBoxRight) ? metrics.actualBoundingBoxRight : metrics.width;
+      const ascent = Number.isFinite(metrics.actualBoundingBoxAscent) ? metrics.actualBoundingBoxAscent : 0;
+      const descent = Number.isFinite(metrics.actualBoundingBoxDescent) ? metrics.actualBoundingBoxDescent : 0;
+      const words = [...new Intl.Segmenter(language, { granularity: "word" }).segment(lineText)].filter((part) => part.isWordLike);
+      const wordBoundaries = words.slice(0, -1).flatMap((word, index) => {
+        const next = words[index + 1];
+        const leftEdge = context.measureText(lineText.slice(0, word.index + word.segment.length)).width;
+        const rightEdge = context.measureText(lineText.slice(0, next.index)).width;
+        return rightEdge > leftEdge ? [{ center: (leftEdge + rightEdge) / 2, width: rightEdge - leftEdge }] : [];
+      });
+      return {
+        text: lineText,
+        inkLeft: -left,
+        inkRight: right,
+        ascent,
+        descent,
+        baseline: ascent + lineIndex * lineSpacing,
+        wordBoundaries,
+      };
+    });
+    return { font, fontFamily: run.fontFamily, fontSize, direction, lines };
+  };
 
   const prepareOfflineWorker = () => {
     if (!offlineStatus || !navigator.serviceWorker?.controller || offlineWorker) return;
@@ -204,6 +376,19 @@ function initializePhotoAnalysis(container: HTMLElement): void {
   const clearResults = () => {
     results.hidden = true;
     latestAnalysis = null;
+    referenceLayout = null;
+    referenceFit = null;
+    referenceStatus.textContent = copy.referenceUnavailable;
+    referenceFontOutput.textContent = "";
+    referenceSources.replaceChildren();
+    referenceSources.hidden = true;
+    referenceSourcesTitle.hidden = true;
+    referenceViewSelect.disabled = true;
+    referenceFigure.hidden = true;
+    referenceMetrics.hidden = true;
+    referenceCanvas.width = 0;
+    referenceCanvas.height = 0;
+    wordGapsOutput.textContent = copy.referenceWordSpacingUnavailable;
     exportJsonButton.disabled = true;
     exportOverlayButton.disabled = true;
     analysisContext.textContent = "";
@@ -237,6 +422,175 @@ function initializePhotoAnalysis(container: HTMLElement): void {
     }, 1000);
   };
 
+
+  const renderReferenceSources = (font: FontExport) => {
+    referenceSources.replaceChildren();
+    for (const sourceId of font.sources) {
+      const source = sourceById.get(sourceId);
+      if (!source) continue;
+      const item = document.createElement("li");
+      const details = [source.title, ...source.author];
+      if (source.year !== null) details.push(String(source.year));
+      if (source.rights.license) details.push(source.rights.license);
+      item.textContent = details.join(" · ");
+      if (source.url && /^https?:\/\//.test(source.url)) {
+        const link = document.createElement("a");
+        link.href = source.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = source.url;
+        item.append(" ", link);
+      }
+      referenceSources.append(item);
+    }
+    referenceSources.hidden = referenceSources.childElementCount === 0;
+    referenceSourcesTitle.hidden = referenceSources.hidden;
+  };
+
+  const drawReferenceText = (context: CanvasRenderingContext2D, layout: ReferenceLayout, fit: PhotoReferenceFit, color: string, opacity: number) => {
+    if (!fit.transform) return;
+    context.save();
+    context.setTransform(fit.transform.scaleX, 0, 0, fit.transform.scaleY, fit.transform.translateX, fit.transform.translateY);
+    context.font = `${layout.fontSize}px \"${layout.fontFamily}\"`;
+    context.direction = layout.direction;
+    context.textAlign = "left";
+    context.textBaseline = "alphabetic";
+    context.fillStyle = color;
+    context.globalAlpha = opacity;
+    for (const line of layout.lines) context.fillText(line.text, 0, line.baseline);
+    context.restore();
+  };
+
+  const renderReferenceView = () => {
+    if (!latestAnalysis || !referenceLayout || !referenceFit?.available || !referenceFit.transform) return;
+    const width = latestAnalysis.width;
+    const height = latestAnalysis.height;
+    referenceCanvas.width = width;
+    referenceCanvas.height = height;
+    const context = referenceCanvas.getContext("2d");
+    if (!context) return;
+    const mode = referenceViewSelect.value;
+    const captions: Record<string, string> = {
+      reference: copy.referenceViewReference,
+      overlay: copy.referenceViewOverlay,
+      difference: copy.referenceViewDifference,
+    };
+    referenceCaption.textContent = captions[mode] ?? copy.referenceViewReference;
+    referenceCanvas.setAttribute("aria-label", referenceCaption.textContent);
+
+    if (mode === "reference") {
+      context.fillStyle = "white";
+      context.fillRect(0, 0, width, height);
+      drawReferenceText(context, referenceLayout, referenceFit, "#075b91", 1);
+      return;
+    }
+    if (mode === "overlay") {
+      const previewImage = context.createImageData(width, height);
+      previewImage.data.set(latestAnalysis.preview);
+      context.putImageData(previewImage, 0, 0);
+      drawReferenceText(context, referenceLayout, referenceFit, "#075b91", 0.55);
+      return;
+    }
+
+    const referenceMask = document.createElement("canvas");
+    referenceMask.width = width;
+    referenceMask.height = height;
+    const referenceContext = referenceMask.getContext("2d");
+    if (!referenceContext) return;
+    drawReferenceText(referenceContext, referenceLayout, referenceFit, "black", 1);
+    const referencePixels = referenceContext.getImageData(0, 0, width, height).data;
+    const difference = context.createImageData(width, height);
+    for (let pixel = 0; pixel < latestAnalysis.mask.length; pixel += 1) {
+      const offset = pixel * 4;
+      const observed = latestAnalysis.mask[pixel] === 1;
+      const expected = referencePixels[offset + 3] > 32;
+      const color = observed && expected ? [24, 128, 80] : observed ? [194, 45, 47] : expected ? [25, 96, 166] : [255, 255, 255];
+      difference.data[offset] = color[0];
+      difference.data[offset + 1] = color[1];
+      difference.data[offset + 2] = color[2];
+      difference.data[offset + 3] = 255;
+    }
+    context.putImageData(difference, 0, 0);
+  };
+
+  const renderReferenceComparison = async (analysis: StoredAnalysis) => {
+    await referenceDataPromise;
+    if (latestAnalysis !== analysis) return null;
+    referenceLayout = null;
+    referenceFit = null;
+    referenceFigure.hidden = true;
+    referenceMetrics.hidden = true;
+    referenceViewSelect.disabled = true;
+    if (referenceDataFailed) {
+      referenceStatus.textContent = copy.referenceFontUnavailable;
+      wordGapsOutput.textContent = copy.referenceWordSpacingUnavailable;
+      return null;
+    }
+    const font = selectedReferenceFont();
+    if (!font) {
+      referenceStatus.textContent = copy.referenceUnavailable;
+      wordGapsOutput.textContent = copy.referenceWordSpacingUnavailable;
+      return null;
+    }
+
+    renderReferenceSources(font);
+    const correspondence = `${font.correspondence.degree}${font.correspondence.notes ? ` · ${font.correspondence.notes}` : ""}`;
+    referenceFontOutput.replaceChildren(document.createTextNode(`${font.name} · ${correspondence} · `));
+    if (font.license_file_url) {
+      const licenseLink = document.createElement("a");
+      licenseLink.href = localUrl(font.license_file_url);
+      licenseLink.textContent = font.license;
+      referenceFontOutput.append(licenseLink);
+    } else referenceFontOutput.append(document.createTextNode(font.license));
+    try {
+      const text = expectedTextInput.value.trim();
+      const layout = await shapeReferenceText(font, text);
+      if (latestAnalysis !== analysis) return null;
+      const fit = fitReferenceText(layout.lines, analysis.lines);
+      const wordSpacing = measureReferenceWordSpacing(layout.lines, analysis.lines, analysis.mask, analysis.width, analysis.height, fit);
+      referenceLayout = layout;
+      referenceFit = fit;
+      analysis.referenceComparison = {
+        font: {
+          id: font.id,
+          name: font.name,
+          license: font.license,
+          licenseFileUrl: font.license_file_url ?? null,
+          fileUrls: font.file_urls ?? [],
+          correspondence: font.correspondence,
+          sources: font.sources.map((id) => sourceById.get(id)).filter((source): source is SourceRecord => source !== undefined),
+        },
+        fit,
+        wordSpacing,
+      };
+      if (!fit.available) {
+        referenceStatus.textContent = copy.referenceFitUnavailable;
+        wordGapsOutput.textContent = copy.referenceWordSpacingUnavailable;
+        return analysis.referenceComparison;
+      }
+      referenceStatus.textContent = fit.confidence === "medium" ? copy.referenceFitMedium : copy.referenceFitLow;
+      referenceViewSelect.disabled = false;
+      referenceFigure.hidden = false;
+      referenceMetrics.hidden = fit.confidence !== "medium";
+      if (fit.confidence === "medium" && fit.transform) {
+        referenceScaleX.textContent = format.format(fit.transform.scaleX);
+        referenceScaleY.textContent = format.format(fit.transform.scaleY);
+        referenceResidual.textContent = format.format(fit.residual ?? 0);
+      }
+      const spacingText = wordSpacing.available
+        ? `${format.format(wordSpacing.value ?? 0)}× (${wordSpacing.confidence})`
+        : copy.referenceWordSpacingUnavailable;
+      referenceWordSpacing.textContent = spacingText;
+      wordGapsOutput.textContent = spacingText;
+      renderReferenceView();
+      return analysis.referenceComparison;
+    } catch {
+      referenceStatus.textContent = copy.referenceFontUnavailable;
+      wordGapsOutput.textContent = copy.referenceWordSpacingUnavailable;
+      return null;
+    }
+  };
+
   const cancelWorker = () => {
     requestId += 1;
     worker?.terminate();
@@ -268,11 +622,9 @@ function initializePhotoAnalysis(container: HTMLElement): void {
   };
 
   const invalidateResults = () => {
-    if (worker || !results.hidden) {
-      cancelWorker();
-      clearResults();
-      status.textContent = copy.statusIdle;
-    }
+    cancelWorker();
+    clearResults();
+    if (selectedFile) status.textContent = copy.statusIdle;
     updateControls();
   };
 
@@ -420,6 +772,9 @@ function initializePhotoAnalysis(container: HTMLElement): void {
 
   const exportMeasurements = () => {
     if (!latestAnalysis) return;
+    const { preview, mask, ...metrics } = latestAnalysis;
+    void preview;
+    void mask;
     const model = modelSelect.selectedOptions[0];
     const report = {
       format: "schreibatlas-photo-analysis",
@@ -430,11 +785,13 @@ function initializePhotoAnalysis(container: HTMLElement): void {
         modelId: modelSelect.value,
         modelLabel: model?.textContent?.trim() ?? modelSelect.value,
         modelUsedForScoring: false,
+        referenceFontId: latestAnalysis.referenceComparison?.font.id ?? null,
+        referenceUsedForAlignment: latestAnalysis.referenceComparison?.fit.available ?? false,
       },
       imageDimensions: { inputWidth: imageWidth, inputHeight: imageHeight, rectifiedWidth: latestAnalysis.width, rectifiedHeight: latestAnalysis.height },
-      metrics: latestAnalysis,
-      unavailable: { wordGaps: { available: false, reasonCode: "no_ocr_or_word_segmentation" } },
-      limitations: ["no_ocr", "no_model_scoring", "baseline_is_low_confidence_lower_ink_envelope", "worksheet_measurements_require_a_matching_local_svg_and_confident_markers", ...(latestAnalysis.worksheetGeometry?.status === "recognized" ? [] : ["measurements_depend_on_manual_crop"])],
+      metrics,
+      unavailable: { wordGaps: latestAnalysis.referenceComparison?.wordSpacing ?? { available: false, reason: "no-reference-fit", confidence: "unavailable", referenceUsed: false, observations: [] } },
+      limitations: ["no_ocr", "no_model_scoring", "reference_font_is_a_digital_interpretation", "reference_fit_uses_bounded_axis_scales_and_translation_only", "line_spacing_is_a_display_convention", "baseline_is_low_confidence_lower_ink_envelope", "worksheet_measurements_require_a_matching_local_svg_and_confident_markers", ...(latestAnalysis.worksheetGeometry?.status === "recognized" ? [] : ["measurements_depend_on_manual_crop"])],
     };
     try {
       downloadBlob(new Blob([JSON.stringify(report, null, 2)], { type: "application/json" }), "schreibatlas-photo-analysis.json");
@@ -464,10 +821,12 @@ function initializePhotoAnalysis(container: HTMLElement): void {
     }
   };
 
-  const displayResult = (message: ResultMessage) => {
+  const displayResult = async (message: ResultMessage) => {
     const previewPixels = new Uint8ClampedArray(message.preview);
     const mask = new Uint8Array(message.mask);
     latestAnalysis = {
+      preview: previewPixels,
+      mask,
       width: message.width,
       height: message.height,
       threshold: message.threshold,
@@ -478,6 +837,7 @@ function initializePhotoAnalysis(container: HTMLElement): void {
       lineSpacing: message.lineSpacing,
       worksheetGeometry: message.worksheetGeometry,
       worksheetWriting: message.worksheetWriting,
+      referenceComparison: null,
     };
     exportJsonButton.disabled = false;
     exportOverlayButton.disabled = false;
@@ -575,6 +935,10 @@ function initializePhotoAnalysis(container: HTMLElement): void {
       item.textContent = `${copy.line} ${line.index + 1}: ${copy.writingWidth} ${format.format(line.width)} px; ${copy.lineHeight} ${format.format(line.height)} px; ${copy.baselineCandidate} y=${format.format(baseline.y)} px, ${copy.slope} ${format.format(baseline.slopeDegrees)}° (${copy.baselineConfidenceLow}); ${copy.baselineVariation} ${format.format(baseline.residualStdDev)} px.`;
       lineList.append(item);
     }
+    const analysis = latestAnalysis;
+    if (!analysis) return;
+    await renderReferenceComparison(analysis);
+    if (latestAnalysis !== analysis) return;
     results.hidden = false;
   };
 
@@ -611,8 +975,11 @@ function initializePhotoAnalysis(container: HTMLElement): void {
           status.textContent = copy.statusDecodeError;
           return;
         }
-        displayResult(data);
-        status.textContent = copy.statusComplete;
+        void displayResult(data).then(() => {
+          if (requestId === currentRequest) status.textContent = copy.statusComplete;
+        }).catch(() => {
+          if (requestId === currentRequest) status.textContent = copy.statusDecodeError;
+        });
       };
       currentWorker.onerror = () => {
         currentWorker.terminate();
@@ -670,6 +1037,7 @@ function initializePhotoAnalysis(container: HTMLElement): void {
   worksheetInput.addEventListener("change", () => { void chooseWorksheetReference(worksheetInput.files?.[0] ?? null); });
   expectedTextInput.addEventListener("input", invalidateForInputChange);
   modelSelect.addEventListener("change", invalidateForInputChange);
+  referenceViewSelect.addEventListener("change", renderReferenceView);
   resetCropButton.addEventListener("click", () => {
     if (!selectedFile) return;
     invalidateForInputChange();

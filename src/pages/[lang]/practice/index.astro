@@ -1,7 +1,9 @@
 ---
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { messages, type Locale } from "../../../lib/i18n";
 import { withBase } from "../../../lib/routes";
+import { worksheetPresets } from "../../../../tools/worksheet.mjs";
 import { loadContent, locales } from "../../../../tools/content.mjs";
 import type { LanguageRecord, ModelRecord } from "../../../../tools/content.mjs";
 
@@ -32,6 +34,7 @@ const clientCopy = {
   missingOutlines: copy.practiceMissingOutlines,
   overflow: copy.practiceOverflow,
   error: copy.practiceStatusError,
+  exportError: copy.practiceExportError,
   provenance: copy.practiceProvenance,
   copyLinkSuccess: copy.practiceCopyLinkSuccess,
   copyLinkError: copy.practiceCopyLinkError,
@@ -46,6 +49,7 @@ const clientCopy = {
       <h1>{copy.practiceTitle}</h1>
       <p>{copy.practiceDescription}</p>
       <p class="comparison-disclaimer">{copy.practiceTextPromptNote} {copy.practiceContextLimit}</p>
+      <p class="worksheet-preset-note">{copy.practicePresetNote}</p>
       <p>{copy.practicePrivacy}</p>
     </header>
 
@@ -60,7 +64,13 @@ const clientCopy = {
         </select>
       </label>
       <label for="worksheet-text">{copy.practiceText}
-        <input id="worksheet-text" type="text" maxlength="48" data-text-input />
+        <input id="worksheet-text" type="text" maxlength="24" data-text-input />
+      </label>
+      <label for="worksheet-preset">{copy.practicePreset}
+        <select id="worksheet-preset" data-preset-select>
+          <option value="">{copy.practicePresetPlaceholder}</option>
+          {worksheetPresets.map((preset) => <option value={preset.id} data-model={preset.model} data-text={preset.text}>Volksschrift · {preset.text}</option>)}
+        </select>
       </label>
       <label for="worksheet-paper">{copy.practicePaper}
         <select id="worksheet-paper" data-paper-select>
@@ -112,6 +122,8 @@ const clientCopy = {
       </div>
       <div class="worksheet-actions">
         <button type="button" data-export-svg disabled>{copy.practiceExportSvg}</button>
+        <button type="button" data-export-png disabled>{copy.practiceExportPng}</button>
+        <button type="button" data-export-pdf disabled>{copy.practiceExportPdf}</button>
         <button type="button" data-print-sheet disabled>{copy.practicePrint}</button>
       </div>
     </form>

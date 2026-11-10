@@ -1,0 +1,15 @@
+---
+// SPDX-License-Identifier: Apache-2.0
+import TextComparisonPage from "../../../../components/TextComparisonPage.astro";
+import { type Locale } from "../../../../lib/i18n";
+import { loadContent, locales } from "../../../../../tools/content.mjs";
+import type { Content } from "../../../../../tools/content.mjs";
+
+export function getStaticPaths() {
+  const content = loadContent();
+  return locales.map((lang) => ({ params: { lang }, props: { lang, content } }));
+}
+
+const { lang, content } = Astro.props as { lang: Locale; content: Content };
+---
+<TextComparisonPage lang={lang} content={content} kind="sentence" />

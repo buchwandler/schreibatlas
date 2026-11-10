@@ -1,0 +1,149 @@
+---
+// SPDX-License-Identifier: Apache-2.0
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { messages, type Locale } from "../lib/i18n";
+import { withBase } from "../lib/routes";
+import type { Content } from "../../tools/content.mjs";
+
+interface Props {
+  lang: Locale;
+  content: Content;
+  kind: "word" | "sentence";
+}
+
+const { lang, content, kind } = Astro.props as Props;
+const copy = messages[lang];
+const isSentence = kind === "sentence";
+const title = isSentence ? copy.sentenceTitle : copy.wordTitle;
+const description = isSentence ? copy.sentenceDescription : copy.wordDescription;
+const inputLabel = isSentence ? copy.sentenceInputLabel : copy.wordInputLabel;
+const inputPlaceholder = isSentence ? copy.sentenceInputPlaceholder : copy.wordInputPlaceholder;
+const relatedTitle = isSentence ? copy.wordTitle : copy.sentenceTitle;
+const relatedPath = isSentence ? "words/" : "sentences/";
+const canonicalPath = `/${lang}/compare/${isSentence ? "sentences" : "words"}/`;
+const maximumLength = isSentence ? 600 : 240;
+const localized = (values: Record<string, string>) => values[lang] ?? values.en ?? values.de ?? "";
+const pageData = {
+  models: content.models.map((model) => ({
+    id: model.id,
+    name: localized(model.name),
+    languages: model.languages,
+    reference_fonts: model.reference_fonts,
+    metrics: model.metrics,
+  })),
+  languages: content.languages.map((language) => ({ id: language.id, name: localized(language.name), direction: language.direction })),
+};
+const messageData = {
+  compareModelA: copy.compareModelA,
+  compareModelB: copy.compareModelB,
+  compareMode: copy.compareMode,
+  sideBySide: copy.sideBySide,
+  overlay: copy.overlay,
+  opacity: copy.opacity,
+  baseline: copy.baseline,
+  xHeight: copy.xHeight,
+  sources: copy.sources,
+  noSources: copy.noSources,
+  licenseAttribution: copy.licenseAttribution,
+  sourceAuthor: copy.sourceAuthor,
+  sourceYear: copy.sourceYear,
+  sourcePages: copy.sourcePages,
+  sourceNotes: copy.sourceNotes,
+  sourceOpen: copy.sourceOpen,
+  fontDegree: copy.fontDegree,
+  noFonts: copy.noFonts,
+  fontCorrespondence: copy.fontCorrespondence,
+  fontCalibration: copy.fontCalibration,
+  wordTitle: copy.wordTitle,
+  wordDescription: copy.wordDescription,
+  wordInputLabel: copy.wordInputLabel,
+  wordInputPlaceholder: copy.wordInputPlaceholder,
+  wordFontA: copy.wordFontA,
+  wordFontB: copy.wordFontB,
+  wordPreview: copy.wordPreview,
+  wordShapingNotice: copy.wordShapingNotice,
+  wordFontLimitations: copy.wordFontLimitations,
+  wordNoFont: copy.wordNoFont,
+  wordNoCalibration: copy.wordNoCalibration,
+  wordNoFiles: copy.wordNoFiles,
+  wordEmptyText: copy.wordEmptyText,
+  wordLoadError: copy.wordLoadError,
+  wordLoading: copy.wordLoading,
+  wordSummary: copy.wordSummary,
+  sentenceSample: copy.sentenceSample,
+};
+const safeJson = (value: unknown) => JSON.stringify(value).replaceAll("<", "\\u003c");
+---
+<BaseLayout lang={lang} title={title} description={description} canonicalPath={canonicalPath} section="compare">
+  <div class="content-page word-comparison" data-word-comparison data-comparison-kind={kind} data-index-url={withBase("data/v1/index.json")}>
+    <nav class="breadcrumbs" aria-label={copy.breadcrumbNavigation}>
+      <a href={withBase(`${lang}/`)}>{copy.home}</a>
+      <span aria-current="page">{title}</span>
+    </nav>
+    <header class="page-heading">
+      <h1>{title}</h1>
+      <p>{description}</p>
+      <p class="comparison-disclaimer">{copy.wordShapingNotice}</p>
+      <p class="comparison-disclaimer">{copy.wordFontLimitations}</p>
+      {isSentence && <p class="comparison-disclaimer">{copy.sentenceLineSpacingNote}</p>}
+      <nav class="comparison-related-links" aria-label={copy.compareTitle}>
+        <a href={withBase(`${lang}/compare/letters/`)}>{copy.compareTitle}</a>
+        <a href={withBase(`${lang}/compare/${relatedPath}`)}>{relatedTitle}</a>
+      </nav>
+    </header>
+
+    <section class="word-controls" aria-label={title}>
+      <label for="word-input">{inputLabel}
+        <textarea id="word-input" rows={isSentence ? 5 : 3} maxlength={maximumLength} placeholder={inputPlaceholder} spellcheck="false"></textarea>
+      </label>
+      {isSentence && <button class="secondary sentence-sample-button" type="button" data-sentence-sample>{copy.sentenceSampleButton}</button>}
+      <label for="word-model-a">{copy.compareModelA}
+        <select id="word-model-a">
+          {content.models.map((model) => <option value={model.id}>{localized(model.name)}</option>)}
+        </select>
+      </label>
+      <label for="word-model-b">{copy.compareModelB}
+        <select id="word-model-b">
+          {content.models.map((model) => <option value={model.id}>{localized(model.name)}</option>)}
+        </select>
+      </label>
+      <label for="word-font-a">{copy.wordFontA}
+        <select id="word-font-a" disabled><option value="">{copy.wordNoFont}</option></select>
+      </label>
+      <label for="word-font-b">{copy.wordFontB}
+        <select id="word-font-b" disabled><option value="">{copy.wordNoFont}</option></select>
+      </label>
+      <label for="word-mode">{copy.compareMode}
+        <select id="word-mode">
+          <option value="side-by-side">{copy.sideBySide}</option>
+          <option value="overlay">{copy.overlay}</option>
+        </select>
+      </label>
+      <label class="comparison-opacity" for="word-opacity">{copy.opacity}
+        <input id="word-opacity" type="range" min="0.1" max="1" step="0.05" value="0.5" />
+        <output id="word-opacity-value" for="word-opacity">50%</output>
+      </label>
+      <fieldset class="comparison-guides">
+        <legend>{copy.normalizedGuidelines}</legend>
+        <label for="word-baseline"><input id="word-baseline" type="checkbox" checked /> {copy.showBaseline}</label>
+        <label for="word-x-height"><input id="word-x-height" type="checkbox" checked /> {copy.showXHeight}</label>
+      </fieldset>
+    </section>
+
+    <p id="word-status" class="comparison-status" role="status" aria-live="polite">{copy.wordNoFont}</p>
+    <p id="word-summary" class="comparison-summary" aria-live="polite"></p>
+    <section class="word-preview-panel" aria-labelledby="word-preview-heading">
+      <h2 id="word-preview-heading">{copy.wordPreview}</h2>
+      <pre id="word-literal-preview">{copy.wordEmptyText}</pre>
+    </section>
+    <div id="word-provenance" class="comparison-provenance" role="region" aria-label={copy.sources}></div>
+    <div id="word-stage" class="comparison-stage" role="group" aria-label={title}></div>
+    <noscript><p>{description}</p></noscript>
+
+    <script id="word-data" type="application/json" set:html={safeJson(pageData)}></script>
+    <script id="word-messages" type="application/json" set:html={safeJson(messageData)}></script>
+  </div>
+  <script>
+    import "../scripts/word-comparison";
+  </script>
+</BaseLayout>

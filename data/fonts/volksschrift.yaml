@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: font-volksschrift
+name: "Volksschrift UNZ1#"
+author: Peter Wiegel (CAT-Fonts)
+project_url: "https://www.peter-wiegel.de/Volksschrift.html"
+license: OFL-1.1
+files:
+  - "assets/fonts/de-volksschrift/Volksschrift-UNZ1.ttf"
+license_file: licenses/OFL-1.1-Volksschrift.txt
+calibration:
+  x_height_em: 0.368
+  x_height_method: "OpenType OS/2.sxHeight: 368 units / 1000 units per em."
+  ascender_em: 0.75
+  descender_em: 0.37
+correspondence:
+  model: de-volksschrift
+  degree: partial
+  notes: "The designer describes the font as a computerized interpretation based on Deutsche Volksschrift. Font metrics and outlines are digital font data, not evidence for the exact forms or movement of an individual historical writer."
+sources:
+  - src-volksschrift-author
+  - src-volksschrift-font

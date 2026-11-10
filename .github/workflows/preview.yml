@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: Apache-2.0
+name: PR visual preview
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Capture localized visual previews
+        run: npm run test:e2e -- --grep "PR visual preview screenshots"
+        env:
+          GENERATE_PREVIEW_ARTIFACTS: "true"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: schreibatlas-pr-visual-preview
+          path: |
+            dist/
+            test-results/pr-preview/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -63,6 +64,8 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
     generatedFiles.add(path);
   }
 
+  const countries = sortedValues(records.countries);
+  const languages = sortedValues(records.languages);
   const models = sortedValues(records.models);
   const glyphs = records.glyphs.map(({ value }) => value)
     .sort((left, right) => {
@@ -80,9 +83,8 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
   }));
   const sources = sortedValues(records.sources);
   const fonts = sortedValues(records.fonts);
-  const fontExports = fonts.map((font) => ({
-    ...font,
-    file_urls: font.files.map((file, index) => {
+  const fontExports = fonts.map((font) => {
+    const file_urls = font.files.map((file, index) => {
       const assetPath = `assets/fonts/${font.id}/${index + 1}-${basename(file)}`;
       const outputPath = resolve(targetDirectory, assetPath);
       if (!outputPath.startsWith(`${targetDirectory}${sep}`)) throw new Error(`Font asset path is outside the data output: ${assetPath}`);
@@ -90,8 +92,19 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
       copyFileSync(resolve(repositoryRoot, file), outputPath);
       generatedFiles.add(assetPath);
       return `${apiPrefix}/${assetPath}`;
-    }),
-  }));
+    });
+    let license_file_url = null;
+    if (font.license_file) {
+      const assetPath = `assets/fonts/${font.id}/${basename(font.license_file)}`;
+      const outputPath = resolve(targetDirectory, assetPath);
+      if (!outputPath.startsWith(`${targetDirectory}${sep}`)) throw new Error(`Font license path is outside the data output: ${assetPath}`);
+      mkdirSync(resolve(outputPath, ".."), { recursive: true });
+      copyFileSync(resolve(repositoryRoot, font.license_file), outputPath);
+      generatedFiles.add(assetPath);
+      license_file_url = `${apiPrefix}/${assetPath}`;
+    }
+    return { ...font, file_urls, license_file_url };
+  });
 
   const strokes = records.strokes.map(({ value }) => value).sort((left, right) => {
     const leftRoute = `${left.model}/${glyphRouteSlug(left.character)}`;
@@ -120,6 +133,8 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
     url: `${apiPrefix}/strokes/${stroke.model}/${glyphRouteSlug(stroke.character)}.json`,
   }));
 
+  writeJson("countries.json", countries);
+  writeJson("languages.json", languages);
   for (const model of models) writeJson(`models/${model.id}.json`, model);
   for (const glyph of glyphs) writeJson(`glyphs/${glyph.model}/${glyphRouteSlug(glyph.character)}.json`, glyph);
   writeJson("models.json", models.map((model) => ({ ...model, url: `${apiPrefix}/models/${model.id}.json` })));
@@ -130,6 +145,8 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
   for (const stroke of strokeExports) writeJson(`strokes/${stroke.model}/${glyphRouteSlug(stroke.character)}.json`, stroke);
 
   const index = {
+    countries: `${apiPrefix}/countries.json`,
+    languages: `${apiPrefix}/languages.json`,
     schemaVersion: 1,
     datasetVersion: packageJson.version,
     generatedAt,
@@ -141,7 +158,7 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
   };
   writeJson("index.json", index);
 
-  const expectedUrls = [index.models, index.sources, index.fonts, index.glyphs, index.strokes, ...models.map((model) => `${apiPrefix}/models/${model.id}.json`), ...glyphIndex.map((glyph) => glyph.url), ...fontExports.flatMap((font) => font.file_urls), ...strokeIndex.map((stroke) => stroke.url), ...strokeExports.flatMap((stroke) => stroke.strokes.map((step) => step.file_url))];
+  const expectedUrls = [index.countries, index.languages, index.models, index.sources, index.fonts, index.glyphs, index.strokes, ...models.map((model) => `${apiPrefix}/models/${model.id}.json`), ...glyphIndex.map((glyph) => glyph.url), ...fontExports.flatMap((font) => [...font.file_urls, ...(font.license_file_url ? [font.license_file_url] : [])]), ...strokeIndex.map((stroke) => stroke.url), ...strokeExports.flatMap((stroke) => stroke.strokes.map((step) => step.file_url))];
   validateGeneratedUrls(expectedUrls, { apiPrefix, targetDirectory, generatedFiles });
 
   return {

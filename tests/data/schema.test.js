@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -35,6 +36,23 @@ for (const [schemaName, paths] of [
     test(`${schemaName} record ${path} matches its schema`, () => assertValid(schemaName, readYaml(path)));
   }
 }
+
+test("glyph schema accepts only explicitly recorded contextual outlines", () => {
+  assertValid("glyph", {
+    model: "demo-round",
+    character: "a",
+    unicode: ["U+0061"],
+    forms: { isolated: { status: "draft" }, contextual: [{ context: "before e", status: "draft", outline: { path: "M 0 100 L 50 0 Z", view_box: [0, 0, 50, 100], baseline: 100, x_height: 50 } }] },
+    metrics: { baseline: null, x_height: null, ascender: null, descender: null },
+    outline: null,
+    reference: { font: null, glyph_name: null },
+    connections: { entry: { present: null }, exit: { present: null } },
+    variants: [],
+    sources: ["src-demo-placeholder"],
+    verification: "draft",
+    license: "CC-BY-SA-4.0",
+  });
+});
 
 test("glyph schema accepts an explicit draft record without claiming verified form data", () => {
   assertValid("glyph", {
@@ -75,13 +93,14 @@ test("font x-height calibration requires a mapped model and source", () => {
     license: "OFL-1.1",
     files: [],
     correspondence: { model: "demo-round", degree: "partial", notes: "Test fixture." },
-    calibration: { x_height_em: 0.5 },
+    calibration: { x_height_em: 0.5, x_height_method: "Lowercase x bounding box." },
     sources: ["src-demo-placeholder"],
   };
   assertValid("font", record);
   const invalid = { ...record, correspondence: { ...record.correspondence, model: null }, sources: [] };
   const validate = ajv.getSchema("https://schreibatlas.de/schema/v1/font.schema.json");
   assert.equal(validate(invalid), false);
+  assert.equal(validate({ ...record, calibration: { ...record.calibration, x_height_method: "" } }), false);
 });
 
 test("stroke schema requires normalized paths and provenance", () => {
@@ -96,7 +115,7 @@ test("stroke schema requires normalized paths and provenance", () => {
 });
 
 test("demo models cannot pass the schema as verified", () => {
-  const record = readYaml(modelFiles[0]);
+  const record = readYaml("data/models/demo-round/model.yaml");
   record.status.verification = "verified";
   const validate = ajv.getSchema("https://schreibatlas.de/schema/v1/model.schema.json");
   assert.equal(validate(record), false);

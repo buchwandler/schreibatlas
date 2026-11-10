@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: de-volksschrift
+name:
+  de: Deutsche Volksschrift
+  en: German Volksschrift
+country: DE
+languages:
+  - de
+classification:
+  joined: true
+  slant: null
+period: null
+status:
+  use: historical
+  verification: source-backed
+character_repertoire:
+  - U+0041-U+005A
+  - U+0061-U+007A
+  - U+00C4
+  - U+00D6
+  - U+00DC
+  - U+00DF
+  - U+00E4
+  - U+00F6
+  - U+00FC
+  - U+017F
+character_repertoire_complete: false
+reference_fonts:
+  - font-volksschrift
+sources:
+  - src-volksschrift-author
+  - src-volksschrift-font
+  - src-suetterlin-1922
+license: CC-BY-SA-4.0
+demo: false
+description:
+  de: "Historische deutsche Schulschreibschrift. Die angezeigte digitale Schrift ist eine spätere Interpretation und keine exakte Wiedergabe der Sütterlin-Tafel von 1922."
+  en: "Historical German school script. The included digital font is a later interpretation, not an exact reproduction of the 1922 Sütterlin chart."
+educational_context:
+  de: "Der Fontgestalter beschreibt die deutsche Volksschrift als ab den frühen 1930er Jahren in Schulen verwendete Schreibschrift."
+  en: "The font designer describes the German Volksschrift as a school handwriting script used from the early 1930s."

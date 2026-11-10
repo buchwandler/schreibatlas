@@ -1,5 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
 import { normalizeOutline } from "../../tools/geometry.mjs";
 import { decodeWorksheetSettings, encodeWorksheetSettings, layoutWorksheet, normalizeWorksheetSettings, worksheetId, worksheetMarker, worksheetMarkerLayout } from "../../tools/worksheet.mjs";
+import { appendWorksheetMetadataToPng, createWorksheetPdf } from "../../tools/worksheet-export.mjs";
 import type { GlyphRecord, SourceRecord } from "../../tools/content.mjs";
 import type { WorksheetSettings } from "../../tools/worksheet.mjs";
 
@@ -35,6 +37,7 @@ interface WorksheetMessages {
   missingOutlines: string;
   overflow: string;
   error: string;
+  exportError: string;
   provenance: string;
   copyLinkSuccess: string;
   copyLinkError: string;
@@ -58,6 +61,7 @@ if (root) initializeWorksheet(root);
 async function initializeWorksheet(container: HTMLElement): Promise<void> {
   const modelSelect = container.querySelector<HTMLSelectElement>("[data-model-select]");
   const textInput = container.querySelector<HTMLInputElement>("[data-text-input]");
+  const presetSelect = container.querySelector<HTMLSelectElement>("[data-preset-select]");
   const paperSelect = container.querySelector<HTMLSelectElement>("[data-paper-select]");
   const marginSelect = container.querySelector<HTMLSelectElement>("[data-margin-select]");
   const rowHeightSelect = container.querySelector<HTMLSelectElement>("[data-row-height-select]");
@@ -71,13 +75,15 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
   const provenance = container.querySelector<HTMLUListElement>("[data-worksheet-provenance]");
   const settingsLink = container.querySelector<HTMLInputElement>("[data-settings-link]");
   const downloadButton = container.querySelector<HTMLButtonElement>("[data-export-svg]");
+  const pngDownloadButton = container.querySelector<HTMLButtonElement>("[data-export-png]");
+  const pdfDownloadButton = container.querySelector<HTMLButtonElement>("[data-export-pdf]");
   const printButton = container.querySelector<HTMLButtonElement>("[data-print-sheet]");
   const copyButton = container.querySelector<HTMLButtonElement>("[data-copy-link]");
   const printRule = document.createElement("style");
   printRule.id = "worksheet-page-rule";
   document.head.append(printRule);
 
-  if (!modelSelect || !textInput || !paperSelect || !marginSelect || !rowHeightSelect || !guidesSelect || !referenceCheckbox || !tracingSelect || !blankSelect || !repetitionsSelect || !status || !output || !provenance || !settingsLink || !downloadButton || !printButton || !copyButton) return;
+  if (!modelSelect || !textInput || !presetSelect || !paperSelect || !marginSelect || !rowHeightSelect || !guidesSelect || !referenceCheckbox || !tracingSelect || !blankSelect || !repetitionsSelect || !status || !output || !provenance || !settingsLink || !downloadButton || !pngDownloadButton || !pdfDownloadButton || !printButton || !copyButton) return;
 
   const copy = JSON.parse(container.dataset.messages ?? "{}") as WorksheetMessages;
   const modelIds = [...modelSelect.options].map((option) => option.value);
@@ -98,6 +104,7 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
   const applySettings = (settings: WorksheetSettings) => {
     modelSelect.value = settings.model;
     textInput.value = settings.text;
+    presetSelect.value = "";
     paperSelect.value = settings.paper;
     marginSelect.value = String(settings.marginMm);
     rowHeightSelect.value = String(settings.rowHeightMm);
@@ -194,11 +201,15 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
       output.replaceChildren();
       provenance.replaceChildren();
       downloadButton.disabled = true;
+      pngDownloadButton.disabled = true;
+      pdfDownloadButton.disabled = true;
       printButton.disabled = true;
       return;
     }
 
     downloadButton.disabled = true;
+    pngDownloadButton.disabled = true;
+    pdfDownloadButton.disabled = true;
     printButton.disabled = true;
     currentSvg = null;
     status.textContent = copy.loading;
@@ -215,6 +226,8 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
     updateProvenance(provenance, model, supported.map((character) => glyphByCharacter.get(character)!).filter(Boolean), sourceById, copy);
     downloadButton.disabled = false;
     printButton.disabled = false;
+    pngDownloadButton.disabled = false;
+    pdfDownloadButton.disabled = false;
 
     const messages: string[] = [];
     if (characters.length === 0) messages.push(localize(copy.ready, { supported: "0" }));
@@ -226,6 +239,16 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
   };
 
   const controls = container.querySelector<HTMLFormElement>("[data-worksheet-controls]");
+  presetSelect.addEventListener("change", () => {
+    const option = presetSelect.selectedOptions[0];
+    if (!option?.dataset.model || option.dataset.text === undefined) return;
+    modelSelect.value = option.dataset.model;
+    textInput.value = option.dataset.text;
+  });
+  textInput.addEventListener("input", () => { presetSelect.value = ""; });
+  modelSelect.addEventListener("change", () => {
+    if (presetSelect.selectedOptions[0]?.dataset.model !== modelSelect.value) presetSelect.value = "";
+  });
   controls?.addEventListener("input", () => void render());
   controls?.addEventListener("change", () => void render());
   window.addEventListener("hashchange", () => {
@@ -238,13 +261,39 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
 
   downloadButton.addEventListener("click", () => {
     if (!currentSvg) return;
-    const file = new Blob([new XMLSerializer().serializeToString(currentSvg)], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(file);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `schreibatlas-worksheet-${settings.model || "blank"}.svg`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    downloadBlob(new Blob([new XMLSerializer().serializeToString(currentSvg)], { type: "image/svg+xml;charset=utf-8" }), worksheetFilename(settings.model, "svg"));
+  });
+  pngDownloadButton.addEventListener("click", async () => {
+    if (!currentSvg) return;
+    try {
+      const svg = currentSvg.cloneNode(true) as SVGSVGElement;
+      const metadata = worksheetMetadata(svg);
+      const { canvas } = await rasterizeWorksheet(svg);
+      const png = await canvasBlob(canvas, "image/png");
+      const withMetadata = appendWorksheetMetadataToPng(new Uint8Array(await png.arrayBuffer()), metadata);
+      downloadBlob(new Blob([withMetadata.buffer as ArrayBuffer], { type: "image/png" }), worksheetFilename(settings.model, "png"));
+    } catch {
+      status.textContent = copy.exportError;
+    }
+  });
+  pdfDownloadButton.addEventListener("click", async () => {
+    if (!currentSvg) return;
+    try {
+      const svg = currentSvg.cloneNode(true) as SVGSVGElement;
+      const metadata = worksheetMetadata(svg);
+      const { canvas, widthMm, heightMm } = await rasterizeWorksheet(svg);
+      const pdf = await createWorksheetPdf({
+        pageWidthMm: widthMm,
+        pageHeightMm: heightMm,
+        pixelWidth: canvas.width,
+        pixelHeight: canvas.height,
+        rgb: canvasRgb(canvas),
+        metadata,
+      });
+      downloadBlob(new Blob([pdf.buffer as ArrayBuffer], { type: "application/pdf" }), worksheetFilename(settings.model, "pdf"));
+    } catch {
+      status.textContent = copy.exportError;
+    }
   });
   printButton.addEventListener("click", () => window.print());
   copyButton.addEventListener("click", async () => {
@@ -259,6 +308,73 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
   });
 
   await render();
+}
+
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function worksheetFilename(modelId: string, extension: string): string {
+  return `schreibatlas-worksheet-${modelId || "blank"}.${extension}`;
+}
+
+function worksheetMetadata(svg: SVGSVGElement): Record<string, unknown> {
+  const text = svg.querySelector("metadata")?.textContent;
+  if (!text) throw new Error("Worksheet metadata is missing.");
+  return JSON.parse(text) as Record<string, unknown>;
+}
+
+async function rasterizeWorksheet(svg: SVGSVGElement): Promise<{ canvas: HTMLCanvasElement; widthMm: number; heightMm: number }> {
+  const widthMm = Number(svg.getAttribute("width")?.replace(/mm$/, ""));
+  const heightMm = Number(svg.getAttribute("height")?.replace(/mm$/, ""));
+  if (!Number.isFinite(widthMm) || !Number.isFinite(heightMm)) throw new Error("Worksheet dimensions are invalid.");
+
+  const svgBlob = new Blob([new XMLSerializer().serializeToString(svg)], { type: "image/svg+xml;charset=utf-8" });
+  const svgUrl = URL.createObjectURL(svgBlob);
+  const image = new Image();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      image.addEventListener("load", () => resolve(), { once: true });
+      image.addEventListener("error", () => reject(new Error("Worksheet SVG could not be rasterized.")), { once: true });
+      image.src = svgUrl;
+    });
+    const dpi = 240;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round((widthMm / 25.4) * dpi);
+    canvas.height = Math.round((heightMm / 25.4) * dpi);
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Worksheet canvas is unavailable.");
+    context.fillStyle = "#fff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return { canvas, widthMm, heightMm };
+  } finally {
+    URL.revokeObjectURL(svgUrl);
+  }
+}
+
+function canvasBlob(canvas: HTMLCanvasElement, type: string): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Worksheet image export failed.")), type);
+  });
+}
+
+function canvasRgb(canvas: HTMLCanvasElement): Uint8Array {
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Worksheet canvas is unavailable.");
+  const rgba = context.getImageData(0, 0, canvas.width, canvas.height).data;
+  const rgb = new Uint8Array((rgba.length / 4) * 3);
+  for (let source = 0, target = 0; source < rgba.length; source += 4, target += 3) {
+    rgb[target] = rgba[source];
+    rgb[target + 1] = rgba[source + 1];
+    rgb[target + 2] = rgba[source + 2];
+  }
+  return rgb;
 }
 
 function svgElement(name: string, attributes: Record<string, string> = {}): SVGElement {

@@ -1,15 +1,17 @@
 ---
+// SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { messages, type Locale } from "../../../lib/i18n";
 import { loadContent, locales } from "../../../../tools/content.mjs";
-import type { ModelRecord } from "../../../../tools/content.mjs";
+import { withBase } from "../../../lib/routes";
+import type { LanguageRecord, ModelRecord } from "../../../../tools/content.mjs";
 
 export function getStaticPaths() {
   const content = loadContent();
-  return locales.map((lang) => ({ params: { lang }, props: { models: content.models } }));
+  return locales.map((lang) => ({ params: { lang }, props: { models: content.models, languages: content.languages } }));
 }
 
-const { models } = Astro.props as { models: ModelRecord[] };
+const { models, languages } = Astro.props as { models: ModelRecord[]; languages: LanguageRecord[] };
 const lang = Astro.params.lang as Locale;
 const copy = messages[lang];
 const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
@@ -61,11 +63,28 @@ const clientCopy = {
   baselineNote: copy.analysisBaselineNote,
   lineSpacingUnavailable: copy.analysisLineSpacingUnavailable,
   lineSpacing: copy.analysisLineSpacing,
+  referenceSection: copy.analysisReferenceSection,
+  referenceUnavailable: copy.analysisReferenceUnavailable,
+  referenceFontUnavailable: copy.analysisReferenceFontUnavailable,
+  referenceFitUnavailable: copy.analysisReferenceFitUnavailable,
+  referenceFitLow: copy.analysisReferenceFitLow,
+  referenceFitMedium: copy.analysisReferenceFitMedium,
+  referenceComparisonNote: copy.analysisReferenceComparisonNote,
+  referenceSources: copy.analysisReferenceSources,
+  referenceView: copy.analysisReferenceView,
+  referenceViewReference: copy.analysisReferenceViewReference,
+  referenceViewOverlay: copy.analysisReferenceViewOverlay,
+  referenceViewDifference: copy.analysisReferenceViewDifference,
+  referenceScaleX: copy.analysisReferenceScaleX,
+  referenceScaleY: copy.analysisReferenceScaleY,
+  referenceResidual: copy.analysisReferenceResidual,
+  referenceWordSpacing: copy.analysisReferenceWordSpacing,
+  referenceWordSpacingUnavailable: copy.analysisReferenceWordSpacingUnavailable,
   noLines: copy.analysisNoLines,
 };
 ---
 <BaseLayout lang={lang} title={copy.analysisTitle} description={copy.analysisDescription} canonicalPath={`/${lang}/analyze/`} section="analysis">
-  <div class="content-page photo-analysis-page" data-photo-analysis data-messages={JSON.stringify(clientCopy)}>
+  <div class="content-page photo-analysis-page" data-photo-analysis data-index-url={withBase("data/v1/index.json")} data-messages={JSON.stringify(clientCopy)}>
     <header class="page-heading">
       <p class="eyebrow">{copy.analysisNavigation}</p>
       <h1>{copy.analysisTitle}</h1>
@@ -80,7 +99,7 @@ const clientCopy = {
       </label>
       <p class="analysis-input-help">{copy.analysisImageHelp}</p>
       <label for="analysis-expected-text">{copy.analysisExpectedText}
-        <input id="analysis-expected-text" type="text" maxlength="300" data-analysis-expected-text />
+        <textarea id="analysis-expected-text" rows="3" maxlength="300" data-analysis-expected-text></textarea>
       </label>
       <label for="analysis-worksheet-svg">{copy.analysisWorksheetFile}
         <input id="analysis-worksheet-svg" type="file" accept="image/svg+xml,.svg" data-analysis-worksheet />
@@ -90,7 +109,8 @@ const clientCopy = {
       <label for="analysis-model">{copy.analysisModel}
         <select id="analysis-model" data-analysis-model>
           {models.map((model) => {
-            return <option value={model.id} data-demo={String(model.demo)}>{localized(model.name)}{model.demo ? " · demo" : ""}</option>;
+            const language = languages.find((entry) => model.languages.includes(entry.id));
+            return <option value={model.id} data-demo={String(model.demo)} data-reference-fonts={JSON.stringify(model.reference_fonts)} data-language={language?.id ?? ""} data-direction={language?.direction ?? "ltr"}>{localized(model.name)}{model.demo ? " · demo" : ""}</option>;
           })}
         </select>
       </label>
@@ -125,6 +145,31 @@ const clientCopy = {
       <h2 id="analysis-results-title">{copy.analysisResults}</h2>
       <p data-analysis-context></p>
       <p data-analysis-worksheet-result></p>
+      <section class="analysis-reference-comparison" aria-labelledby="analysis-reference-title">
+        <h3 id="analysis-reference-title">{copy.analysisReferenceSection}</h3>
+        <p data-analysis-reference-status role="status" aria-live="polite">{copy.analysisReferenceUnavailable}</p>
+        <p data-analysis-reference-font></p>
+        <p>{copy.analysisReferenceComparisonNote}</p>
+        <h4 data-analysis-reference-sources-title hidden>{copy.analysisReferenceSources}</h4>
+        <ul data-analysis-reference-sources hidden></ul>
+        <label for="analysis-reference-view">{copy.analysisReferenceView}
+          <select id="analysis-reference-view" data-analysis-reference-view disabled>
+            <option value="reference">{copy.analysisReferenceViewReference}</option>
+            <option value="overlay">{copy.analysisReferenceViewOverlay}</option>
+            <option value="difference">{copy.analysisReferenceViewDifference}</option>
+          </select>
+        </label>
+        <figure class="analysis-preview-card" data-analysis-reference-figure hidden>
+          <figcaption data-analysis-reference-caption>{copy.analysisReferenceViewReference}</figcaption>
+          <canvas data-analysis-reference-canvas role="img" aria-label={copy.analysisReferenceViewReference}></canvas>
+        </figure>
+        <dl class="analysis-summary" data-analysis-reference-metrics hidden>
+          <div><dt>{copy.analysisReferenceScaleX}</dt><dd data-analysis-reference-scale-x></dd></div>
+          <div><dt>{copy.analysisReferenceScaleY}</dt><dd data-analysis-reference-scale-y></dd></div>
+          <div><dt>{copy.analysisReferenceResidual}</dt><dd data-analysis-reference-residual></dd></div>
+          <div><dt>{copy.analysisReferenceWordSpacing}</dt><dd data-analysis-reference-word-spacing>{copy.analysisReferenceWordSpacingUnavailable}</dd></div>
+        </dl>
+      </section>
       <div class="analysis-actions">
         <button type="button" data-analysis-export-json disabled>{copy.analysisExportJson}</button>
         <button type="button" data-analysis-export-overlay disabled>{copy.analysisExportOverlay}</button>

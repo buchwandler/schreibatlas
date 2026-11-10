@@ -10,6 +10,7 @@
     "project_url": { "type": ["string", "null"] },
     "license": { "$ref": "common.schema.json#/$defs/licenseId" },
     "files": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "license_file": { "type": ["string", "null"] },
     "calibration": {
       "description": "Measured font x-height as a fraction of em, required for shared baseline/x-height rendering.",
       "oneOf": [
@@ -20,6 +21,7 @@
           "properties": {
             "x_height_em": { "type": "number", "exclusiveMinimum": 0 },
             "ascender_em": { "type": ["number", "null"] },
+            "x_height_method": { "type": "string", "minLength": 1 },
             "descender_em": { "type": ["number", "null"] }
           },
           "additionalProperties": false

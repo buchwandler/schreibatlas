@@ -1,6 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { parse } from "yaml";
 import test from "node:test";
-import { decodeWorksheetSettings, encodeWorksheetSettings, layoutWorksheet, normalizeWorksheetSettings, worksheetId, worksheetMarkerLayout } from "../../tools/worksheet.mjs";
+import { decodeWorksheetSettings, encodeWorksheetSettings, layoutWorksheet, normalizeWorksheetSettings, worksheetId, worksheetMarkerLayout, worksheetPresets } from "../../tools/worksheet.mjs";
 
 test("worksheet settings encode deterministically and round-trip Unicode without a network query", () => {
   const settings = normalizeWorksheetSettings({
@@ -20,6 +23,22 @@ test("worksheet settings encode deterministically and round-trip Unicode without
   assert.match(encoded, /^#worksheet=[A-Za-z0-9_-]+$/);
   assert.deepEqual(decodeWorksheetSettings(encoded, ["demo-round"]), settings);
   assert.equal(decodeWorksheetSettings("#worksheet=invalid!", ["demo-round"]), null);
+});
+
+test("worksheet presets use only recorded source-backed Volksschrift outlines", () => {
+  for (const preset of worksheetPresets) {
+    assert.equal(preset.model, "de-volksschrift");
+    for (const character of [...preset.text]) {
+      const codepoint = character.codePointAt(0);
+      assert.ok(codepoint);
+      const filename = new URL(`../../data/glyphs/${preset.model}/${codepoint.toString(16).toUpperCase().padStart(4, "0")}.yaml`, import.meta.url);
+      const glyph = parse(readFileSync(filename, "utf8"));
+      assert.equal(glyph.model, preset.model);
+      assert.equal(glyph.character, character);
+      assert.ok(glyph.outline);
+      assert.ok(glyph.sources.length);
+    }
+  }
 });
 
 test("worksheet marker geometry and IDs are deterministic for each page configuration", () => {

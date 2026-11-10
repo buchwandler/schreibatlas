@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export interface WorksheetSettings {
   version: 1;
   model: string;
@@ -22,6 +23,7 @@ export interface WorksheetMarkerPosition {
 export const worksheetPapers: Record<WorksheetSettings["paper"], { width: number; height: number }>;
 export const worksheetMarker: { format: "schreibatlas-fiducial"; version: 1; sizeMm: number; insetMm: number; moduleCount: 2 };
 export function worksheetMarkerLayout(width: number, height: number): WorksheetMarkerPosition[];
+export const worksheetPresets: { id: string; model: string; text: string }[];
 export function worksheetId(settings: WorksheetSettings, datasetVersion: string): string;
 export const worksheetDefaults: Omit<WorksheetSettings, "version" | "model">;
 export function normalizeWorksheetSettings(value: unknown, modelIds?: string[], fallbackModel?: string): WorksheetSettings;

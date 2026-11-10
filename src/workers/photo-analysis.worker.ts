@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { analyzePixels, type ImagePoint } from "../../tools/photo-analysis.mjs";
 import { analyzeWorksheetWriting, detectWorksheetGeometry } from "../../tools/worksheet-analysis.mjs";
 import type { WorksheetMarkerResult, WorksheetWritingResult } from "../../tools/worksheet-analysis.mjs";

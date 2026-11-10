@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export function unicodeCodePoints(value) {
   return Array.from(value, (character) => {
     const hex = character.codePointAt(0).toString(16).toUpperCase().padStart(4, "0");

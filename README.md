@@ -1,6 +1,23 @@
+<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Schreibatlas
 
-Schreibatlas is an open, source-backed handwriting atlas in development. The project is moving from a small static prototype toward the data-first architecture described in `01_todo.md`. Demo models and instructions are illustrative placeholders, not verified handwriting standards.
+Schreibatlas is a bilingual, source-backed handwriting reference atlas in development. The current corpus is a small, partial German research set, not a complete or authoritative account of any handwriting repertoire.
+
+## Corpus and evidence limits
+
+The canonical dataset currently contains one country, one language, five model records (two source-documented German models and three synthetic demos), seven source records, eleven glyph outlines, and two locally packaged reference fonts. It contains no verified production stroke sequences. Check each model, glyph, font, and source record for its own scope, verification status, and license.
+
+The Volksschrift font correspondence is partial. Langula Kurrent is a modern visual-only adaptation, not an authoritative reconstruction of Johann Thomas Loth's 1866 chart. Recorded outlines describe final contours only. They do not establish pen movement, stroke order, or writing instruction. No complete repertoire is claimed.
+
+## Features and limitations
+
+- The German and English atlas pages expose recorded models, repertoires, glyph outlines, sources, licenses, and verification states. Missing outlines remain missing. System-font shapes are never substituted for handwriting records.
+- Letter comparison normalizes recorded vector outlines to their documented baseline and x-height. Word and sentence comparison shapes explicit user text with locally bundled fonts through browser shaping. Shaping behavior depends on the browser, broad repertoire coverage is incomplete, and cross-browser equivalence is unverified. Sentence spacing is a display aid, not a measured handwriting rhythm.
+- Worksheets use available source-backed outlines and preserve settings, provenance, and page fiducials in SVG, PNG, and PDF exports. PNG and PDF are rendered locally in the browser at a fixed resolution; pixel equivalence across browsers and platforms is not claimed.
+- Direct writing captures pointer or keyboard input locally in the browser tab. Movement observations require verified, sourced stroke sequences. None are currently available for the model records, so movement comparison is unavailable for them.
+- Photo analysis keeps selected images local. It supports manual page corners, optional matching worksheet fiducials, and bounded reference fitting against a bundled digital font. Reference, overlay, and difference views are provided; uncertain measurements are withheld. This is not OCR, a handwriting-quality score, or a comparison with an exact historical handwriting sample.
+- The static build generates an offline precache manifest for built pages and assets. User-selected images and generated analysis reports are excluded.
+- The versioned static API is generated under `public/data/v1/` and includes country, language, model, source, font, glyph, and stroke exports.
 
 ## Development
 
@@ -14,7 +31,7 @@ npm run dev
 
 Stop the local development server with `npx astro dev stop`.
 
-Run the repository checks and static build with:
+Run the project checks and static build with:
 
 ```bash
 npm run typecheck
@@ -24,40 +41,26 @@ npm run build
 npm run test:e2e
 ```
 
-The production site is written to `dist/`. Set `SITE_BASE_PATH=/schreibatlas` when building for the GitHub Pages project URL. Set `SITE_BASE_PATH=/` for a root-path custom domain such as `schreibatlas.de`.
+`npm run validate` checks repository metadata, file-level SPDX headers, data schemas, references, licenses, assets, and Unicode routes. `npm run build` writes the static site to `dist/` and generates `dist/offline-precache.json`.
 
-The original `index.html`, `app.js`, and `styles.css` prototype are retained temporarily as implementation references. They contain demo content and are not authoritative data.
+Set `SITE_BASE_PATH=/schreibatlas` when building for the GitHub Pages project URL. Set `SITE_BASE_PATH=/` for a root-path custom domain such as `schreibatlas.de`.
 
-## Data records
+Authored YAML records live under `data/`; JSON Schemas live under `schema/`. Generated API files in `public/data/v1/` must not be edited by hand. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [data contribution guide](docs/data-contributions.md) before adding records or assets.
 
-Authored YAML records live under `data/countries/`, `data/languages/`, `data/models/`, and `data/sources/`. JSON Schemas for countries, languages, models, glyphs, sources, fonts, and strokes live in `schema/`. The current model records are synthetic demos with draft verification and empty character repertoires. There are no authoritative glyph or stroke records. Optional SVG outline paths represent final contours only and require the glyph record's license and source metadata.
-
-
-Each build regenerates the versioned JSON API under `public/data/v1/`. Treat those files as generated output and do not edit them by hand.
-Stroke records require a matching glyph, explicit source and license, contiguous stroke numbers, and simple SVG path assets using `viewBox="0 0 1 1"`. Static diagrams and the optional one-shot animation use the same paths. Animation is never automatic, respects reduced-motion preferences, and marks unsourced playback duration as illustrative.
-
-Unicode glyph filenames use uppercase code-point sequences, and route slugs use lowercase `u`-prefixed code points. Do not infer handwriting facts or official stroke order from these demo records or from fonts.
-
-
-The bilingual atlas includes `/de/explore/` and `/en/explore/`, generated model pages, model-specific repertoires, and `/de/compare/letters/` plus `/en/compare/letters/`. Unicode letter routes require validated glyph records. Letter comparison uses explicit final-form vector outlines, mapping sourced baselines to `0` and x-heights to `1`; it never substitutes system-font shapes when outline data is absent.
-
-`/de/compare/words/` and `/en/compare/words/` accept local text and use browser OpenType shaping with locally packaged reference fonts only. Normalized rendering requires source-backed x-height calibration and displays font correspondence limits. Until font records are available, the page shows only a literal text preview, not a handwriting sample.
-`/de/practice/` and `/en/practice/` generate printable SVG worksheets with page, margin, guide, reference, tracing, blank-row, and repetition settings. Exercise text is a printed prompt only. Documented isolated vector outlines are used when available; missing forms remain blank, and no handwriting shapes are inferred. Settings are encoded in the URL fragment so they are not sent in the page request. SVG metadata records settings, data version, model, outline provenance, a worksheet ID, marker positions, and calibrated blank-row geometry. The photo-analysis route can read the matching SVG locally and rectify against its fiducials. It reports blank-row measurements and only clusters repeated isolated shapes when segmentation and bounded similarity fitting meet confidence requirements. It does not recognize text or rate handwriting.
-`/de/write/` and `/en/write/` capture pointer or keyboard strokes in the browser tab. Samples, optional Pointer Events pen pressure, and basic path geometry stay in memory until the user explicitly downloads JSON or SVG. No capture data is uploaded, and reference overlays are offered only for sourced isolated final-form outlines.
-`/de/analyze/` and `/en/analyze/` accept PNG, JPEG, or WebP files for local preview, manual four-corner crop, optional local worksheet-marker recognition and calibrated rectification from a matching SVG, deskew, thresholding, and preliminary line geometry in a Web Worker. The expected text and selected model are context only, not inputs to OCR or model scoring. Images are neither uploaded nor persisted, and the baseline candidate is explicitly labeled a low-confidence lower-ink-edge estimate.
-Analysis reports and the annotated PNG are downloaded only after an explicit action. A same-origin service worker caches static pages and assets for offline use; it does not cache query URLs, selected images, or analysis measurements. The analysis route warms its worker while online and shows whether the offline cache is ready.
+The manual dataset release workflow packages a partial research corpus after validation. No dataset release has been published yet. See [dataset release instructions](docs/dataset-releases.md).
 
 ## Deployment
 
-Pull requests and pushes to `main` run the CI workflow. The Pages workflow builds the static site and deploys only `dist/` through GitHub Pages Actions. Configure the repository's Pages source to **GitHub Actions**.
+Pull requests and pushes to `main` run CI. The Pages workflow builds the static site and deploys only `dist/` through GitHub Pages Actions. Configure the repository's Pages source to **GitHub Actions**.
 
+The root path offers a language chooser. German and English homes are available directly at `/de/` and `/en/`; each page sets its document language, canonical URL, and reciprocal `hreflang` links. The bilingual licensing and provenance pages are at `/de/about/` and `/en/about/`.
 
-The root path offers a language chooser. German and English homes are available directly at `/de/` and `/en/`; each page sets its document language, canonical URL, and reciprocal `hreflang` links.
+The original `index.html`, `app.js`, and `styles.css` prototype are retained temporarily as implementation references and are not authoritative data.
 
 ## Licensing
 
 - Software: Apache-2.0, see `LICENSE`.
 - Original project content and data: CC BY-SA 4.0, see `LICENSE-CONTENT`.
-- Third-party assets retain their original licenses. See `THIRD_PARTY_NOTICES.md`.
+- Third-party assets retain their original licenses. See `THIRD_PARTY_NOTICES.md` and the license files distributed with each asset.
 
-No authoritative handwriting facts or stroke orders are inferred from demo models or font outlines.
+The initial repository audit and implementation checklist are preserved in [`01_todo.md`](01_todo.md). The initial audit section is historical; current limits are summarized at the end of that file.

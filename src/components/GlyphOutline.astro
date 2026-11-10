@@ -1,0 +1,41 @@
+---
+// SPDX-License-Identifier: Apache-2.0
+import { normalizeOutline, sharedViewBox } from "../../tools/geometry.mjs";
+import { messages, type Locale } from "../lib/i18n";
+import type { GlyphOutline as GlyphOutlineRecord } from "../../tools/content.mjs";
+
+interface Props {
+  lang: Locale;
+  outline: GlyphOutlineRecord | null | undefined;
+  label: string;
+  id: string;
+}
+
+const { lang, outline, label, id } = Astro.props;
+const copy = messages[lang];
+const normalized = outline ? normalizeOutline(outline) : null;
+const viewBox = normalized ? sharedViewBox([normalized]) : null;
+const titleId = `glyph-outline-title-${id}`;
+const descriptionId = `glyph-outline-description-${id}`;
+---
+{outline && normalized && viewBox ? (
+  <figure class="glyph-outline">
+    <svg
+      data-glyph-outline
+      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+      role="img"
+      aria-labelledby={`${titleId} ${descriptionId}`}
+    >
+      <title id={titleId}>{label}</title>
+      <desc id={descriptionId}>{copy.glyphOutlineDescription}</desc>
+      <g transform="scale(1 -1)">
+        <line data-guide="baseline" x1={viewBox.world.minX} x2={viewBox.world.maxX} y1="0" y2="0" />
+        <line data-guide="x-height" x1={viewBox.world.minX} x2={viewBox.world.maxX} y1="1" y2="1" />
+        <path d={outline.path} transform={normalized.transform} fill-rule={outline.fill_rule ?? "nonzero"} />
+      </g>
+    </svg>
+    <figcaption>{copy.glyphOutlineCaption}</figcaption>
+  </figure>
+) : (
+  <p class="empty-state" data-no-glyph-outline>{copy.noVectorOutline}</p>
+)}

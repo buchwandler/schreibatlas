@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export function withBase(path: string): string {
   const base = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -49,6 +50,27 @@ function addReferenceErrors(errors, path, field, ids, records, type) {
   }
 }
 
+
+const evidenceVerificationStatuses = new Set(["source-backed", "reviewed", "verified"]);
+
+function hasNonPlaceholderSource(sourceIds, sourceRecords) {
+  return (sourceIds ?? []).some((id) => sourceRecords.has(id) && sourceRecords.get(id).kind !== "project-placeholder");
+}
+
+function addEvidenceErrors(errors, path, statuses, sourceIds, sourceRecords) {
+  const claimedStatus = statuses.find((status) => evidenceVerificationStatuses.has(status));
+  if (claimedStatus && !hasNonPlaceholderSource(sourceIds, sourceRecords)) {
+    errors.push(`${path}: ${claimedStatus} verification requires at least one non-placeholder source.`);
+  }
+}
+
+function addPlaceholderSourceErrors(errors, path, sourceIds, sourceRecords) {
+  for (const id of sourceIds ?? []) {
+    if (sourceRecords.get(id)?.kind === "project-placeholder") {
+      errors.push(`${path}: non-demo record cannot cite placeholder source "${id}".`);
+    }
+  }
+}
 function recordMap(records, type, errors) {
   const byId = new Map();
   for (const { path, value } of records) {
@@ -136,6 +158,7 @@ export function validateDataset({ root = projectRoot } = {}) {
   const sources = recordMap(records.sources.filter(({ path }) => validRecords.sources.has(path)), "source", errors);
   const fonts = recordMap(records.fonts.filter(({ path }) => validRecords.fonts.has(path)), "font", errors);
 
+  const sourceRecordsById = new Map(records.sources.filter(({ path }) => validRecords.sources.has(path)).map(({ value }) => [value.id, value]));
   addLicenseError(errors, "package.json", readJson(resolve(repositoryRoot, "package.json")).license);
 
   for (const { path, value } of records.models) {
@@ -150,6 +173,8 @@ export function validateDataset({ root = projectRoot } = {}) {
     addReferenceErrors(errors, relativePath, "language", value.languages, languages, "language");
     addReferenceErrors(errors, relativePath, "source", value.sources, sources, "source");
     addReferenceErrors(errors, relativePath, "font", value.reference_fonts, fonts, "font");
+    if (value.demo !== true) addPlaceholderSourceErrors(errors, relativePath, value.sources, sourceRecordsById);
+    addEvidenceErrors(errors, relativePath, [value.status?.verification], value.sources, sourceRecordsById);
     addLicenseError(errors, relativePath, value.license);
   }
 
@@ -164,10 +189,12 @@ export function validateDataset({ root = projectRoot } = {}) {
     const relativePath = relative(repositoryRoot, path).split(sep).join("/");
     addLicenseError(errors, relativePath, value.license);
     addReferenceErrors(errors, relativePath, "source", value.sources, sources, "source");
+    addPlaceholderSourceErrors(errors, relativePath, value.sources, sourceRecordsById);
     if (value.correspondence?.model && !models.has(value.correspondence.model)) {
       errors.push(`${relativePath}: unresolved model reference "${value.correspondence.model}".`);
     }
     for (const assetPath of value.files ?? []) addAssetError(errors, repositoryRoot, relativePath, assetPath);
+    if (value.license_file) addAssetError(errors, repositoryRoot, relativePath, value.license_file);
   }
 
   for (const { path, value } of records.glyphs) {
@@ -176,6 +203,9 @@ export function validateDataset({ root = projectRoot } = {}) {
     const relativePath = relative(repositoryRoot, path).split(sep).join("/");
     addLicenseError(errors, relativePath, value.license);
     addReferenceErrors(errors, relativePath, "source", value.sources, sources, "source");
+    const referencedModel = modelRecords.get(value.model);
+    if (referencedModel && referencedModel.demo !== true) addPlaceholderSourceErrors(errors, relativePath, value.sources, sourceRecordsById);
+    addEvidenceErrors(errors, relativePath, [value.verification, value.forms?.isolated?.status, ...(value.forms?.contextual ?? []).map(({ status }) => status)], value.sources, sourceRecordsById);
     if (!models.has(value.model)) {
       errors.push(`${relativePath}: unresolved model reference "${value.model}".`);
       continue;
@@ -203,6 +233,13 @@ export function validateDataset({ root = projectRoot } = {}) {
       if (width <= 0 || height <= 0) errors.push(`${relativePath}: outline view_box width and height must be positive.`);
       if (value.outline.baseline <= value.outline.x_height) errors.push(`${relativePath}: outline baseline must be below its x-height in SVG coordinates.`);
     }
+    for (const form of value.forms?.contextual ?? []) {
+      if (!form.outline) continue;
+      if (!value.sources?.length) errors.push(`${relativePath}: contextual outlines require at least one source reference.`);
+      const [, , width, height] = form.outline.view_box;
+      if (width <= 0 || height <= 0) errors.push(`${relativePath}: contextual outline view_box width and height must be positive.`);
+      if (form.outline.baseline <= form.outline.x_height) errors.push(`${relativePath}: contextual outline baseline must be below its x-height.`);
+    }
   }
 
   const strokeRoutes = new Set();
@@ -212,6 +249,9 @@ export function validateDataset({ root = projectRoot } = {}) {
     const relativePath = relative(repositoryRoot, path).split(sep).join("/");
     addLicenseError(errors, relativePath, value.license);
     addReferenceErrors(errors, relativePath, "source", value.sources, sources, "source");
+    const model = modelRecords.get(value.model);
+    if (model && model.demo !== true) addPlaceholderSourceErrors(errors, relativePath, value.sources, sourceRecordsById);
+    addEvidenceErrors(errors, relativePath, [value.verification], value.sources, sourceRecordsById);
     if (!models.has(value.model)) errors.push(`${relativePath}: unresolved model reference "${value.model}".`);
     const route = `${value.model}/${glyphRouteSlug(value.character)}`;
     if (strokeRoutes.has(route)) errors.push(`${relativePath}: duplicate stroke record route "${route}".`);

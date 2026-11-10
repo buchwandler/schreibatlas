@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { renderNormalizedGlyphStage } from "../lib/normalized-glyph-stage";
 import type { GlyphRecord, ModelRecord, SourceRecord } from "../../tools/content.mjs";
 

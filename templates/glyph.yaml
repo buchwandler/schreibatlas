@@ -1,0 +1,29 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Draft starter only. Never infer an outline, contextual shape, or movement.
+model: replace-me
+character: a
+unicode:
+  - U+0061
+forms:
+  isolated:
+    status: draft
+  contextual: []
+metrics:
+  baseline: null
+  x_height: null
+  ascender: null
+  descender: null
+outline: null
+reference:
+  font: null
+  glyph_name: null
+connections:
+  entry:
+    present: null
+  exit:
+    present: null
+variants: []
+sources:
+  - src-replace-me
+verification: draft
+license: CC-BY-SA-4.0

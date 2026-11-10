@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Replace every placeholder and verify source rights before use.
+id: src-replace-me
+kind: publication
+title: Replace with exact source title
+author:
+  - Replace with author or editor
+publisher: null
+year: null
+locator: null
+url: null
+rights:
+  type: unknown
+  license: null
+notes: Replace with what this source supports and what remains uncertain.

@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: src-langula-kurrent-font
+kind: publication
+title: "Langula Kurrent font package"
+author:
+  - Langula
+  - "Peter Wiegel (original Greifswalder Deutsche Schrift)"
+publisher: Langula
+year: null
+locator: null
+url: "https://langula.app/en/old-german-script/fonts/"
+rights:
+  type: licensed
+  license: OFL-1.1
+notes: >-
+  Langula's official page lists Langula Kurrent as a free TTF under the SIL Open Font License. The downloaded package contains LIESMICH.txt and OFL.txt. The included readme says the font is based on Peter Wiegel's Greifswalder Deutsche Schrift (2009/2010), was renamed and adapted by Langula, and retains the original authors' rights. The included OFL names Reserved Font Name Greifswalder. The redistributed TTF and OFL are unmodified. TTF SHA-256: de44d5897995dbc1c45d805a42d8730791ae665f6de6b05761cdd2cfa8e7a093. OFL SHA-256: 32900c101df57ee12b44743f606dae66bd6141b4ddd8123d980a16ebef652fb3. The x-height is measured from the lowercase x glyph bounding box, not the inconsistent OS/2.sxHeight value.

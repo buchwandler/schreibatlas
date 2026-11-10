@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 export type Locale = "de" | "en";
 export type VerificationStatus = "draft" | "inferred" | "source-backed" | "reviewed" | "verified" | "deprecated";
 
@@ -13,6 +14,22 @@ type MessageSet = {
   switchLanguage: string;
   skipToContent: string;
   footerLicense: string;
+  licensingAbout: string;
+  aboutTitle: string;
+  aboutDescription: string;
+  aboutIntro: string;
+  softwareLicense: string;
+  softwareLicenseDescription: string;
+  contentLicense: string;
+  contentLicenseDescription: string;
+  thirdPartyLicenses: string;
+  thirdPartyLicensesDescription: string;
+  publicData: string;
+  publicDataDescription: string;
+  apiIndex: string;
+  countryData: string;
+  languageData: string;
+  noRegisteredFonts: string;
   project: string;
   homeTitle: string;
   homeDescription: string;
@@ -71,14 +88,19 @@ type MessageSet = {
   fontInformation: string;
   noFonts: string;
   fontCorrespondence: string;
+  fontCalibration: string;
   fontDegree: Record<string, string>;
   licenseAttribution: string;
+  licenseFile: string;
   verification: Record<VerificationStatus, VerificationMessage>;
   backToModels: string;
   letterTitle: string;
   character: string;
   codePoints: string;
   unicodeOnly: string;
+  unicodeLabel: string;
+  glyphOutlineCaption: string;
+  glyphOutlineDescription: string;
   normalizedGuidelines: string;
   noGuidelineMetrics: string;
   baseline: string;
@@ -126,6 +148,9 @@ type MessageSet = {
   practiceModel: string;
   practiceText: string;
   practiceTextPromptNote: string;
+  practicePreset: string;
+  practicePresetPlaceholder: string;
+  practicePresetNote: string;
   practicePaper: string;
   practiceA4: string;
   practiceLetter: string;
@@ -139,6 +164,9 @@ type MessageSet = {
   practiceTracingRows: string;
   practiceBlankRows: string;
   practiceRepetitions: string;
+  practiceExportPng: string;
+  practiceExportPdf: string;
+  practiceExportError: string;
   practiceExportSvg: string;
   practicePrint: string;
   practiceCopyLink: string;
@@ -199,6 +227,27 @@ type MessageSet = {
   writeReferenceDisclaimer: string;
   writeProvenance: string;
   writeProvenanceEmpty: string;
+  writeMovementTitle: string;
+  writeMovementNote: string;
+  writeMovementCompare: string;
+  writeMovementLoading: string;
+  writeMovementUnavailable: string;
+  writeMovementNoCapture: string;
+  writeMovementReferenceReady: string;
+  writeMovementError: string;
+  writeMovementResultReady: string;
+  writeMovementComplete: string;
+  writeMovementStart: string;
+  writeMovementDirection: string;
+  writeMovementOrder: string;
+  writeMovementPenLifts: string;
+  writeMovementRhythm: string;
+  writeMovementSources: string;
+  writeMovementConfidence: string;
+  writeMovementMatch: string;
+  writeMovementDifferent: string;
+  writeMovementUncertain: string;
+  writeMovementUnavailableState: string;
   analysisNavigation: string;
   analysisTitle: string;
   analysisDescription: string;
@@ -274,6 +323,23 @@ type MessageSet = {
   analysisOverlayPreview: string;
   analysisWordGaps: string;
   analysisWordGapsUnavailable: string;
+  analysisReferenceSection: string;
+  analysisReferenceUnavailable: string;
+  analysisReferenceFontUnavailable: string;
+  analysisReferenceFitUnavailable: string;
+  analysisReferenceFitLow: string;
+  analysisReferenceFitMedium: string;
+  analysisReferenceComparisonNote: string;
+  analysisReferenceSources: string;
+  analysisReferenceView: string;
+  analysisReferenceViewReference: string;
+  analysisReferenceViewOverlay: string;
+  analysisReferenceViewDifference: string;
+  analysisReferenceScaleX: string;
+  analysisReferenceScaleY: string;
+  analysisReferenceResidual: string;
+  analysisReferenceWordSpacing: string;
+  analysisReferenceWordSpacingUnavailable: string;
   compareTitle: string;
   compareDescription: string;
   compareCharacter: string;
@@ -314,6 +380,13 @@ type MessageSet = {
   wordLoadError: string;
   wordLoading: string;
   wordSummary: string;
+  sentenceTitle: string;
+  sentenceDescription: string;
+  sentenceInputLabel: string;
+  sentenceInputPlaceholder: string;
+  sentenceSampleButton: string;
+  sentenceSample: string;
+  sentenceLineSpacingNote: string;
 };
 
 export const messages: Record<Locale, MessageSet> = {
@@ -326,26 +399,42 @@ export const messages: Record<Locale, MessageSet> = {
     switchLanguage: "English",
     skipToContent: "Zum Inhalt springen",
     footerLicense: "Inhalte: CC BY-SA 4.0 · Software: Apache-2.0",
+    licensingAbout: "Lizenzen und Provenienz",
+    aboutTitle: "Lizenzen, Quellen und Daten",
+    aboutDescription: "Lizenzhinweise, Provenienz und öffentliche Datenausgaben des Schreibatlas.",
+    aboutIntro: "Schreibatlas trennt Software, eigene Inhalte und Drittmaterial. Prüfe für jedes Drittmaterial die angegebene Lizenz und Rechteinformation; ein Quellenhinweis allein erlaubt keine Weiterverwendung.",
+    softwareLicense: "Software",
+    softwareLicenseDescription: "Der Softwarecode des Projekts steht unter der Apache-Lizenz 2.0.",
+    contentLicense: "Eigene Inhalte und Datensatz",
+    contentLicenseDescription: "Eigene Inhalte und Originaldaten sind laut LICENSE-CONTENT unter CC BY-SA 4.0 lizenziert. Das ändert nicht die Lizenzen von Schriftdateien, Quellen, Bildern oder anderen Drittmaterialien.",
+    thirdPartyLicenses: "Drittmaterial",
+    thirdPartyLicensesDescription: "Für Schriftdateien, historische Quellen, Bilder und andere Drittmaterialien gelten die jeweils dokumentierten Lizenzen und Rechteangaben. Eine reine Zitationsquelle ist keine Weiterverteilungserlaubnis.",
+    publicData: "Öffentliche Daten-API",
+    publicDataDescription: "Die versionierte statische JSON-API stellt geprüfte Länder-, Sprach-, Modell-, Quellen-, Schrift-, Glyphen- und Strichdatensätze mit den Links im Index bereit.",
+    apiIndex: "API-Index",
+    countryData: "Länderdatensätze",
+    languageData: "Sprachdatensätze",
+    noRegisteredFonts: "Es sind keine Referenzschriften registriert.",
     project: "Offener Handschriftatlas",
     homeTitle: "Handschriftmodelle erkunden",
     homeDescription: "Ein offener, quellenbasierter Atlas für Handschriftmodelle, Buchstabenformen und lokale Analyse.",
     heroEyebrow: "Buchwandler · Open handwriting reference",
     heroTitle: "Handschriftmodelle offen erkunden",
-    heroIntro: "Schreibatlas baut einen quellenbasierten, maschinenlesbaren Atlas für Handschriftmodelle und Buchstabenformen auf.",
-    demoTitle: "Demo-Daten, keine verifizierten Standards",
-    demoDescription: "Die vorhandenen Modelleinträge sind synthetische UI-Platzhalter. Es gibt noch keine belegten Glyphen oder Schreibanweisungen.",
+    heroIntro: "Schreibatlas dokumentiert ein quellenbasiertes, maschinenlesbares Teilkorpus deutscher Handschriftmodelle und Buchstabenformen.",
+    demoTitle: "Kleines Teilkorpus, keine vollständigen Standards",
+    demoDescription: "Zwei deutsche Schreibmodelle sind quellenbasiert dokumentiert; drei weitere Einträge sind synthetische Demos. Elf Buchstabenumrisse sind erfasst. Sie belegen keine Schreibbewegungen und bilden keine vollständigen Repertoires.",
     pillarsTitle: "Vier miteinander verbundene Bereiche",
     pillars: [
       { title: "Erkunden", description: "Modelle, Repertoires und Buchstaben anhand nachvollziehbarer Quellen dokumentieren." },
       { title: "Lernen", description: "Schreibhinweise und Übungsmaterial nur dann zeigen, wenn Inhalt und Herkunft klar gekennzeichnet sind." },
       { title: "Vergleichen", description: "Buchstabenformen auf einer gemeinsamen Grundlinie und x-Höhe gegenüberstellen." },
-      { title: "Analysieren", description: "Geometrische Maße später lokal im Browser berechnen, ohne Handschriftbilder hochzuladen." },
+      { title: "Analysieren", description: "Fotos lokal mit gebündelten digitalen Referenzschriften vergleichen; unsichere Messwerte bleiben unverfügbar." },
     ],
     promisesTitle: "Offen und datenschutzfreundlich",
     promises: [
       "Maschinenlesbare Daten und wiederverwendbare statische Exporte sind das Projektziel.",
       "Quellen und Prüfstatus gehören sichtbar zu jedem fachlichen Datensatz.",
-      "Fotoanalyse ist noch nicht verfügbar. Direkte lokale Stifterfassung gibt es unter Lokal schreiben.",
+      "Fotoanalyse verarbeitet Bilder lokal und vergleicht erwarteten Text mit gebündelten digitalen Referenzschriften. Sie führt keine OCR aus und vergibt keine Gesamtbewertung.",
     ],
     landingTitle: "Sprache wählen",
     landingDescription: "Wähle Deutsch oder Englisch für den Schreibatlas.",
@@ -393,8 +482,10 @@ export const messages: Record<Locale, MessageSet> = {
     fontInformation: "Referenzschriften",
     noFonts: "Keine Referenzschrift ist für dieses Modell registriert.",
     fontCorrespondence: "Übereinstimmung mit dem Modell",
+    fontCalibration: "x-Höhenkalibrierung",
     fontDegree: { complete: "Vollständig", partial: "Teilweise", "visual-only": "Nur visuell", unknown: "Unbekannt" },
     licenseAttribution: "Lizenz und Namensnennung",
+    licenseFile: "Lizenzdatei",
     verification: {
       draft: { label: "Entwurf", explanation: "Unvollständige Arbeitsdaten, keine Aussage über einen anerkannten Handschriftstandard." },
       inferred: { label: "Abgeleitet", explanation: "Begründete Rekonstruktion, nicht direkt dokumentiert." },
@@ -407,7 +498,10 @@ export const messages: Record<Locale, MessageSet> = {
     letterTitle: "Buchstabe",
     character: "Zeichen",
     codePoints: "Unicode-Codepunkte",
-    unicodeOnly: "Dieses Zeichen ist nur als Unicode-Textbezeichnung vorhanden, nicht als Handschriftprobe.",
+    unicodeOnly: "Der Unicode-Text ist eine Bezeichnung, keine Handschriftprobe.",
+    unicodeLabel: "Unicode-Textbezeichnung, keine Vorlagenform",
+    glyphOutlineCaption: "Dokumentierter Vektor-Umriss",
+    glyphOutlineDescription: "Dokumentierter Umriss, auf Grundlinie und x-Höhe normalisiert. Er zeigt weder Strichfolge noch Stiftbewegung.",
     normalizedGuidelines: "Normalisierte Schreibrichtlinien",
     noGuidelineMetrics: "Es sind keine normalisierten Grundlinien- und Höhenmaße dokumentiert.",
     baseline: "Grundlinie",
@@ -446,6 +540,9 @@ export const messages: Record<Locale, MessageSet> = {
     practiceModel: "Handschriftmodell",
     practiceText: "Übungstext",
     practiceTextPromptNote: "Der getippte Text ist nur ein Aufgabenhinweis. Er ist keine Handschriftvorlage.",
+    practicePreset: "Übungsvorlage",
+    practicePresetPlaceholder: "Vorlage wählen",
+    practicePresetNote: "Die Vorlagen verwenden nur aufgezeichnete, aus der digitalen Volksschrift-Schriftdatei abgeleitete Buchstabenkonturen. Sie sind keine historische Schreibübung.",
     practicePaper: "Papierformat",
     practiceA4: "A4",
     practiceLetter: "US Letter",
@@ -459,6 +556,9 @@ export const messages: Record<Locale, MessageSet> = {
     practiceTracingRows: "Nachspurzeilen je Wiederholung",
     practiceBlankRows: "Leere Zeilen je Wiederholung",
     practiceRepetitions: "Wiederholungen",
+    practiceExportPng: "PNG herunterladen",
+    practiceExportPdf: "PDF herunterladen",
+    practiceExportError: "Der PNG- oder PDF-Export ist fehlgeschlagen.",
     practiceExportSvg: "SVG herunterladen",
     practicePrint: "Drucken",
     practiceCopyLink: "Einstellungslink kopieren",
@@ -519,6 +619,27 @@ export const messages: Record<Locale, MessageSet> = {
     writeReferenceDisclaimer: "Eine Referenzkontur ist eine isolierte Endform aus dem Datensatz, keine Strichfolge und keine Schreibanleitung.",
     writeProvenance: "Herkunft der Referenzkontur",
     writeProvenanceEmpty: "Keine Referenzkontur ausgewählt.",
+    writeMovementTitle: "Bewegung mit belegter Strichfolge vergleichen",
+    writeMovementNote: "Nur als geprüft gekennzeichnete, quellenbelegte Strichfolgen werden verwendet. Der Abgleich darf die Probe nur einheitlich skalieren und verschieben, nie drehen oder verformen. Er zeigt einzelne Beobachtungen, keinen Handschrift-Gesamtwert.",
+    writeMovementCompare: "Bewegung vergleichen",
+    writeMovementLoading: "Suche lokal nach einer geprüften, belegten Strichfolge …",
+    writeMovementUnavailable: "Für dieses Modell und Zeichen liegt keine geprüfte, quellenbelegte Strichfolge vor. Es wird kein Bewegungsvergleich ausgegeben.",
+    writeMovementNoCapture: "Erfasse eine Schreibprobe, um den Vergleich zu aktivieren.",
+    writeMovementReferenceReady: "Geprüfte Strichgeometrie und Quellenangaben lokal geladen. Erfasse eine Probe und starte den Vergleich.",
+    writeMovementError: "Die geprüfte Strichgeometrie konnte nicht geladen werden. Es wird kein Bewegungsvergleich ausgegeben.",
+    writeMovementResultReady: "Einzelbeobachtungen aus der geprüften Strichfolge. Dies ist kein Gesamtwert.",
+    writeMovementComplete: "Bewegungsvergleich abgeschlossen.",
+    writeMovementStart: "Startpunkt",
+    writeMovementDirection: "Strichrichtung",
+    writeMovementOrder: "Strichreihenfolge",
+    writeMovementPenLifts: "Stiftabhebungen",
+    writeMovementRhythm: "Relativer Zeitrhythmus",
+    writeMovementSources: "Quellen der Strichfolge",
+    writeMovementConfidence: "Konfidenz",
+    writeMovementMatch: "innerhalb der Beobachtungstoleranz",
+    writeMovementDifferent: "deutliche Abweichung",
+    writeMovementUncertain: "nicht eindeutig",
+    writeMovementUnavailableState: "nicht verfügbar",
     analysisNavigation: "Fotoanalyse",
     analysisTitle: "Handschriftfoto lokal untersuchen",
     analysisDescription: "Ein Foto lokal entzerren und vorläufige geometrische Zeilenmerkmale berechnen. Erwarteten Text und Modell gibst du nur als Kontext an; es gibt keine OCR oder Modellbewertung.",
@@ -593,7 +714,24 @@ export const messages: Record<Locale, MessageSet> = {
     analysisNoLines: "Es wurden keine ausreichend zusammenhängenden Zeilenbereiche erkannt.",
     analysisOverlayPreview: "Tintenmaske (rot), Zeilenbereich (blau) und Basiskandidat (orange gestrichelt)",
     analysisWordGaps: "Wortabstände",
-    analysisWordGapsUnavailable: "Nicht verfügbar (keine OCR oder Wortsegmentierung)",
+    analysisWordGapsUnavailable: "Nicht verfügbar: Der lokale Referenzvergleich erkennt keinen eindeutigen Leerraum am erwarteten Wortübergang oder die Anpassung ist nicht sicher genug.",
+    analysisReferenceSection: "Referenzschriftvergleich",
+    analysisReferenceUnavailable: "Für dieses Modell ist keine lokal verfügbare, kalibrierte Referenzschrift zugeordnet. Die allgemeine Bildanalyse bleibt verfügbar.",
+    analysisReferenceFontUnavailable: "Die lokale Referenzschrift konnte nicht geladen werden. Es wird keine Referenzanpassung ausgegeben.",
+    analysisReferenceFitUnavailable: "Keine Referenzanpassung: Zeilenanzahl, Bildgeometrie oder begrenzte Transformationsgrenzen passen nicht.",
+    analysisReferenceFitLow: "Die Anpassung hat niedrige Konfidenz. Die Ansicht dient nur der Orientierung; Messwerte werden zurückgehalten.",
+    analysisReferenceFitMedium: "Mittlere Konfidenz. Die Zeilenbereiche passen innerhalb der begrenzten Anpassung.",
+    analysisReferenceComparisonNote: "Verglichen wird mit einem lokal gebündelten digitalen Font, nicht mit einer exakten historischen Handschrift. Die Anpassung verwendet nur begrenzte horizontale und vertikale Skalierung sowie Verschiebung. Zeilenabstand ist eine Darstellungsannahme. Es gibt keinen Handschrift-Gesamtwert.",
+    analysisReferenceSources: "Quellen und Lizenz der Referenzschrift",
+    analysisReferenceView: "Vergleichsansicht",
+    analysisReferenceViewReference: "Referenz",
+    analysisReferenceViewOverlay: "Überlagerung",
+    analysisReferenceViewDifference: "Differenz",
+    analysisReferenceScaleX: "Horizontale Skalierung",
+    analysisReferenceScaleY: "Vertikale Skalierung",
+    analysisReferenceResidual: "Normalisierter Anpassungsrest",
+    analysisReferenceWordSpacing: "Wortabstand relativ zur Fontreferenz",
+    analysisReferenceWordSpacingUnavailable: "Nicht verfügbar: Am erwarteten Wortübergang wurde kein eindeutiger Leerraum erkannt oder die Anpassung ist zu unsicher.",
     strokeNumber: "Strich {number}",
     direction: "Richtung",
     penContact: "Stiftkontakt",
@@ -642,6 +780,13 @@ export const messages: Record<Locale, MessageSet> = {
     wordLoadError: "Die lokale Referenzschrift konnte nicht geladen werden.",
     wordLoading: "Lokale Referenzschriften werden geladen …",
     wordSummary: "Textvergleich für Modell A {modelA} und Modell B {modelB}.",
+    sentenceTitle: "Sätze vergleichen",
+    sentenceDescription: "Gib einen Satz auf Deutsch ein. Die Eingabe bleibt lokal; Zeilenumbrüche werden im Vergleich beibehalten.",
+    sentenceInputLabel: "Satztext",
+    sentenceInputPlaceholder: "Einen deutschen Satz eingeben",
+    sentenceSampleButton: "Beispielsatz auf Deutsch einfügen",
+    sentenceSample: "Fleißige Schüler üben täglich.",
+    sentenceLineSpacingNote: "Zeilenumbrüche bleiben erhalten. Die Vorschau verwendet einen festen Abstand von 1,5 x-Höhen, keine gemessene Schreib- oder Zeilenrhythmik.",
     outlineDisclaimer: "Vektorkonturen zeigen dokumentierte Endformen. Sie sind keine Schreibbewegungen oder Strichreihenfolge.",
   },
   en: {
@@ -653,26 +798,42 @@ export const messages: Record<Locale, MessageSet> = {
     switchLanguage: "Deutsch",
     skipToContent: "Skip to content",
     footerLicense: "Content: CC BY-SA 4.0 · Software: Apache-2.0",
+    licensingAbout: "Licenses and provenance",
+    aboutTitle: "Licenses, sources, and data",
+    aboutDescription: "Licensing, provenance, and public data exports for Schreibatlas.",
+    aboutIntro: "Schreibatlas separates its software, original content, and third-party material. Check each third-party record for its stated license and rights information; a citation alone does not grant permission to redistribute.",
+    softwareLicense: "Software",
+    softwareLicenseDescription: "The project software is licensed under the Apache License 2.0.",
+    contentLicense: "Original content and dataset",
+    contentLicenseDescription: "Project-original content and data are licensed under CC BY-SA 4.0 as stated in LICENSE-CONTENT. This does not change the licenses of fonts, sources, images, or other third-party material.",
+    thirdPartyLicenses: "Third-party material",
+    thirdPartyLicensesDescription: "Fonts, historical sources, images, and other third-party material retain their recorded licenses and rights statements. A citation-only source does not grant redistribution permission.",
+    publicData: "Public data API",
+    publicDataDescription: "The versioned static JSON API exposes validated country, language, model, source, font, glyph, and stroke records through the links in its index.",
+    apiIndex: "API index",
+    countryData: "Country records",
+    languageData: "Language records",
+    noRegisteredFonts: "No reference fonts are registered.",
     project: "Open handwriting atlas",
     homeTitle: "Explore handwriting models",
     homeDescription: "An open, source-backed atlas for handwriting models, letterforms, and local analysis.",
     heroEyebrow: "Buchwandler · Open handwriting reference",
     heroTitle: "Explore handwriting models openly",
-    heroIntro: "Schreibatlas is building a source-backed, machine-readable atlas of handwriting models and letterforms.",
-    demoTitle: "Demo data, not verified standards",
-    demoDescription: "The current model records are synthetic UI placeholders. There are no source-backed glyphs or writing instructions yet.",
+    heroIntro: "Schreibatlas documents a source-backed, machine-readable partial corpus of German handwriting models and letterforms.",
+    demoTitle: "Small partial corpus, not complete standards",
+    demoDescription: "Two German handwriting models are documented with sources; three other entries are synthetic demos. Eleven letter outlines are recorded. They do not establish stroke movement or complete repertoires.",
     pillarsTitle: "Four connected areas",
     pillars: [
       { title: "Explore", description: "Document models, repertoires, and letters with traceable sources." },
       { title: "Learn", description: "Present writing guidance and practice material only with clear status and provenance." },
       { title: "Compare", description: "Compare letterforms against a shared baseline and x-height." },
-      { title: "Analyze", description: "Later, measure geometry locally in the browser without uploading handwriting images." },
+      { title: "Analyze", description: "Compare photos locally against bundled digital reference fonts; uncertain measurements are withheld." },
     ],
     promisesTitle: "Open and privacy-conscious",
     promises: [
       "Machine-readable data and reusable static exports are project goals.",
       "Sources and verification status belong alongside every factual record.",
-      "Photo analysis is not available yet. Direct local pen capture is available under Write locally.",
+      "Photo analysis processes images locally and compares supplied text against bundled digital fonts. It does not perform OCR or produce an overall score.",
     ],
     landingTitle: "Choose a language",
     landingDescription: "Choose German or English for the Schreibatlas handwriting atlas.",
@@ -720,8 +881,10 @@ export const messages: Record<Locale, MessageSet> = {
     fontInformation: "Reference fonts",
     noFonts: "No reference font is registered for this model.",
     fontCorrespondence: "Correspondence to the model",
+    fontCalibration: "x-height calibration",
     fontDegree: { complete: "Complete", partial: "Partial", "visual-only": "Visual only", unknown: "Unknown" },
     licenseAttribution: "License and attribution",
+    licenseFile: "License file",
     verification: {
       draft: { label: "Draft", explanation: "Incomplete working data, not a claim about a recognized handwriting standard." },
       inferred: { label: "Inferred", explanation: "A reasoned reconstruction, not directly documented." },
@@ -734,7 +897,10 @@ export const messages: Record<Locale, MessageSet> = {
     letterTitle: "Letter",
     character: "Character",
     codePoints: "Unicode code points",
-    unicodeOnly: "This character is shown only as a Unicode text label, not as a handwriting sample.",
+    unicodeOnly: "The Unicode character is a text label, not a handwriting sample.",
+    unicodeLabel: "Unicode text label, not the reference shape",
+    glyphOutlineCaption: "Recorded vector outline",
+    glyphOutlineDescription: "Recorded outline normalized to its baseline and x-height. It does not show stroke order or pen movement.",
     normalizedGuidelines: "Normalized writing guidelines",
     noGuidelineMetrics: "No normalized baseline and height measurements are recorded.",
     baseline: "Baseline",
@@ -773,6 +939,9 @@ export const messages: Record<Locale, MessageSet> = {
     practiceModel: "Handwriting model",
     practiceText: "Exercise text",
     practiceTextPromptNote: "Typed text is only an exercise prompt. It is not a handwriting sample.",
+    practicePreset: "Practice preset",
+    practicePresetPlaceholder: "Choose a preset",
+    practicePresetNote: "Presets use only recorded letter outlines derived from the digital Volksschrift font file. They are practice strings, not historical exercises.",
     practicePaper: "Paper size",
     practiceA4: "A4",
     practiceLetter: "US Letter",
@@ -786,6 +955,9 @@ export const messages: Record<Locale, MessageSet> = {
     practiceTracingRows: "Tracing rows per repetition",
     practiceBlankRows: "Blank rows per repetition",
     practiceRepetitions: "Repetitions",
+    practiceExportPng: "Download PNG",
+    practiceExportPdf: "Download PDF",
+    practiceExportError: "The PNG or PDF export failed.",
     practiceExportSvg: "Download SVG",
     practicePrint: "Print",
     practiceCopyLink: "Copy settings link",
@@ -846,6 +1018,27 @@ export const messages: Record<Locale, MessageSet> = {
     writeReferenceDisclaimer: "A reference outline is an isolated final form from the dataset, not a stroke sequence or writing instruction.",
     writeProvenance: "Reference outline provenance",
     writeProvenanceEmpty: "No reference outline selected.",
+    writeMovementTitle: "Compare against a sourced stroke sequence",
+    writeMovementNote: "Only stroke sequences marked verified and linked to sources are used. Matching permits only one uniform scale and translation, never rotation or warping. It reports separate observations, not an overall handwriting score.",
+    writeMovementCompare: "Compare movement",
+    writeMovementLoading: "Checking locally for a verified, sourced stroke sequence …",
+    writeMovementUnavailable: "No verified, source-backed stroke sequence exists for this model and character. No movement comparison is reported.",
+    writeMovementNoCapture: "Capture a writing sample to enable comparison.",
+    writeMovementReferenceReady: "Verified stroke geometry and source records loaded locally. Capture a sample and run the comparison.",
+    writeMovementError: "Verified stroke geometry could not be loaded. No movement comparison is reported.",
+    writeMovementResultReady: "Separate observations from the verified stroke sequence. This is not an overall score.",
+    writeMovementComplete: "Movement comparison complete.",
+    writeMovementStart: "Start point",
+    writeMovementDirection: "Stroke direction",
+    writeMovementOrder: "Stroke order",
+    writeMovementPenLifts: "Pen lifts",
+    writeMovementRhythm: "Relative timing rhythm",
+    writeMovementSources: "Stroke-sequence sources",
+    writeMovementConfidence: "Confidence",
+    writeMovementMatch: "within observation tolerance",
+    writeMovementDifferent: "clear difference",
+    writeMovementUncertain: "uncertain",
+    writeMovementUnavailableState: "unavailable",
     analysisNavigation: "Photo analysis",
     analysisTitle: "Analyze a handwriting photo locally",
     analysisDescription: "Rectify a photo locally and calculate preliminary geometric line features. Expected text and model are context only; there is no OCR or model scoring.",
@@ -920,7 +1113,24 @@ export const messages: Record<Locale, MessageSet> = {
     analysisNoLines: "No sufficiently continuous line regions were detected.",
     analysisOverlayPreview: "Ink mask (red), line region (blue), and baseline candidate (orange dashed)",
     analysisWordGaps: "Word gaps",
-    analysisWordGapsUnavailable: "Unavailable (no OCR or word segmentation)",
+    analysisWordGapsUnavailable: "Unavailable: the local reference comparison found no unique blank gap near an expected word boundary, or the fit was not confident enough.",
+    analysisReferenceSection: "Reference-font comparison",
+    analysisReferenceUnavailable: "No locally available, calibrated reference font is mapped to this model. General image analysis remains available.",
+    analysisReferenceFontUnavailable: "The local reference font could not be loaded. No reference fit is reported.",
+    analysisReferenceFitUnavailable: "No reference fit is available because the line count, image geometry, or bounded transform limits do not match.",
+    analysisReferenceFitLow: "The fit has low confidence. The view is for orientation only, so measurements are withheld.",
+    analysisReferenceFitMedium: "Medium confidence. The detected line regions fit within the bounded transform.",
+    analysisReferenceComparisonNote: "This compares with a locally bundled digital font, not an exact historical handwriting sample. Fitting uses bounded horizontal and vertical scaling plus translation only. Line spacing is a display convention. No overall handwriting score is produced.",
+    analysisReferenceSources: "Reference-font sources and license",
+    analysisReferenceView: "Comparison view",
+    analysisReferenceViewReference: "Reference",
+    analysisReferenceViewOverlay: "Overlay",
+    analysisReferenceViewDifference: "Difference",
+    analysisReferenceScaleX: "Horizontal scale",
+    analysisReferenceScaleY: "Vertical scale",
+    analysisReferenceResidual: "Normalized fit residual",
+    analysisReferenceWordSpacing: "Word gap relative to the font reference",
+    analysisReferenceWordSpacingUnavailable: "Unavailable: no unique blank gap was detected near an expected word boundary, or the fit is not confident enough.",
     strokeNumber: "Stroke {number}",
     direction: "Direction",
     penContact: "Pen contact",
@@ -969,6 +1179,13 @@ export const messages: Record<Locale, MessageSet> = {
     wordLoadError: "The local reference font could not be loaded.",
     wordLoading: "Loading local reference fonts …",
     wordSummary: "Text comparison for model A {modelA} and model B {modelB}.",
+    sentenceTitle: "Compare sentences",
+    sentenceDescription: "Enter a German sentence. The input stays local, and line breaks are retained in the comparison.",
+    sentenceInputLabel: "Sentence text",
+    sentenceInputPlaceholder: "Enter a German sentence",
+    sentenceSampleButton: "Insert German sample sentence",
+    sentenceSample: "Fleißige Schüler üben täglich.",
+    sentenceLineSpacingNote: "Line breaks are retained. The preview uses fixed spacing of 1.5 x-heights, not measured handwriting or line rhythm.",
     outlineDisclaimer: "Vector contours show documented final forms. They are not writing movements or stroke order.",
   },
 };

@@ -16,15 +16,16 @@
   "scripts": {
     "dev": "npm run build:data && astro dev",
     "typecheck": "astro check",
-    "validate": "node tools/validate-project.mjs && node tools/validate-data.mjs",
+    "validate": "node tools/validate-project.mjs && node tools/check-spdx-headers.mjs && node tools/validate-data.mjs",
     "build:data": "node tools/build-data.mjs",
     "test": "node --test",
     "test:e2e": "playwright test",
-    "build": "npm run build:data && astro build",
+    "build": "npm run build:data && astro build && node tools/build-offline-manifest.mjs",
     "preview": "astro preview"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.0",
     "@types/node": "^26.6.6",
     "ajv": "^8.20.0",

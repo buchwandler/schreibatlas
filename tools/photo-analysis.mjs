@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 const maxOutputPixels = 3_000_000;
 const maxOutputDimension = 2600;
 
