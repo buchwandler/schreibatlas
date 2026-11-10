@@ -29,7 +29,8 @@ self.addEventListener("message", (event) => {
     const cache = await caches.open(CACHE_NAME);
     const urls = [...new Set(event.data.urls)];
     let complete = true;
-    await Promise.all(urls.map(async (value) => {
+    for (let offset = 0; offset < urls.length; offset += 8) {
+      await Promise.all(urls.slice(offset, offset + 8).map(async (value) => {
       try {
         const url = new URL(value, self.location.origin);
         if (!cacheableUrl(url)) return;
@@ -41,7 +42,8 @@ self.addEventListener("message", (event) => {
       } catch {
         complete = false;
       }
-    }));
+      }));
+    }
     event.ports[0]?.postMessage({ type: "cached", complete });
   })());
 });

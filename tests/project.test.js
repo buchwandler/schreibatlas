@@ -5,6 +5,24 @@ import test from "node:test";
 import { spdxHeaderErrors } from "../tools/check-spdx-headers.mjs";
 import { parse } from "yaml";
 
+import { fontNoticeErrors, projectContentErrors, relativeLinkErrors } from "../tools/project-checks.mjs";
+import { fileURLToPath } from "node:url";
+
+const projectRoot = fileURLToPath(new URL("../", import.meta.url));
+
+test("README links, font notices and Node versions are consistent", () => {
+  assert.deepEqual(projectContentErrors(projectRoot), []);
+});
+
+test("local link checks reject missing targets but ignore external URLs and fragments", () => {
+  assert.deepEqual(relativeLinkErrors("[readme](README.md#development) [web](https://example.org/) [anchor](#here)", "README.md", projectRoot), []);
+  assert.equal(relativeLinkErrors("[missing](missing-file.md)", "README.md", projectRoot).length, 1);
+});
+
+test("font notices must identify each exact font record", () => {
+  assert.deepEqual(fontNoticeErrors([{ id: "font-test" }], "`font-test`"), []);
+  assert.equal(fontNoticeErrors([{ id: "font-test" }], "font-test-other").length, 1);
+});
 const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 test("software package metadata identifies Apache-2.0", () => {
@@ -16,7 +34,7 @@ test("localized home copy identifies demo status", () => {
   const germanPage = readFileSync(new URL("../src/pages/de/index.astro", import.meta.url), "utf8");
   const englishPage = readFileSync(new URL("../src/pages/en/index.astro", import.meta.url), "utf8");
   assert.match(messages, /Kleines Teilkorpus, keine vollständigen Standards/);
-  assert.match(messages, /Zwei deutsche Schreibmodelle sind quellenbasiert dokumentiert/);
+  assert.match(messages, /Sechs deutsche Schreibmodelle sind quellenbasiert dokumentiert/);
   assert.match(messages, /Small partial corpus, not complete standards/);
   assert.match(messages, /Photo analysis processes images locally/);
   assert.match(germanPage, /messages\.de/);

@@ -10,6 +10,12 @@ Reviewers should check the applicable items before approving a data or product c
 - [ ] Model period, locale, author, and declared repertoire match the source's scope.
 - [ ] Glyph and contextual-form outlines are traceable to sources. Font-derived shapes are labeled as font data, not transcriptions of a historical specimen.
 - [ ] Missing evidence remains unknown, draft, or unavailable. No movement or stroke order is inferred from final outlines or fonts.
+- [ ] Scoped repertoire completeness is backed by educational evidence, not Unicode font coverage; glyph/stroke coverage is reported separately.
+- [ ] Font-derived glyphs identify their font and process and exclude official stroke order. Field-specific claims and structured variants resolve to real sources.
+- [ ] Pair/sequence connections identify valid model fonts and variant IDs without implying teaching movement.
+- [ ] Pinned font bytes, upstream release/full commit, internal version, identity, calibration and required OpenType features were checked.
+- [ ] Web citations have retrieval dates and precise locators where available; model claims have evidence independent of the font project.
+- [ ] Human movement-path review is recorded before reviewed/verified movement claims.
 
 ## Licensing
 

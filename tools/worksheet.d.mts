@@ -11,6 +11,7 @@ export interface WorksheetSettings {
   tracingRows: 0 | 1 | 2;
   blankRows: 1 | 2;
   repetitions: 1 | 2;
+  referenceKind?: "vector" | "font";
 }
 
 export interface WorksheetMarkerPosition {

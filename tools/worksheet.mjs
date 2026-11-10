@@ -14,6 +14,7 @@ export const worksheetDefaults = {
   tracingRows: 2,
   blankRows: 2,
   repetitions: 1,
+  referenceKind: "vector",
 };
 
 export const worksheetPresets = [
@@ -77,6 +78,7 @@ export function normalizeWorksheetSettings(value, modelIds = [], fallbackModel =
     tracingRows: allowedTracingRows.has(source.tracingRows) ? source.tracingRows : worksheetDefaults.tracingRows,
     blankRows: allowedBlankRows.has(source.blankRows) ? source.blankRows : worksheetDefaults.blankRows,
     repetitions: allowedRepetitions.has(source.repetitions) ? source.repetitions : worksheetDefaults.repetitions,
+    referenceKind: source.referenceKind === "font" ? "font" : "vector",
   };
 }
 

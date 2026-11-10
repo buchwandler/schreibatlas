@@ -1,0 +1,61 @@
+---
+// SPDX-License-Identifier: Apache-2.0
+import type { Content } from "../../tools/content.mjs";
+import { repertoireCharacters } from "../../tools/content.mjs";
+import { inspectTrueType } from "../../tools/font-metadata.mjs";
+import { readFileSync } from "node:fs";
+import { resolve, basename } from "node:path";
+import { withBase } from "../lib/routes";
+import { messages, type Locale } from "../lib/i18n";
+interface Props { content: Content; lang: Locale; }
+const { content, lang } = Astro.props;
+const copy = messages[lang];
+const localized = (text: Record<string, string>) => text[lang] ?? text.en ?? text.de;
+const data = content.models.map((model) => {
+  const font = content.fonts.find((font) => font.id === model.reference_fonts[0]);
+  const metadata = font?.files[0] ? inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))) : undefined;
+  return {
+    id: model.id, name: localized(model.name), country: model.country, languages: model.languages,
+    joined: model.classification?.joined ?? null, characters: repertoireCharacters(model),
+    glyphs: content.glyphs.filter((glyph) => glyph.model === model.id),
+    url: withBase(`${lang}/models/${model.id}/`),
+    font: font?.files[0] && font.calibration ? { ...font, url: withBase(`data/v1/assets/fonts/${font.id}/1-${basename(font.files[0])}`), supported: repertoireCharacters(model).filter((character) => metadata?.hasCharacter(character)) } : undefined,
+  };
+});
+---
+<section class="data-section" data-multi-comparison data-lang={lang} aria-labelledby="multi-title">
+  <h2 id="multi-title">{lang === "de" ? "Mehrere Modelle vergleichen (2–6)" : "Compare multiple models (2–6)"}</h2>
+  <p>{lang === "de" ? "Belegte Konturen haben Vorrang. Fontreferenzen sind keine offiziellen Modellkonturen oder Bewegungsanweisungen. Überlagerung: höchstens drei Modelle." : "Recorded outlines take priority. Font references are not official model traces or movement instructions. Overlay: at most three models."}</p>
+  <div class="multi-controls">
+    <label>{copy.character}<input data-multi-character type="text" value="r" maxlength="8" /></label>
+    <button type="button" data-multi-case="upper">{lang === "de" ? "Großbuchstabe" : "Uppercase"}</button>
+    <button type="button" data-multi-case="lower">{lang === "de" ? "Kleinbuchstabe" : "Lowercase"}</button>
+    <label>{copy.country}<select data-multi-filter="country"><option value="">{copy.allFilterOptions}</option>{content.countries.map((country) => <option value={country.id}>{localized(country.name)}</option>)}</select></label>
+    <label>{copy.languages}<select data-multi-filter="language"><option value="">{copy.allFilterOptions}</option>{content.languages.map((language) => <option value={language.id}>{localized(language.name)}</option>)}</select></label>
+    <label>{copy.joined}<select data-multi-filter="joined"><option value="">{copy.allFilterOptions}</option><option value="true">{copy.present}</option><option value="false">{copy.absent}</option></select></label>
+    <label>{lang === "de" ? "Anordnung" : "Arrangement"}<select data-multi-mode><option value="grid">{lang === "de" ? "Raster" : "Grid"}</option><option value="strip">{lang === "de" ? "Ausgerichtete Reihe" : "Aligned strip"}</option><option value="overlay">{copy.overlay}</option></select></label>
+    <label>{copy.opacity}<input data-multi-opacity type="range" min="0.1" max="1" step="0.05" value="0.5" /></label>
+  </div>
+  <fieldset><legend>{lang === "de" ? "Modellauswahl" : "Model set"}</legend>
+    {data.map((model) => <label data-multi-option><input type="checkbox" value={model.id} checked={["de-grundschrift", "de-la", "de-sas", "de-va"].includes(model.id)} /> {model.name}</label>)}
+  </fieldset>
+  <p data-multi-status role="status" aria-live="polite"></p>
+  <div data-multi-stage class="multi-stage"></div>
+  <label>{copy.shareUrl}<input data-multi-share type="url" readonly /></label>
+  <script data-multi-data type="application/json" set:html={JSON.stringify(data).replaceAll("<", "\\u003c")}></script>
+</section>
+<script>
+  import "../scripts/multi-model-comparison";
+</script>
+<style>
+  .multi-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; }
+  label { display: flex; flex-direction: column; gap: 0.3rem; }
+  fieldset { margin: 1rem 0; display: flex; flex-wrap: wrap; gap: 1rem; }
+  fieldset label { flex-direction: row; align-items: center; }
+  [hidden] { display: none; }
+  .multi-stage { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; }
+  .multi-stage[data-mode="strip"] { display: flex; overflow-x: auto; }
+  .multi-stage :global(figure) { margin: 0; min-width: 12rem; }
+  .multi-stage :global(svg) { width: 100%; height: 15rem; }
+  .multi-stage :global(figcaption) { font-size: 0.85rem; }
+</style>

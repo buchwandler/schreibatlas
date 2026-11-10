@@ -6,6 +6,7 @@ export interface TextShapeInput {
   fontId: string;
   language?: string;
   direction?: TextDirection;
+  features?: string[];
 }
 
 export interface ShapedRun extends TextShapeInput {

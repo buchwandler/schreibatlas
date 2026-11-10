@@ -1,23 +1,11 @@
 ---
 // SPDX-License-Identifier: Apache-2.0
 import { messages, type Locale } from "../lib/i18n";
-
-interface Source {
-  id: string;
-  kind: string;
-  title: string;
-  author: string[];
-  publisher: string | null;
-  year: number | null;
-  locator: { pages?: number[] } | null;
-  url: string | null;
-  rights: { type: string; license: string | null };
-  notes: string | null;
-}
+import type { SourceRecord } from "../../tools/content.mjs";
 
 interface Props {
   lang: Locale;
-  sources: Source[];
+  sources: SourceRecord[];
 }
 
 const { lang, sources } = Astro.props;
@@ -37,10 +25,16 @@ const safeUrl = (value: string | null) => value && /^https?:\/\//i.test(value) ?
             <dt>{copy.sourcePublisher}</dt><dd>{source.publisher ?? copy.notRecorded}</dd>
             <dt>{copy.sourceYear}</dt><dd>{source.year ?? copy.notRecorded}</dd>
             <dt>{copy.sourcePages}</dt><dd>{source.locator?.pages?.join(", ") ?? copy.notRecorded}</dd>
+            {Object.entries(source.locator ?? {}).filter(([key, value]) => key !== "pages" && value != null).map(([key, value]) => <><dt>{key}</dt><dd>{String(value)}</dd></>)}
+            {source.retrieved && <><dt>{lang === "de" ? "Abgerufen" : "Retrieved"}</dt><dd>{source.retrieved}</dd></>}
+            {source.edition && <><dt>{lang === "de" ? "Ausgabe" : "Edition"}</dt><dd>{source.edition}</dd></>}
+            {source.isbn && <><dt>ISBN</dt><dd>{source.isbn}</dd></>}
+            {source.doi && <><dt>DOI</dt><dd>{source.doi}</dd></>}
             <dt>{copy.licenseAttribution}</dt><dd>{source.rights.type} · {source.rights.license ?? copy.notRecorded}</dd>
           </dl>
           {source.notes && <p>{source.notes}</p>}
           {safeUrl(source.url) && <a href={safeUrl(source.url)!} rel="external">{copy.sourceOpen}</a>}
+          {safeUrl(source.archive_url ?? null) && <a href={safeUrl(source.archive_url ?? null)!} rel="external">{lang === "de" ? "Archiv" : "Archive"}</a>}
         </article>
       ))}
     </div>

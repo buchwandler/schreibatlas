@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: src-reference-inventory
+kind: project-original
+title: Schreibatlas German reference browsing inventory and example text
+author: [Schreibatlas contributors]
+publisher: Schreibatlas
+year: 2026
+locator:
+  section: German reference set; declared browsing scope
+url: null
+rights:
+  type: project-original
+  license: CC-BY-SA-4.0
+notes: "Project-selected browsing inventory: A–Z, a–z, ÄÖÜäöüß, decimal digits and basic punctuation. This is an explicitly incomplete educational-model inventory, not a transcription of an official alphabet or an inference from font coverage. Project-authored examples are ordinary test text, not quoted teaching examples."

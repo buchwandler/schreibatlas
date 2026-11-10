@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schreibatlas.de/schema/v1/connection.schema.json",
+  "type": "object",
+  "required": ["model", "left", "right", "status", "behavior", "reference", "sources", "license"],
+  "properties": {
+    "model": { "$ref": "common.schema.json#/$defs/modelId" },
+    "left": { "type": "string", "minLength": 1 },
+    "right": { "type": "string", "minLength": 1 },
+    "status": { "$ref": "common.schema.json#/$defs/verificationStatus" },
+    "behavior": {
+      "type": "object",
+      "required": ["joins", "left_variant", "right_variant"],
+      "properties": {
+        "joins": { "type": ["boolean", "null"] },
+        "left_variant": { "type": ["string", "null"] },
+        "right_variant": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "reference": {
+      "type": "object",
+      "required": ["font", "shaped_text"],
+      "properties": {
+        "font": { "oneOf": [{ "$ref": "common.schema.json#/$defs/fontId" }, { "type": "null" }] },
+        "shaped_text": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "sources": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/sourceId" }, "uniqueItems": true },
+    "license": { "$ref": "common.schema.json#/$defs/licenseId" },
+    "notes": { "$ref": "common.schema.json#/$defs/localizedText" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: font-playwrite-de-grund
+name: Playwrite DE Grund
+author: The Playwrite Project Authors / TypeTogether
+project_url: https://github.com/TypeTogether/Playwrite
+license: OFL-1.1
+files: [assets/fonts/playwrite-de-grund/PlaywriteDEGrund-Regular.ttf]
+license_file: licenses/OFL-1.1-Playwrite.txt
+font_version: Version 1.003
+family_name: Playwrite DE Grund
+postscript_name: PlaywriteDEGrund-Regular
+format: truetype
+weight: 400
+style: normal
+upstream:
+  repository: https://github.com/TypeTogether/Playwrite
+  release: v1.003
+  commit: 36b6ee15dd64a9c64d1adfe19f6a0f602c39b5e4
+  source_file: Playwrite-fonts/fonts/ttf/PlaywriteDEGrund-Regular.ttf
+integrity:
+  sha256: fece840c7f27355b94bddd4c2384c5ee9b769afc981290a483a8a6934cd0ec93
+  bytes: 232132
+calibration:
+  x_height_em: 0.52
+  x_height_method: "TrueType cmap U+0078 -> glyf.yMax / head.unitsPerEm; tools/font-metadata.mjs. Ascender/descender use OS/2.sTypoAscender and absolute sTypoDescender divided by unitsPerEm."
+  ascender_em: 1.33
+  descender_em: 0.421
+shaping:
+  required_features: [calt, kern]
+  language_tag: de
+  direction: ltr
+correspondence:
+  model: de-grundschrift
+  degree: partial
+  scope: [visual-letterforms, contextual-shaping]
+  excludes: [authoritative-stroke-order, official-teaching-sequence, exact-source-trace]
+  sources: [src-playwrite-project, src-playwrite-v1-003]
+  notes: "Research-informed digital visual reference, not an official source trace or evidence of teaching movement. Font coverage does not establish the model's educational repertoire."
+sources: [src-playwrite-project, src-playwrite-v1-003]

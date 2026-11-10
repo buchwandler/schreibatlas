@@ -78,16 +78,16 @@ test("explore filters validated model records using recorded metadata", async ({
   await page.goto("de/explore/");
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
   await expect(page.getByRole("heading", { name: "Handschriftmodelle", level: 1 })).toBeVisible();
-  await expect(page.locator("[data-model-card]")).toHaveCount(5);
+  await expect(page.locator("[data-model-card]")).toHaveCount(9);
   await page.getByRole("searchbox", { name: "Modelle suchen" }).fill("Rundschrift");
-  await expect(page.locator("[data-model-card]:visible")).toHaveCount(1);
+  await expect(page.locator("[data-model-card]:visible")).toHaveCount(2);
   await page.getByRole("searchbox", { name: "Modelle suchen" }).fill("not-a-model");
   await expect(page.getByText("Keine Modelle passen zu den aktuellen Filtern.")).toBeVisible();
   await page.getByRole("searchbox", { name: "Modelle suchen" }).fill("");
   await page.locator('[data-model-filter="joined"]').selectOption("joined");
-  await expect(page.locator("[data-model-card]:visible")).toHaveCount(1);
-  await expect(page.locator("[data-model-card]:visible")).toContainText("Deutsche Volksschrift");
-  await expect(page.locator("[data-model-card]:visible")).toContainText("Verbundene Schrift: Vorhanden");
+  await expect(page.locator("[data-model-card]:visible")).toHaveCount(4);
+  await expect(page.locator("[data-model-card]:visible").filter({ hasText: "Deutsche Volksschrift" })).toHaveCount(1);
+  await expect(page.locator("[data-model-card]:visible").first()).toContainText("Verbundene Schrift: Vorhanden");
   await page.locator('[data-model-filter="joined"]').selectOption("");
   await page.locator('[data-model-filter="use"]').selectOption("historical");
   await expect(page.locator("[data-model-card]:visible")).toHaveCount(2);
@@ -146,15 +146,15 @@ test("letter detail renders its recorded normalized outline and provenance", asy
 
 test("repertoire renders recorded outlines and reports glyphs without vector data", async ({ page }) => {
   await page.goto("en/models/de-volksschrift/letters/");
-  await expect(page.locator("[data-glyph-card]")).toHaveCount(10);
+  await expect(page.locator("[data-glyph-card]")).toHaveCount(60);
   await expect(page.locator("[data-glyph-outline] path")).toHaveCount(10);
   await expect(page.locator(".verification-badge.status-source-backed")).toHaveCount(11);
 
   await page.goto("en/models/de-kurrent-loth-1866/letters/");
-  await expect(page.locator("[data-glyph-card]")).toHaveCount(1);
-  await expect(page.getByText("No sourced vector outline is available for this glyph record.")).toBeVisible();
+  await expect(page.locator("[data-glyph-card]")).toHaveCount(57);
   await expect(page.locator("[data-glyph-outline]")).toHaveCount(0);
-  await expect(page.locator(".glyph-card .glyph-text-label")).toHaveText("A");
+  await expect(page.locator("[data-font-preview]")).not.toHaveCount(0);
+  await expect(page.locator(".glyph-card .glyph-text-label").first()).toHaveText("A");
 });
 
 test("English model and repertoire routes render honest empty-data states", async ({ page }) => {
@@ -215,6 +215,9 @@ test("word comparison treats hostile Unicode input as literal text and loads loc
     if (/fonts\/font-(?:langula-kurrent|volksschrift)/.test(request.url())) fontRequests.push(request.url());
   });
   await page.goto("de/compare/words/");
+  await expect(page.locator("#word-font-a")).toBeEnabled();
+  await page.locator("#word-model-a").selectOption("de-kurrent-loth-1866");
+  await page.locator("#word-model-b").selectOption("de-volksschrift");
   const hostileText = '<img src=x onerror="alert(1)"> & ß ﬁ a\u0308';
   await page.getByRole("textbox", { name: "Vergleichstext" }).fill(hostileText);
   await expect(page.locator("#word-literal-preview")).toHaveText(hostileText);

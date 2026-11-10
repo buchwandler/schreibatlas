@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: de-la
+name: {de: Lateinische Ausgangsschrift, en: Lateinische Ausgangsschrift}
+aliases: {de: [LA], en: [LA, Latin initial script]}
+country: DE
+languages: [de]
+regions: []
+family: modern-school-script
+classification:
+  joined: true
+  slant: {kind: unknown, nominal_degrees: null}
+period:
+  from: 1950
+  to: null
+  precision: decade
+  notes: {de: Die KMK beschreibt die Verwendung seit den 1950er Jahren; kein einzelnes Einführungsjahr wird behauptet., en: KMK describes use since the 1950s; no single introduction year is claimed.}
+status: {use: current-or-historical, verification: source-backed}
+education:
+  level: [primary]
+  role: [connected-script]
+  notes: {de: "Ausgangs- bzw. Übergangsschrift zur Entwicklung einer individuellen Handschrift; keine unveränderliche Normschrift.", en: "Initial or transitional script for developing individual handwriting, not an immutable standard."}
+characteristics:
+  uppercase: {de: Die KMK nennt Richtungswechsel bei Großbuchstaben wie H und X., en: KMK notes direction changes in capitals such as H and X.}
+  lowercase: {de: "Aufstriche etwa bei a und d prägen die beschriebenen Formen.", en: "Entry upstrokes, for example in a and d, characterize the described forms."}
+  connections: {de: Nach der KMK werden alle Buchstaben konsequent verbunden., en: KMK describes consistent joining between letters.}
+character_repertoire: [U+0041-U+005A, U+0061-U+007A, U+00C4, U+00D6, U+00DC, U+00E4, U+00F6, U+00FC, U+00DF, U+0030-U+0039, U+002E, U+002C, U+003F, U+0021]
+character_repertoire_complete: false
+repertoire:
+  teaching_core:
+    entries: [U+0041-U+005A, U+0061-U+007A, U+00C4, U+00D6, U+00DC, U+00E4, U+00F6, U+00FC, U+00DF]
+    complete: false
+    sources: [src-reference-inventory]
+  numerals: {entries: [U+0030-U+0039], complete: false, sources: [src-reference-inventory]}
+  punctuation: {entries: [U+002E, U+002C, U+003F, U+0021], complete: false, sources: [src-reference-inventory]}
+reference_fonts: [font-playwrite-de-la]
+sources: [src-kmk-handwriting-2024, src-reference-inventory]
+license: CC-BY-SA-4.0
+demo: false
+description:
+  de: Quellenbasiert beschriebenes deutsches Ausgangsschriftmodell. Das Browsing-Inventar ist keine vollständige offizielle Alphabettafel. Die lokale Playwrite-Referenz ersetzt keine belegten Einzelkonturen oder Bewegungsanweisungen.
+  en: Source-documented German initial-script model. The browsing inventory is not a complete official alphabet chart. The local Playwrite reference does not replace documented individual outlines or movement instructions.
+examples:
+  words: [{text: Schule, language: de, sources: [src-reference-inventory]}]
+  sentences: [{text: Wir schreiben gemeinsam., language: de, sources: [src-reference-inventory]}]

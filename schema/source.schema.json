@@ -5,17 +5,29 @@
   "required": ["id", "kind", "title", "author", "publisher", "year", "locator", "url", "rights", "notes"],
   "properties": {
     "id": { "$ref": "common.schema.json#/$defs/sourceId" },
-    "kind": { "type": "string", "enum": ["publication", "project-placeholder"] },
+    "kind": { "type": "string", "enum": ["publication", "official-guidance", "archive", "website", "font-project", "font-release", "project-original", "project-placeholder"] },
     "title": { "type": "string", "minLength": 1 },
     "author": { "type": "array", "items": { "type": "string", "minLength": 1 } },
     "publisher": { "type": ["string", "null"] },
     "year": { "type": ["integer", "null"] },
     "locator": {
       "type": ["object", "null"],
-      "properties": { "pages": { "type": "array", "items": { "type": "integer", "minimum": 1 } } },
+      "properties": {
+        "pages": { "type": "array", "items": { "type": "integer", "minimum": 1 } },
+        "figure": { "type": ["string", "null"] },
+        "section": { "type": ["string", "null"] },
+        "table": { "type": ["string", "null"] },
+        "anchor": { "type": ["string", "null"] },
+        "quote_anchor": { "type": ["string", "null"] }
+      },
       "additionalProperties": false
     },
     "url": { "type": ["string", "null"] },
+    "retrieved": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "edition": { "type": ["string", "null"] },
+    "isbn": { "type": ["string", "null"] },
+    "doi": { "type": ["string", "null"] },
+    "archive_url": { "type": ["string", "null"] },
     "rights": {
       "type": "object",
       "required": ["type", "license"],

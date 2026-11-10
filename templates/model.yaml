@@ -4,6 +4,30 @@ id: replace-me
 name:
   de: Replace with a sourced German name
   en: Replace with a sourced English name
+aliases:
+  de: []
+  en: []
+regions: []
+education:
+  level: []
+  role: []
+  notes:
+    en: Replace with supported educational context.
+characteristics:
+  uppercase:
+    en: Not documented yet.
+  lowercase:
+    en: Not documented yet.
+  connections:
+    en: Not documented yet.
+examples:
+  words: []
+  sentences: []
+repertoire:
+  teaching_core:
+    entries: []
+    complete: false
+    sources: [src-replace-me]
 country: null
 languages: []
 status:

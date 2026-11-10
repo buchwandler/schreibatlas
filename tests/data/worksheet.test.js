@@ -103,3 +103,12 @@ test("worksheet text limits preserve complete grapheme clusters", () => {
   assert.equal(segments.length, 24);
   assert.equal(segments.at(-1).segment, "e\u0301");
 });
+
+test("worksheet representation round-trips and changes the worksheet identity", () => {
+  const vector = normalizeWorksheetSettings({ model: "de-sas", text: "Schule" }, ["de-sas"]);
+  const font = normalizeWorksheetSettings({ ...vector, referenceKind: "font" }, ["de-sas"]);
+  assert.equal(vector.referenceKind, "vector");
+  assert.equal(decodeWorksheetSettings(encodeWorksheetSettings(font), ["de-sas"]).referenceKind, "font");
+  assert.notEqual(worksheetId(vector, "v1"), worksheetId(font, "v1"));
+  assert.equal(normalizeWorksheetSettings({ referenceKind: "unknown" }).referenceKind, "vector");
+});

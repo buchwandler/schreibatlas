@@ -422,7 +422,7 @@ export const messages: Record<Locale, MessageSet> = {
     heroTitle: "Handschriftmodelle offen erkunden",
     heroIntro: "Schreibatlas dokumentiert ein quellenbasiertes, maschinenlesbares Teilkorpus deutscher Handschriftmodelle und Buchstabenformen.",
     demoTitle: "Kleines Teilkorpus, keine vollständigen Standards",
-    demoDescription: "Zwei deutsche Schreibmodelle sind quellenbasiert dokumentiert; drei weitere Einträge sind synthetische Demos. Elf Buchstabenumrisse sind erfasst. Sie belegen keine Schreibbewegungen und bilden keine vollständigen Repertoires.",
+    demoDescription: "Sechs deutsche Schreibmodelle sind quellenbasiert dokumentiert; drei weitere Einträge sind synthetische Demos. Vier moderne Modelle haben lokale Playwrite-Referenzfonts. Elf Buchstabenumrisse sind erfasst. Fonts und Umrisse belegen keine Schreibbewegungen oder vollständigen offiziellen Repertoires.",
     pillarsTitle: "Vier miteinander verbundene Bereiche",
     pillars: [
       { title: "Erkunden", description: "Modelle, Repertoires und Buchstaben anhand nachvollziehbarer Quellen dokumentieren." },
@@ -821,7 +821,7 @@ export const messages: Record<Locale, MessageSet> = {
     heroTitle: "Explore handwriting models openly",
     heroIntro: "Schreibatlas documents a source-backed, machine-readable partial corpus of German handwriting models and letterforms.",
     demoTitle: "Small partial corpus, not complete standards",
-    demoDescription: "Two German handwriting models are documented with sources; three other entries are synthetic demos. Eleven letter outlines are recorded. They do not establish stroke movement or complete repertoires.",
+    demoDescription: "Six German handwriting models are documented with sources; three other entries are synthetic demos. Four modern models have local Playwrite reference fonts. Eleven letter outlines are recorded. Fonts and outlines do not establish stroke movement or complete official repertoires.",
     pillarsTitle: "Four connected areas",
     pillars: [
       { title: "Explore", description: "Document models, repertoires, and letters with traceable sources." },

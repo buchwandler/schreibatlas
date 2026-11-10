@@ -7,6 +7,7 @@ import licenseIds from "spdx-license-ids" with { type: "json" };
 import { parse } from "yaml";
 import { glyphFileName, glyphRouteSlug, unicodeCodePoints } from "./unicode.mjs";
 import { parseStrokeSvg } from "./stroke-assets.mjs";
+import { evidenceErrors } from "./evidence-validation.mjs";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const typeSchemas = {
@@ -17,6 +18,7 @@ const typeSchemas = {
   sources: "source",
   fonts: "font",
   strokes: "stroke",
+  connections: "connection",
 };
 const schemaNames = Object.values(typeSchemas);
 const validLicenses = new Set(licenseIds);
@@ -282,6 +284,10 @@ export function validateDataset({ root = projectRoot } = {}) {
     }
   }
 
+  const schemaValidRecords = Object.fromEntries(Object.entries(records).map(([type, entries]) =>
+    [type, entries.filter(({ path }) => validRecords[type].has(path))]));
+  errors.push(...evidenceErrors(schemaValidRecords, repositoryRoot));
+  for (const { path, value } of schemaValidRecords.connections) addLicenseError(errors, relative(repositoryRoot, path), value.license);
   return { errors, records };
 }
 

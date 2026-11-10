@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: de-grundschrift
+name: {de: Grundschrift, en: Grundschrift}
+aliases: {de: [Grundschrift-Konzept], en: [German basic handwriting]}
+country: DE
+languages: [de]
+regions: []
+family: modern-school-script
+classification:
+  joined: false
+  slant: {kind: unknown, nominal_degrees: null}
+period:
+  from: 2005
+  to: null
+  precision: approximate
+  notes: {de: Die Projektgruppe entstand nach 2005; kein einheitliches Einführungsjahr., en: The project group formed after 2005; no single introduction year is claimed.}
+status: {use: current, verification: source-backed}
+education:
+  level: [primary]
+  role: [initial-script, development-script]
+  notes: {de: Entwicklung einer individuellen Handschrift aus einfachen Druckschriftformen; sichtbare Verbindungen sind optional., en: Develops individual handwriting from simple print forms; visible connections are optional.}
+characteristics:
+  uppercase: {de: Ausgangspunkt sind einfache Druckschriftformen., en: Starts from simple print forms.}
+  lowercase: {de: Wendebögen an Buchstaben mit Abstrich erleichtern mögliche Verbindungen., en: Turning arcs on letters ending in a downstroke support optional connections.}
+  connections: {de: "Man kann sichtbar verbinden, muss aber nicht; unverbunden bezeichnet hier nur die Ausgangsformen.", en: "Visible joining is optional; unjoined here describes only the initial forms."}
+character_repertoire: [U+0041-U+005A, U+0061-U+007A, U+00C4, U+00D6, U+00DC, U+00E4, U+00F6, U+00FC, U+00DF, U+0030-U+0039, U+002E, U+002C, U+003F, U+0021]
+character_repertoire_complete: false
+repertoire:
+  teaching_core:
+    entries: [U+0041-U+005A, U+0061-U+007A, U+00C4, U+00D6, U+00DC, U+00E4, U+00F6, U+00FC, U+00DF]
+    complete: false
+    sources: [src-reference-inventory]
+  numerals: {entries: [U+0030-U+0039], complete: false, sources: [src-reference-inventory]}
+  punctuation: {entries: [U+002E, U+002C, U+003F, U+0021], complete: false, sources: [src-reference-inventory]}
+reference_fonts: [font-playwrite-de-grund]
+sources: [src-kmk-handwriting-2024, src-grundschulverband-grundschrift, src-reference-inventory]
+license: CC-BY-SA-4.0
+demo: false
+description:
+  de: Quellenbasiert beschriebenes Grundschrift-Konzept. Das erklärte Inventar dient dem Browsen und ist keine vollständige offizielle Alphabettafel. Playwrite ist eine gesondert gekennzeichnete digitale Referenz; belegte Einzelkonturen und Bewegungsdaten fehlen noch.
+  en: Source-documented Grundschrift concept. The declared browsing inventory is not a complete official alphabet chart. Playwrite is a separately labeled digital reference; documented individual outlines and movement data are not yet available.
+examples:
+  words: [{text: Schule, language: de, sources: [src-reference-inventory]}]
+  sentences: [{text: Wir schreiben gemeinsam., language: de, sources: [src-reference-inventory]}]

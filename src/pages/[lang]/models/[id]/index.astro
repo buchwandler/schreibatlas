@@ -7,8 +7,12 @@ import SourceList from "../../../../components/SourceList.astro";
 import VerificationBadge from "../../../../components/VerificationBadge.astro";
 import { messages, type Locale } from "../../../../lib/i18n";
 import { withBase } from "../../../../lib/routes";
-import { localizedGlyphPaths, localizedModelPaths, loadContent } from "../../../../../tools/content.mjs";
+import { localizedLetterPaths, localizedModelPaths, loadContent } from "../../../../../tools/content.mjs";
 import type { Content, FontRecord, ModelRecord, SourceRecord } from "../../../../../tools/content.mjs";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { inspectTrueType } from "../../../../../tools/font-metadata.mjs";
+import { unicodeCodePoints } from "../../../../../tools/unicode.mjs";
 
 export function getStaticPaths() {
   const content = loadContent();
@@ -26,7 +30,11 @@ const country = content.countries.find((entry) => entry.id === model.country);
 const languageNames = model.languages.map((id) => content.languages.find((entry) => entry.id === id)).filter((entry) => entry !== undefined).map((entry) => localized(entry.name));
 const modelFonts = model.reference_fonts.flatMap((id) => content.fonts.filter((font) => font.id === id)) as FontRecord[];
 const glyphs = content.glyphs.filter((glyph) => glyph.model === model.id);
-const glyphRoutes = localizedGlyphPaths(glyphs).filter((route) => route.lang === lang);
+const glyphRoutes = localizedLetterPaths([model], content.glyphs).filter((route) => route.lang === lang);
+const fontCoverage = modelFonts.filter((font) => font.files[0]).map((font) => inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))));
+const renderable = glyphRoutes.filter(({ character }) => fontCoverage.some((font) => font.hasCharacter(character))).length;
+const connectionRecords = content.connections.filter((entry) => entry.model === model.id);
+const movementCount = content.strokes.filter((entry) => entry.model === model.id && ["source-backed", "reviewed", "verified"].includes(entry.verification)).length;
 const sourceIds = [...new Set([...model.sources, ...glyphs.flatMap((glyph) => glyph.sources), ...modelFonts.flatMap((font) => font.sources)])];
 const modelSources = sourceIds.flatMap((id) => content.sources.filter((source) => source.id === id)) as SourceRecord[];
 const useLabels: Record<string, string> = {
@@ -81,11 +89,43 @@ const breadcrumbItems = [
         <dt>{copy.period}</dt><dd>{periodLabel}</dd>
         <dt>{copy.useStatus}</dt><dd>{useLabel}</dd>
         <dt>{copy.joined}</dt><dd>{joinedLabel}</dd>
-        <dt>{copy.education}</dt><dd>{localized(model.educational_context)}</dd>
+        <dt>{copy.education}</dt><dd>{localized(model.education?.notes ?? model.educational_context)}</dd>
         <dt>{copy.slant}</dt><dd>{model.classification?.slant ? `${model.classification.slant.kind}${model.classification.slant.nominal_degrees === null ? "" : ` · ${model.classification.slant.nominal_degrees}°`}` : copy.notRecorded}</dd>
       </dl>
     </section>
 
+    <section class="data-section" aria-labelledby="context-title">
+      <h2 id="context-title">{lang === "de" ? "Modellkontext und Merkmale" : "Model context and characteristics"}</h2>
+      <dl class="metadata-list">
+        <dt>{lang === "de" ? "Alternative Namen" : "Alternative names"}</dt><dd>{(model.aliases?.[lang] ?? []).join(", ") || copy.notRecorded}</dd>
+        <dt>{lang === "de" ? "Regionen" : "Regions"}</dt><dd>{model.regions?.join(", ") || copy.notRecorded}</dd>
+        <dt>{lang === "de" ? "Modellfamilie" : "Model family"}</dt><dd>{model.family ?? copy.notRecorded}</dd>
+        <dt>{lang === "de" ? "Bildungsrolle" : "Educational role"}</dt><dd>{model.education?.role?.join(", ") || copy.notRecorded}</dd>
+        <dt>{lang === "de" ? "Zeitraum: Genauigkeit" : "Period precision"}</dt><dd>{model.period?.precision ?? copy.notRecorded}</dd>
+        <dt>{lang === "de" ? "Zeitraum: Hinweise" : "Period notes"}</dt><dd>{localized(model.period?.notes)}</dd>
+        <dt>{lang === "de" ? "Großbuchstaben" : "Uppercase"}</dt><dd>{localized(model.characteristics?.uppercase)}</dd>
+        <dt>{lang === "de" ? "Kleinbuchstaben" : "Lowercase"}</dt><dd>{localized(model.characteristics?.lowercase)}</dd>
+        <dt>{copy.connections}</dt><dd>{localized(model.characteristics?.connections)}</dd>
+      </dl>
+      <h3>{lang === "de" ? "Beispielwörter und -sätze" : "Example words and sentences"}</h3>
+      <ul>{[...(model.examples?.words ?? []), ...(model.examples?.sentences ?? [])].map((example) => <li lang={example.language}>{example.text} <small>({example.sources.join(", ")})</small></li>)}</ul>
+    </section>
+
+    <section class="data-section" aria-labelledby="completeness-title" data-model-completeness>
+      <h2 id="completeness-title">{lang === "de" ? "Datenabdeckung" : "Data completeness"}</h2>
+      <dl class="metadata-list">
+        <dt>{lang === "de" ? "Deklarierte Zeichen" : "Declared characters"}</dt><dd>{glyphRoutes.length}</dd>
+        <dt>{lang === "de" ? "Mit Referenzfont darstellbar" : "Reference-font renderable"}</dt><dd>{renderable} / {glyphRoutes.length}</dd>
+        <dt>{lang === "de" ? "Erfasste Vektorkonturen" : "Recorded vector outlines"}</dt><dd>{glyphs.filter((glyph) => glyph.outline).length} / {glyphRoutes.length}</dd>
+        <dt>{lang === "de" ? "Aus Modellquellen nachgezeichnet" : "Source-traced model outlines"}</dt><dd>{glyphs.filter((glyph) => glyph.outline && glyph.derivation?.kind === "source-traced").length} / {glyphRoutes.length}</dd>
+        <dt>{copy.contextualForms}</dt><dd>{glyphs.flatMap((glyph) => glyph.forms.contextual).filter((form) => ["source-backed", "reviewed", "verified"].includes(form.status)).length}</dd>
+        <dt>{lang === "de" ? "Quellenbasierte Bewegungsreferenzen" : "Source-backed movement references"}</dt><dd>{movementCount}</dd>
+        <dt>{lang === "de" ? "Verifizierte Bewegungsreferenzen" : "Verified movement references"}</dt><dd>{content.strokes.filter((entry) => entry.model === model.id && entry.verification === "verified").length}</dd>
+        <dt>{lang === "de" ? "Verbindungsdatensätze" : "Connection records"}</dt><dd>{connectionRecords.length}</dd>
+      </dl>
+      {model.repertoire && <ul>{Object.entries(model.repertoire).map(([category, scope]) => <li><code>{category}</code>: {scope.complete ? copy.repertoireComplete : copy.repertoireIncomplete} <small>({scope.sources.join(", ")})</small></li>)}</ul>}
+      <p>{lang === "de" ? "Fontabdeckung ist keine Vollständigkeit des Lehrmodells. Eine Fontdarstellung belegt weder offizielle Konturen noch Schreibbewegung." : "Font coverage is not educational-model completeness. A font rendering establishes neither official model outlines nor writing movement."}</p>
+    </section>
     <section class="data-section" aria-labelledby="repertoire-title">
       <div class="section-heading-row">
         <h2 id="repertoire-title">{copy.repertoire}</h2>
@@ -102,14 +142,14 @@ const breadcrumbItems = [
       <h3>{copy.glyphRecords}</h3>
       {glyphRoutes.length > 0 ? (
         <ul class="glyph-link-list">
-          {glyphRoutes.map(({ slug, glyph }) => (
+          {glyphRoutes.map(({ slug, glyph, character }) => (
             <li>
               <a href={withBase(`${lang}/models/${model.id}/letters/${slug}/`)}>
-                <span class="glyph-text-label">{glyph.character}</span>
+                <span class="glyph-text-label">{character}</span>
                 <span class="unicode-label">{copy.unicodeLabel}</span>
-                <code>{glyph.unicode.join(", ")}</code>
+                <code>{unicodeCodePoints(character).join(", ")}</code>
               </a>
-              <VerificationBadge lang={lang} status={glyph.verification} />
+              {glyph && <VerificationBadge lang={lang} status={glyph.verification} />}
             </li>
           ))}
         </ul>
@@ -133,6 +173,7 @@ const breadcrumbItems = [
               <p>{font.author}</p>
               <dl class="metadata-list">
                 <dt>{copy.licenseAttribution}</dt><dd>{font.license}</dd>
+                <dt>{lang === "de" ? "Fontversion" : "Font version"}</dt><dd>{font.font_version ?? copy.notRecorded}</dd>
                 <dt>{copy.fontCorrespondence}</dt><dd>{copy.fontDegree[font.correspondence.degree]}</dd>
               </dl>
               {font.license_file && fontLicenseUrl(font) && <p><strong>{copy.licenseFile}:</strong> <a href={fontLicenseUrl(font)}>{font.license_file}</a></p>}

@@ -6,6 +6,45 @@
   "properties": {
     "id": { "$ref": "common.schema.json#/$defs/modelId" },
     "name": { "$ref": "common.schema.json#/$defs/localizedText" },
+    "aliases": { "type": "object", "additionalProperties": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true } },
+    "regions": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z]{2}-[A-Z0-9]{1,3}$" }, "uniqueItems": true },
+    "family": { "type": "string", "minLength": 1 },
+    "education": {
+      "type": "object",
+      "properties": {
+        "level": { "type": "array", "items": { "enum": ["primary", "secondary", "adult"] }, "uniqueItems": true },
+        "role": { "type": "array", "items": { "enum": ["initial-script", "connected-script", "development-script"] }, "uniqueItems": true },
+        "notes": { "$ref": "common.schema.json#/$defs/localizedText" }
+      },
+      "additionalProperties": false
+    },
+    "characteristics": {
+      "type": "object",
+      "properties": {
+        "uppercase": { "$ref": "common.schema.json#/$defs/localizedText" },
+        "lowercase": { "$ref": "common.schema.json#/$defs/localizedText" },
+        "connections": { "$ref": "common.schema.json#/$defs/localizedText" }
+      },
+      "additionalProperties": false
+    },
+    "examples": {
+      "type": "object",
+      "properties": {
+        "words": { "type": "array", "items": { "$ref": "#/$defs/example" } },
+        "sentences": { "type": "array", "items": { "$ref": "#/$defs/example" } }
+      },
+      "additionalProperties": false
+    },
+    "repertoire": {
+      "type": "object",
+      "properties": {
+        "teaching_core": { "$ref": "#/$defs/repertoireScope" },
+        "numerals": { "$ref": "#/$defs/repertoireScope" },
+        "punctuation": { "$ref": "#/$defs/repertoireScope" },
+        "special_characters": { "$ref": "#/$defs/repertoireScope" }
+      },
+      "additionalProperties": false
+    },
     "country": { "oneOf": [{ "$ref": "common.schema.json#/$defs/countryId" }, { "type": "null" }] },
     "languages": {
       "type": "array",
@@ -33,7 +72,9 @@
       "required": ["from", "to"],
       "properties": {
         "from": { "type": ["integer", "null"] },
-        "to": { "type": ["integer", "null"] }
+        "to": { "type": ["integer", "null"] },
+        "precision": { "enum": ["year", "decade", "approximate", "unknown"] },
+        "notes": { "$ref": "common.schema.json#/$defs/localizedText" }
       },
       "additionalProperties": false
     },
@@ -68,6 +109,29 @@
     "demo": { "type": "boolean" },
     "description": { "$ref": "common.schema.json#/$defs/localizedText" },
     "educational_context": { "$ref": "common.schema.json#/$defs/localizedText" }
+  },
+  "$defs": {
+    "example": {
+      "type": "object",
+      "required": ["text", "language", "sources"],
+      "properties": {
+        "text": { "type": "string", "minLength": 1 },
+        "language": { "$ref": "common.schema.json#/$defs/languageId" },
+        "sources": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/sourceId" }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    },
+    "repertoireScope": {
+      "type": "object",
+      "required": ["entries", "complete", "sources"],
+      "properties": {
+        "entries": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/unicodeEntry" }, "uniqueItems": true },
+
+        "complete": { "type": "boolean" },
+        "sources": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/sourceId" }, "uniqueItems": true }
+      },
+      "additionalProperties": false
+    }
   },
   "allOf": [
     {

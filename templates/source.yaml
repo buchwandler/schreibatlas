@@ -7,7 +7,18 @@ author:
   - Replace with author or editor
 publisher: null
 year: null
-locator: null
+locator:
+  pages: []
+  figure: null
+  section: null
+  table: null
+  anchor: null
+  quote_anchor: null
+edition: null
+isbn: null
+doi: null
+archive_url: null
+# For web sources, add retrieved as a quoted YYYY-MM-DD date.
 url: null
 rights:
   type: unknown

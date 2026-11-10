@@ -11,7 +11,7 @@ const root = fileURLToPath(new URL("../../", import.meta.url));
 const readJson = (path) => JSON.parse(readFileSync(join(root, path), "utf8"));
 const readYaml = (path) => parse(readFileSync(join(root, path), "utf8"));
 const ajv = new Ajv2020({ allErrors: true, strict: false });
-const schemaNames = ["country", "language", "model", "glyph", "source", "font", "stroke"];
+const schemaNames = ["country", "language", "model", "glyph", "source", "font", "stroke", "connection"];
 
 ajv.addSchema(readJson("schema/common.schema.json"));
 for (const name of schemaNames) ajv.addSchema(readJson(`schema/${name}.schema.json`));

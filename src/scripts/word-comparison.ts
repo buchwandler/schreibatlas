@@ -131,6 +131,15 @@ if (page) {
       const licenseLine = document.createElement("p");
       licenseLine.textContent = `${messages.licenseAttribution}: ${font.license}`;
       card.append(licenseLine);
+      const shapingLine = document.createElement("p");
+      const features = font.shaping?.required_features ?? [];
+      shapingLine.textContent = `${font.font_version ?? "Version: unknown"} · OpenType: ${features.length ? features.join(", ") : "contextual feature requirements not documented"}`;
+      card.append(shapingLine);
+      if (features.length && !CSS.supports("font-feature-settings", features.map((tag) => `"${tag}" 1`).join(", "))) {
+        const warning = document.createElement("p");
+        warning.textContent = document.documentElement.lang === "de" ? "Warnung: Die erforderlichen Kontextfunktionen werden nicht unterstützt." : "Warning: required contextual features are unavailable.";
+        card.append(warning);
+      }
       if (font.calibration) {
         const calibrationLine = document.createElement("p");
         calibrationLine.textContent = `${messages.fontCalibration}: ${font.calibration.x_height_em} em${font.calibration.x_height_method ? ` · ${font.calibration.x_height_method}` : ""}`;
@@ -224,8 +233,8 @@ if (page) {
       const languageA = languageById.get(modelA.languages[0] ?? "");
       const languageB = languageById.get(modelB.languages[0] ?? "");
       const [runA, runB] = await Promise.all([
-        shaper.shape({ text, fontId: fontA.id, language: languageA?.id, direction: languageA?.direction === "rtl" ? "rtl" : "ltr" }),
-        shaper.shape({ text, fontId: fontB.id, language: languageB?.id, direction: languageB?.direction === "rtl" ? "rtl" : "ltr" }),
+        shaper.shape({ text, fontId: fontA.id, features: fontA.shaping?.required_features, language: languageA?.id, direction: languageA?.direction === "rtl" ? "rtl" : "ltr" }),
+        shaper.shape({ text, fontId: fontB.id, features: fontB.shaping?.required_features, language: languageB?.id, direction: languageB?.direction === "rtl" ? "rtl" : "ltr" }),
       ]);
       if (version !== renderVersion) return;
       renderNormalizedTextStage(stage, [

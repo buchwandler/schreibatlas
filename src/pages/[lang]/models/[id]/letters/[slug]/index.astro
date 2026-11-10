@@ -4,12 +4,14 @@ import BaseLayout from "../../../../../../layouts/BaseLayout.astro";
 import BreadcrumbJsonLd from "../../../../../../components/BreadcrumbJsonLd.astro";
 import NormalizedGuidelines from "../../../../../../components/NormalizedGuidelines.astro";
 import GlyphOutline from "../../../../../../components/GlyphOutline.astro";
+import FontGlyphPreview from "../../../../../../components/FontGlyphPreview.astro";
+import { unicodeCodePoints } from "../../../../../../../tools/unicode.mjs";
 import SourceList from "../../../../../../components/SourceList.astro";
 import VerificationBadge from "../../../../../../components/VerificationBadge.astro";
 import StrokeRenderer from "../../../../../../components/StrokeRenderer.astro";
 import { messages, type Locale } from "../../../../../../lib/i18n";
 import { withBase } from "../../../../../../lib/routes";
-import { localizedGlyphPaths, loadContent } from "../../../../../../../tools/content.mjs";
+import { localizedLetterPaths, loadContent } from "../../../../../../../tools/content.mjs";
 import type { Content, FontRecord, GlyphRecord, ModelRecord, SourceRecord, StrokeRecord } from "../../../../../../../tools/content.mjs";
 
 import { readFileSync } from "node:fs";
@@ -17,27 +19,27 @@ import { resolve } from "node:path";
 import { parseStrokeSvg } from "../../../../../../../tools/stroke-assets.mjs";
 export function getStaticPaths() {
   const content = loadContent();
-  return localizedGlyphPaths(content.glyphs).map(({ lang, id, slug, glyph }) => ({
+  return localizedLetterPaths(content.models, content.glyphs).map(({ lang, id, slug, glyph, character, model }) => ({
     params: { lang, id, slug },
-    props: { glyph, content },
+    props: { glyph, character, model, content },
   }));
 }
 
-const { glyph, content } = Astro.props as { glyph: GlyphRecord; content: Content };
+const { glyph, character, model, content } = Astro.props as { glyph?: GlyphRecord; character: string; model: ModelRecord; content: Content };
+const unicode = unicodeCodePoints(character);
 const lang = Astro.params.lang as Locale;
 const copy = messages[lang];
-const model = content.models.find((entry) => entry.id === glyph.model) as ModelRecord;
 const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
 const modelName = localized(model.name);
 const slug = Astro.params.slug;
-const title = `${copy.letterTitle} ${glyph.character} · ${modelName}`;
-const stroke = content.strokes.find((entry) => entry.model === glyph.model && entry.character === glyph.character) as StrokeRecord | undefined;
+const title = `${copy.letterTitle} ${character} · ${modelName}`;
+const stroke = content.strokes.find((entry) => entry.model === model.id && entry.character === character) as StrokeRecord | undefined;
 const strokeDiagramSteps = stroke ? [...stroke.strokes].sort((left, right) => left.order - right.order).map((step) => ({
   ...step,
   paths: parseStrokeSvg(readFileSync(resolve(process.cwd(), step.file), "utf8"), step.file).paths,
 })) : [];
-const font = content.fonts.find((entry) => entry.id === glyph.reference.font) as FontRecord | undefined;
-const sourceIds = [...new Set([...model.sources, ...glyph.sources, ...(stroke?.sources ?? []), ...(font?.sources ?? [])])];
+const font = content.fonts.find((entry) => entry.id === (glyph?.reference.font ?? model.reference_fonts[0])) as FontRecord | undefined;
+const sourceIds = [...new Set([...model.sources, ...(glyph?.sources ?? []), ...(stroke?.sources ?? []), ...(font?.sources ?? [])])];
 const sourceMap = new Map(content.sources.map((source) => [source.id, source]));
 const sources = sourceIds.flatMap((id) => sourceMap.has(id) ? [sourceMap.get(id)!] : []) as SourceRecord[];
 const fontLicenseFilename = font?.license_file?.split("/").at(-1);
@@ -48,12 +50,12 @@ const breadcrumbItems = [
   { name: copy.exploreNavigation, url: new URL(`/${lang}/explore/`, site).href },
   { name: modelName, url: new URL(`/${lang}/models/${model.id}/`, site).href },
   { name: copy.repertoire, url: new URL(`/${lang}/models/${model.id}/letters/`, site).href },
-  { name: glyph.character, url: new URL(`/${lang}/models/${model.id}/letters/${slug}/`, site).href },
+  { name: character, url: new URL(`/${lang}/models/${model.id}/letters/${slug}/`, site).href },
 ];
 const connectionText = (present: boolean | null) => present === null ? copy.unknown : present ? copy.present : copy.absent;
 const directionText: Record<string, string> = { forward: copy.forward, reverse: copy.reverse, unknown: copy.unknown };
 ---
-<BaseLayout lang={lang} title={title} description={`${copy.letterTitle} ${glyph.character} in ${modelName}.`} canonicalPath={`/${lang}/models/${model.id}/letters/${slug}/`}>
+<BaseLayout lang={lang} title={title} description={`${copy.letterTitle} ${character} in ${modelName}.`} canonicalPath={`/${lang}/models/${model.id}/letters/${slug}/`}>
   <BreadcrumbJsonLd items={breadcrumbItems} />
   <div class="content-page">
     <nav class="breadcrumbs" aria-label={copy.breadcrumbNavigation}>
@@ -65,30 +67,30 @@ const directionText: Record<string, string> = { forward: copy.forward, reverse: 
       <span aria-hidden="true">/</span>
       <a href={withBase(`${lang}/models/${model.id}/letters/`)}>{copy.repertoire}</a>
       <span aria-hidden="true">/</span>
-      <span aria-current="page"><code>{glyph.unicode.join(", ")}</code></span>
+      <span aria-current="page"><code>{unicode.join(", ")}</code></span>
     </nav>
 
     <header class="page-heading letter-heading">
       <p class="eyebrow">{copy.letterTitle} · {modelName}</p>
       <h1>{title}</h1>
-      <VerificationBadge lang={lang} status={glyph.verification} />
+      {glyph ? <VerificationBadge lang={lang} status={glyph.verification} /> : <p class="empty-state">{copy.noGlyphRecords}</p>}
       {model.demo && <p class="demo-marker">{copy.demoTitle}</p>}
     </header>
 
     <section class="data-section glyph-record" aria-labelledby="character-title">
       <h2 id="character-title">{copy.character}</h2>
-      <p class="character-display" aria-label={`${copy.character}: ${glyph.character}`}>{glyph.character}</p>
+      <p class="character-display" aria-label={`${copy.character}: ${character}`}>{character}</p>
       <p>{copy.unicodeOnly}</p>
-      <GlyphOutline lang={lang} outline={glyph.outline} label={`${copy.letterTitle} ${glyph.character} · ${modelName}`} id={`letter-${model.id}-${slug}`} />
+      {glyph?.outline ? <GlyphOutline lang={lang} outline={glyph.outline} label={`${copy.letterTitle} ${character} · ${modelName}`} id={`letter-${model.id}-${slug}`} /> : <FontGlyphPreview lang={lang} character={character} font={font} />}
       <dl class="metadata-list">
-        <dt>{copy.codePoints}</dt><dd><code>{glyph.unicode.join(", ")}</code></dd>
-        <dt>{copy.licenseAttribution}</dt><dd>{glyph.license}</dd>
+        <dt>{copy.codePoints}</dt><dd><code>{unicode.join(", ")}</code></dd>
+        <dt>{copy.licenseAttribution}</dt><dd>{glyph?.license ?? model.license}</dd>
       </dl>
     </section>
 
     <section class="data-section" aria-labelledby="guidelines-title">
       <h2 id="guidelines-title">{copy.normalizedGuidelines}</h2>
-      <NormalizedGuidelines lang={lang} metrics={glyph.metrics} label={`${copy.normalizedGuidelines}: ${glyph.character}`} />
+      <NormalizedGuidelines lang={lang} metrics={glyph?.metrics ?? model.metrics} label={`${copy.normalizedGuidelines}: ${character}`} />
     </section>
 
     <section class="data-section" aria-labelledby="forms-title">
@@ -96,14 +98,14 @@ const directionText: Record<string, string> = { forward: copy.forward, reverse: 
       <div class="detail-grid">
         <article class="detail-card">
           <h3>{copy.isolatedForm}</h3>
-          <VerificationBadge lang={lang} status={glyph.forms.isolated.status} />
+          {glyph ? <VerificationBadge lang={lang} status={glyph.forms.isolated.status} /> : <p>{copy.noGlyphRecords}</p>}
         </article>
         <article class="detail-card">
           <h3>{copy.contextualForms}</h3>
-          {glyph.forms.contextual.length > 0 ? (
-            <ul>{glyph.forms.contextual.map((form, index) => <li>
+          {(glyph?.forms.contextual ?? []).length > 0 ? (
+            <ul>{(glyph?.forms.contextual ?? []).map((form, index) => <li>
               <p>{form.context} · {messages[lang].verification[form.status].label}</p>
-              {form.outline ? <GlyphOutline lang={lang} outline={form.outline} label={`${copy.contextualForms} ${form.context} · ${glyph.character}`} id={`context-${model.id}-${slug}-${index}`} /> : <p class="empty-state">{copy.noVectorOutline}</p>}
+              {form.outline ? <GlyphOutline lang={lang} outline={form.outline} label={`${copy.contextualForms} ${form.context} · ${character}`} id={`context-${model.id}-${slug}-${index}`} /> : <p class="empty-state">{copy.noVectorOutline}</p>}
             </li>)}</ul>
           ) : (
             <p class="empty-state">{copy.noContextualForms}</p>
@@ -115,14 +117,14 @@ const directionText: Record<string, string> = { forward: copy.forward, reverse: 
     <section class="data-section" aria-labelledby="connections-title">
       <h2 id="connections-title">{copy.connections}</h2>
       <dl class="metadata-list">
-        <dt>{copy.entryConnection}</dt><dd>{connectionText(glyph.connections.entry.present)}</dd>
-        <dt>{copy.exitConnection}</dt><dd>{connectionText(glyph.connections.exit.present)}</dd>
+        <dt>{copy.entryConnection}</dt><dd>{connectionText(glyph?.connections.entry.present ?? null)}</dd>
+        <dt>{copy.exitConnection}</dt><dd>{connectionText(glyph?.connections.exit.present ?? null)}</dd>
       </dl>
     </section>
 
     <section class="data-section" aria-labelledby="variants-title">
       <h2 id="variants-title">{copy.variants}</h2>
-      {glyph.variants.length > 0 ? <ul>{glyph.variants.map((variant) => <li>{variant}</li>)}</ul> : <p class="empty-state">{copy.noVariants}</p>}
+      {(glyph?.variants ?? []).length > 0 ? <ul>{(glyph?.variants ?? []).map((variant) => <li>{typeof variant === "string" ? variant : localized(variant.label)}</li>)}</ul> : <p class="empty-state">{copy.noVariants}</p>}
     </section>
 
     <section class="data-section" aria-labelledby="strokes-title">
@@ -157,7 +159,7 @@ const directionText: Record<string, string> = { forward: copy.forward, reverse: 
           <dl class="metadata-list">
             <dt>{copy.licenseAttribution}</dt><dd>{font.license}</dd>
             <dt>{copy.fontCorrespondence}</dt><dd>{copy.fontDegree[font.correspondence.degree]}</dd>
-            <dt>{copy.character}</dt><dd>{glyph.reference.glyph_name ?? copy.notRecorded}</dd>
+            <dt>{copy.character}</dt><dd>{glyph?.reference.glyph_name ?? copy.notRecorded}</dd>
           </dl>
           {font.license_file && fontLicenseUrl && <p><strong>{copy.licenseFile}:</strong> <a href={fontLicenseUrl}>{font.license_file}</a></p>}
           {font.correspondence.notes && <p>{font.correspondence.notes}</p>}

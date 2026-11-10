@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+# Replace placeholders using actual pair/sequence evidence, not font movement inference.
+model: replace-me
+left: r
+right: e
+status: draft
+behavior:
+  joins: null
+  left_variant: null
+  right_variant: null
+reference:
+  font: null
+  shaped_text: re
+sources: [src-replace-me]
+license: CC-BY-SA-4.0
+notes:
+  en: Replace with the source-supported connection behavior and representation limits.

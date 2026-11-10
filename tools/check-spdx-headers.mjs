@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const scannedDirectories = ["src", "tools", "tests", "data", ".github", "docs", "templates"];
-const rootFiles = ["01_todo.md", ".codecrate.toml", "CONTRIBUTING.md", "README.md", "THIRD_PARTY_NOTICES.md", "app.js", "astro.config.mjs", "index.html", "plan.md", "playwright.config.ts", "styles.css", "public/sw.js"];
+const rootFiles = ["01_todo.md", ".codecrate.toml", "CONTRIBUTING.md", "README.md", "THIRD_PARTY_NOTICES.md", "app.js", "astro.config.mjs", "index.html", "playwright.config.ts", "styles.css", "public/sw.js"];
 const commentableExtensions = new Set([".astro", ".cjs", ".css", ".html", ".js", ".md", ".mjs", ".mts", ".toml", ".ts", ".tsx", ".yaml", ".yml"]);
 const contentLicense = "CC-BY-SA-4.0";
 const softwareLicense = "Apache-2.0";

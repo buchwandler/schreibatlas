@@ -4,15 +4,19 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { messages, type Locale } from "../../../lib/i18n";
 import { withBase } from "../../../lib/routes";
 import { worksheetPresets } from "../../../../tools/worksheet.mjs";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { inspectTrueType } from "../../../../tools/font-metadata.mjs";
+import { repertoireCharacters } from "../../../../tools/content.mjs";
 import { loadContent, locales } from "../../../../tools/content.mjs";
-import type { LanguageRecord, ModelRecord } from "../../../../tools/content.mjs";
+import type { FontRecord, LanguageRecord, ModelRecord } from "../../../../tools/content.mjs";
 
 export function getStaticPaths() {
   const content = loadContent();
-  return locales.map((lang) => ({ params: { lang }, props: { models: content.models, languages: content.languages } }));
+  return locales.map((lang) => ({ params: { lang }, props: { models: content.models, languages: content.languages, fonts: content.fonts } }));
 }
 
-const { models, languages } = Astro.props as { models: ModelRecord[]; languages: LanguageRecord[] };
+const { models, languages, fonts } = Astro.props as { models: ModelRecord[]; languages: LanguageRecord[]; fonts: FontRecord[] };
 const lang = Astro.params.lang as Locale;
 const copy = messages[lang];
 const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
@@ -59,8 +63,17 @@ const clientCopy = {
           {models.map((model) => {
             const modelLanguages = model.languages.map((id) => languages.find((entry) => entry.id === id)).filter((entry): entry is LanguageRecord => Boolean(entry));
             const direction = modelLanguages[0]?.direction ?? "ltr";
-            return <option value={model.id} data-sources={JSON.stringify(model.sources)} data-license={model.license} data-verification={model.status.verification} data-demo={String(model.demo)} data-direction={direction}>{localized(model.name)}</option>;
+            const font = fonts.find((font) => font.id === model.reference_fonts[0]);
+            const metadata = font?.files[0] ? inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))) : undefined;
+            const supported = repertoireCharacters(model).filter((character) => metadata?.hasCharacter(character));
+            return <option value={model.id} data-font={font?.id ?? ""} data-supported={JSON.stringify(supported)} data-sources={JSON.stringify(model.sources)} data-license={model.license} data-verification={model.status.verification} data-demo={String(model.demo)} data-direction={direction}>{localized(model.name)}</option>;
           })}
+        </select>
+      </label>
+      <label for="worksheet-reference-kind">{lang === "de" ? "Referenzdarstellung" : "Reference representation"}
+        <select id="worksheet-reference-kind" data-reference-kind>
+          <option value="vector">{lang === "de" ? "Erfasste Vektorkonturen" : "Recorded vector forms"}</option>
+          <option value="font">{lang === "de" ? "Referenzfont-Darstellung" : "Reference font rendering"}</option>
         </select>
       </label>
       <label for="worksheet-text">{copy.practiceText}

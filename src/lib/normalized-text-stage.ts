@@ -92,6 +92,7 @@ function makeFigure(layers: NormalizedTextLayer[], index: number, viewBox: Retur
         "fill-opacity": options.mode === "overlay" && layerIndex === 1 ? String(options.opacity) : "1",
         lang: layer.run.language ?? "",
       });
+      text.style.fontFeatureSettings = (layer.run.features ?? ["calt", "kern"]).map((tag) => `"${tag}" 1`).join(", ");
       text.textContent = line;
       world.append(text);
     });

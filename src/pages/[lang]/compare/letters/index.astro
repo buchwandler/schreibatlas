@@ -1,6 +1,7 @@
 ---
 // SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import MultiModelComparison from "../../../../components/MultiModelComparison.astro";
 import { messages, type Locale } from "../../../../lib/i18n";
 import { withBase } from "../../../../lib/routes";
 import { loadContent, locales } from "../../../../../tools/content.mjs";
@@ -99,6 +100,7 @@ const initialStatus = content.glyphs.length ? copy.loadingGlyphs : copy.noCompar
     <div id="comparison-stage" class="comparison-stage" role="group" aria-label={copy.compareTitle}></div>
     <noscript><p>{copy.compareDescription}</p></noscript>
 
+    <MultiModelComparison lang={lang} content={content} />
     <script id="comparison-data" type="application/json" set:html={safeJson(pageData)}></script>
     <script id="comparison-messages" type="application/json" set:html={safeJson(messageData)}></script>
   </div>

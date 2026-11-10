@@ -23,6 +23,17 @@ connections:
   exit:
     present: null
 variants: []
+# Use structured variants with id, localized label, outline, status and sources.
+derivation:
+  kind: unknown
+  process: Replace with the actual extraction or authorship process.
+  verification: draft
+  represents: []
+  does_not_establish: [official-stroke-order]
+notes:
+  en: Replace with representation limits.
+related_characters: []
+source_claims: []
 sources:
   - src-replace-me
 verification: draft

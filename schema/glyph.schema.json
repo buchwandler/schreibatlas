@@ -39,6 +39,36 @@
       "additionalProperties": false
     },
     "metrics": { "$ref": "common.schema.json#/$defs/metrics" },
+    "derivation": {
+      "type": "object",
+      "required": ["kind", "process", "verification", "represents", "does_not_establish"],
+      "properties": {
+        "kind": { "enum": ["source-traced", "font-derived", "project-reconstructed", "project-authored", "unknown"] },
+        "source_font": { "$ref": "common.schema.json#/$defs/fontId" },
+        "source_glyph": { "type": "string", "minLength": 1 },
+        "process": { "type": "string", "minLength": 1 },
+        "verification": { "$ref": "common.schema.json#/$defs/verificationStatus" },
+        "represents": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "does_not_establish": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true }
+      },
+      "allOf": [{ "if": { "properties": { "kind": { "const": "font-derived" } }, "required": ["kind"] }, "then": { "required": ["source_font", "source_glyph"] } }],
+      "additionalProperties": false
+    },
+    "notes": { "$ref": "common.schema.json#/$defs/localizedText" },
+    "related_characters": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "source_claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "sources", "notes"],
+        "properties": {
+          "field": { "type": "string", "minLength": 1 },
+          "sources": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/sourceId" }, "uniqueItems": true },
+          "notes": { "$ref": "common.schema.json#/$defs/localizedText" }
+        },
+        "additionalProperties": false
+      }
+    },
     "outline": {
       "description": "Optional final-form vector outline in SVG user units. This is not stroke-order or movement data.",
       "oneOf": [
@@ -75,7 +105,26 @@
       },
       "additionalProperties": false
     },
-    "variants": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "variants": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string", "minLength": 1 },
+          {
+            "type": "object",
+            "required": ["id", "label", "status", "sources"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+              "label": { "$ref": "common.schema.json#/$defs/localizedText" },
+              "outline": { "$ref": "#/properties/outline" },
+              "status": { "$ref": "common.schema.json#/$defs/verificationStatus" },
+              "sources": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/sourceId" }, "uniqueItems": true }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
     "sources": {
       "type": "array",
       "items": { "$ref": "common.schema.json#/$defs/sourceId" },

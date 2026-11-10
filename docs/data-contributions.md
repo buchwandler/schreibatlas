@@ -26,6 +26,22 @@ A final-form vector outline is not stroke-order evidence. Do not derive movement
 
 Record repertoire completeness only when a source supports the exact declared scope. Keep the model's period, locale, author, and regional limits explicit. Digital fonts may be partial, modern adaptations, or visual-only aids; represent those limits in the font correspondence fields.
 
+## Structured evidence fields
+
+Use `repertoire.teaching_core`, `numerals`, `punctuation`, and `special_characters` for explicitly sourced inventories. Each scope declares `entries`, `complete`, and `sources`. Scope completeness is an educational inventory claim, not font coverage, traced-outline coverage, or movement coverage. Keep the legacy flat inventory as the union of declared entries; the validator checks scoped entries against it.
+
+Model aliases are locale-keyed string arrays. Regions use country-prefixed ISO subdivision identifiers. Educational roles, characteristics, period uncertainty and examples must remain supported by citations. Project-original example text needs its own project-original source rather than being attributed to an educational publication.
+
+Set glyph `derivation.kind` to `source-traced`, `font-derived`, `project-reconstructed`, `project-authored`, or `unknown`, with the actual process, verification and representation limits. Font-derived data requires `source_font`, `source_glyph`, and an explicit `official-stroke-order` exclusion. Use `source_claims` to attach sources to individual fields. New variants should be objects containing `id`, localized `label`, optional `outline`, `status`, and `sources`; legacy string variants remain supported for migration only.
+
+Connection records use `templates/connection.yaml` and live under `data/connections/<model>/`. Cite pair/sequence evidence, use only the model's reference fonts, and resolve variant IDs to structured glyph variants. Start with a small documented subset, not a full connection matrix.
+
+For web sources, record a quoted `retrieved` date in YYYY-MM-DD form. Locators can identify pages, figures, sections, tables and anchors. Record edition, ISBN, DOI or archive URL when known. These fields do not grant redistribution rights.
+
+New pinned font records include the full upstream commit, release, source path, internal version, family/PostScript identity, format/weight/style, single-asset SHA-256 and byte count, measured calibration and required shaping features. Document correspondence scope and exclusions separately from model identity. Include the font record ID in `THIRD_PARTY_NOTICES.md`. Do not retrofit invented upstream metadata onto older fonts.
+
+See [schema history and release policy](data-schema-history.md).
+
 ## Licensing and assets
 
 Retain the asset's original license. Record the license identifier and include the required license text and attribution. Do not assume that a publicly viewable image or a source URL grants redistribution rights. Do not add third-party fonts or scans to the repository until the license and attribution requirements have been checked.

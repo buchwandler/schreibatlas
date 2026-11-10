@@ -143,6 +143,9 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
   writeJson("glyphs.json", glyphIndex);
   writeJson("strokes.json", strokeIndex);
   for (const stroke of strokeExports) writeJson(`strokes/${stroke.model}/${glyphRouteSlug(stroke.character)}.json`, stroke);
+  const connections = records.connections.map(({ value }) => value).sort((left, right) =>
+    `${left.model}/${left.left}/${left.right}`.localeCompare(`${right.model}/${right.left}/${right.right}`, "en"));
+  writeJson("connections.json", connections);
 
   const index = {
     countries: `${apiPrefix}/countries.json`,
@@ -155,10 +158,11 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
     fonts: `${apiPrefix}/fonts.json`,
     glyphs: `${apiPrefix}/glyphs.json`,
     strokes: `${apiPrefix}/strokes.json`,
+    connections: `${apiPrefix}/connections.json`,
   };
   writeJson("index.json", index);
 
-  const expectedUrls = [index.countries, index.languages, index.models, index.sources, index.fonts, index.glyphs, index.strokes, ...models.map((model) => `${apiPrefix}/models/${model.id}.json`), ...glyphIndex.map((glyph) => glyph.url), ...fontExports.flatMap((font) => [...font.file_urls, ...(font.license_file_url ? [font.license_file_url] : [])]), ...strokeIndex.map((stroke) => stroke.url), ...strokeExports.flatMap((stroke) => stroke.strokes.map((step) => step.file_url))];
+  const expectedUrls = [index.countries, index.languages, index.models, index.sources, index.fonts, index.glyphs, index.strokes, index.connections, ...models.map((model) => `${apiPrefix}/models/${model.id}.json`), ...glyphIndex.map((glyph) => glyph.url), ...fontExports.flatMap((font) => [...font.file_urls, ...(font.license_file_url ? [font.license_file_url] : [])]), ...strokeIndex.map((stroke) => stroke.url), ...strokeExports.flatMap((stroke) => stroke.strokes.map((step) => step.file_url))];
   validateGeneratedUrls(expectedUrls, { apiPrefix, targetDirectory, generatedFiles });
 
   return {

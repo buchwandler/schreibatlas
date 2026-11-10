@@ -1,0 +1,54 @@
+---
+// SPDX-License-Identifier: Apache-2.0
+import { readFileSync } from "node:fs";
+import { resolve, basename } from "node:path";
+import type { FontRecord } from "../../tools/content.mjs";
+import { inspectTrueType } from "../../tools/font-metadata.mjs";
+import { withBase } from "../lib/routes";
+import { messages, type Locale } from "../lib/i18n";
+interface Props { lang: Locale; character: string; font?: FontRecord; }
+const { lang, character, font } = Astro.props;
+const copy = messages[lang];
+const usable = font?.files[0] && font.calibration?.x_height_em && inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))).hasCharacter(character);
+const url = font?.files[0] ? withBase(`data/v1/assets/fonts/${font.id}/1-${basename(font.files[0])}`) : "";
+const license = font?.license_file ? withBase(`data/v1/assets/fonts/${font.id}/${basename(font.license_file)}`) : null;
+const features = (font?.shaping?.required_features ?? ["calt", "kern"]).map((feature) => `"${feature}" 1`).join(", ");
+---
+{usable && font ? (
+  <figure data-font-preview data-font-id={font.id} data-font-url={url} data-font-family={`preview-${font.id}`}>
+    <svg style="display: none" data-font-preview-shape viewBox="-1 -2.5 5 4.5" role="img" aria-label={`${lang === "de" ? "Referenzfont-Darstellung" : "Reference font rendering"}: ${character} · ${font.name}`}>
+      <line x1="-1" x2="4" y1="0" y2="0" stroke="currentColor" stroke-width="0.01" opacity="0.4" />
+      <line x1="-1" x2="4" y1="-1" y2="-1" stroke="currentColor" stroke-width="0.01" opacity="0.4" />
+      <text x="1.5" y="0" text-anchor="middle" lang={font.shaping?.language_tag ?? lang} direction={font.shaping?.direction ?? "ltr"} style={`font-family: "preview-${font.id}"; font-size: ${1 / font.calibration!.x_height_em}px; font-feature-settings: ${features};`} fill="currentColor">{character}</text>
+    </svg>
+    <p data-font-preview-unavailable class="empty-state">{copy.noVectorOutline} {lang === "de" ? "Referenzfont wird geladen; bei einem Fehler bleibt die Darstellung nicht verfügbar." : "Loading reference font; if loading fails, the rendering remains unavailable."}</p>
+    <figcaption>
+      <strong>{lang === "de" ? "Referenzfont-Darstellung" : "Reference font rendering"}</strong>
+      <span> · {font.name} · {font.font_version ?? copy.notRecorded} · {copy.fontDegree[font.correspondence.degree]}</span>
+      <p>{lang === "de" ? "Keine offizielle Quellenkontur und kein Beleg für Schreibbewegung oder Strichfolge." : "Not an official source trace or evidence of writing movement or stroke order."}</p>
+      {license && <a href={license}>{font.license}</a>}
+      {font.project_url && <a href={font.project_url} rel="external"> · {font.name}</a>}
+    </figcaption>
+  </figure>
+) : <p class="empty-state">{copy.noVectorOutline}</p>}
+<script>
+  const fonts = new Map<string, Promise<FontFace>>();
+  for (const preview of document.querySelectorAll<HTMLElement>("[data-font-preview]")) {
+    const family = preview.dataset.fontFamily!;
+    const url = preview.dataset.fontUrl!;
+    if (!fonts.has(family)) {
+      const face = new FontFace(family, `url("${url}")`);
+      fonts.set(family, face.load().then((loaded) => { document.fonts.add(loaded); return loaded; }));
+    }
+    fonts.get(family)!.then(() => {
+      preview.querySelector("[data-font-preview-shape]")?.removeAttribute("style");
+      preview.querySelector("[data-font-preview-unavailable]")?.setAttribute("hidden", "");
+    }).catch(() => { /* Keep the unavailable state; never show a system-font substitute. */ });
+  }
+</script>
+<style>
+  figure { margin: 0; }
+  svg { width: 100%; max-height: 18rem; }
+  [hidden] { display: none; }
+  figcaption { font-size: 0.9rem; }
+</style>

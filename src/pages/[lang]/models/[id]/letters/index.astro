@@ -4,10 +4,12 @@ import BaseLayout from "../../../../../layouts/BaseLayout.astro";
 import BreadcrumbJsonLd from "../../../../../components/BreadcrumbJsonLd.astro";
 import SourceList from "../../../../../components/SourceList.astro";
 import GlyphOutline from "../../../../../components/GlyphOutline.astro";
+import FontGlyphPreview from "../../../../../components/FontGlyphPreview.astro";
+import { unicodeCodePoints } from "../../../../../../tools/unicode.mjs";
 import VerificationBadge from "../../../../../components/VerificationBadge.astro";
 import { messages, type Locale } from "../../../../../lib/i18n";
 import { withBase } from "../../../../../lib/routes";
-import { localizedGlyphPaths, localizedModelPaths, loadContent } from "../../../../../../tools/content.mjs";
+import { localizedLetterPaths, localizedModelPaths, loadContent } from "../../../../../../tools/content.mjs";
 import type { Content, ModelRecord } from "../../../../../../tools/content.mjs";
 
 export function getStaticPaths() {
@@ -24,9 +26,10 @@ const copy = messages[lang];
 const localized = (values: Record<string, string> | undefined) => values?.[lang] ?? values?.en ?? values?.de ?? copy.notRecorded;
 const modelName = localized(model.name);
 const title = `${copy.repertoire}: ${modelName}`;
-const glyphRoutes = localizedGlyphPaths(content.glyphs.filter((glyph) => glyph.model === model.id)).filter((route) => route.lang === lang);
+const glyphRoutes = localizedLetterPaths([model], content.glyphs).filter((route) => route.lang === lang);
+const font = content.fonts.find((entry) => entry.id === model.reference_fonts[0]);
 const sourceMap = new Map(content.sources.map((source) => [source.id, source]));
-const sourceIds = [...new Set([...model.sources, ...model.reference_fonts.flatMap((id) => content.fonts.find((font) => font.id === id)?.sources ?? []), ...glyphRoutes.flatMap(({ glyph }) => glyph.sources)])];
+const sourceIds = [...new Set([...model.sources, ...model.reference_fonts.flatMap((id) => content.fonts.find((font) => font.id === id)?.sources ?? []), ...glyphRoutes.flatMap(({ glyph }) => glyph?.sources ?? [])])];
 const sources = sourceIds.flatMap((id) => sourceMap.has(id) ? [sourceMap.get(id)!] : []);
 const site = Astro.site ?? new URL("https://schreibatlas.de");
 const breadcrumbItems = [
@@ -72,15 +75,15 @@ const breadcrumbItems = [
       <h2 id="glyphs-title">{copy.glyphRecords}</h2>
       {glyphRoutes.length > 0 ? (
         <ul class="glyph-card-grid">
-          {glyphRoutes.map(({ slug, glyph }) => (
+          {glyphRoutes.map(({ slug, glyph, character }) => (
             <li class="glyph-card" data-glyph-card>
               <a class="glyph-card-link" href={withBase(`${lang}/models/${model.id}/letters/${slug}/`)}>
-                <span class="glyph-text-label">{glyph.character}</span>
+                <span class="glyph-text-label">{character}</span>
                 <span class="unicode-label">{copy.unicodeLabel}</span>
-                <code>{glyph.unicode.join(", ")}</code>
+                <code>{unicodeCodePoints(character).join(", ")}</code>
               </a>
-              <VerificationBadge lang={lang} status={glyph.verification} />
-              <GlyphOutline lang={lang} outline={glyph.outline} label={`${copy.letterTitle} ${glyph.character}`} id={`repertoire-${model.id}-${slug}`} />
+              {glyph && <VerificationBadge lang={lang} status={glyph.verification} />}
+              {glyph?.outline ? <GlyphOutline lang={lang} outline={glyph.outline} label={`${copy.letterTitle} ${character}`} id={`repertoire-${model.id}-${slug}`} /> : <FontGlyphPreview lang={lang} character={character} font={font} />}
             </li>
           ))}
         </ul>

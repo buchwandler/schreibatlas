@@ -38,13 +38,20 @@ const joinedOptions = [...new Set(models.map((model) => model.classification?.jo
   value,
   label: value === "joined" ? copy.present : value === "unjoined" ? copy.absent : copy.notRecorded,
 }));
+const valuesAsOptions = (values: string[]) => [...new Set(values)].sort().map((value) => ({ value, label: value }));
+const periodClass = (model: Content["models"][number]) => model.period?.from == null ? "unknown" : model.period.from < 1900 ? "before-1900" : model.period.from < 2000 ? "1900-1999" : "2000-onward";
 const filterConfigs = [
   { key: "status", label: copy.verificationFilter, options: verificationOptions },
   { key: "country", label: copy.country, options: countryOptions },
   { key: "language", label: copy.languages, options: languageOptions },
   { key: "use", label: copy.useStatus, options: useOptions },
   { key: "joined", label: copy.joined, options: joinedOptions },
-].filter((filter) => filter.options.length > 1);
+  { key: "period", label: copy.period, options: valuesAsOptions(models.map(periodClass)) },
+  { key: "slant", label: copy.slant, options: valuesAsOptions(models.map((model) => model.classification?.slant?.kind ?? "unknown")) },
+  { key: "role", label: lang === "de" ? "Bildungsrolle" : "Educational role", options: valuesAsOptions(models.flatMap((model) => model.education?.role ?? [])) },
+  { key: "region", label: lang === "de" ? "Region" : "Region", options: valuesAsOptions(models.flatMap((model) => model.regions ?? [])) },
+  { key: "family", label: lang === "de" ? "Modellfamilie" : "Model family", options: valuesAsOptions(models.flatMap((model) => model.family ? [model.family] : [])) },
+].filter((filter) => filter.options.length > 0);
 ---
 <BaseLayout lang={lang} title={copy.exploreTitle} description={copy.exploreDescription} canonicalPath={`/${lang}/explore/`} section="explore">
   <div class="content-page">
@@ -80,7 +87,7 @@ const filterConfigs = [
           {models.map((model) => {
             const name = model.name[lang] ?? model.name.en ?? model.name.de;
             const description = model.description?.[lang] ?? model.description?.en ?? model.description?.de ?? "";
-            const searchText = [name, description, model.id, model.country ?? "", ...model.languages].join(" ");
+            const searchText = [name, description, model.id, model.country ?? "", ...model.languages, ...Object.values(model.aliases ?? {}).flat(), ...(model.regions ?? [])].join(" ");
             const country = countryById.get(model.country ?? "");
             const modelLanguageNames = model.languages.flatMap((id) => {
               const language = languageById.get(id);
@@ -103,6 +110,11 @@ const filterConfigs = [
                 data-language={model.languages.join(" ")}
                 data-use={model.status.use}
                 data-joined={model.classification?.joined === true ? "joined" : model.classification?.joined === false ? "unjoined" : "unknown"}
+                data-period={periodClass(model)}
+                data-slant={model.classification?.slant?.kind ?? "unknown"}
+                data-role={model.education?.role?.join(" ") ?? ""}
+                data-region={model.regions?.join(" ") ?? ""}
+                data-family={model.family ?? ""}
               >
                 <div class="model-card-heading">
                   <h2><a href={withBase(`${lang}/models/${model.id}/`)}>{name}</a></h2>

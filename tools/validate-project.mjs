@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 import { readFileSync, statSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { projectContentErrors } from "./project-checks.mjs";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const packageJson = JSON.parse(read("package.json"));
-const errors = [];
+const errors = projectContentErrors(fileURLToPath(new URL("../", import.meta.url)));
 
 for (const path of [
   "LICENSE",
