@@ -111,7 +111,7 @@ h3 { margin: 0 0 .65rem; }
 ol { padding-left: 1.25rem; }
 .metadata-list { display: grid; grid-template-columns: max-content 1fr; gap: .35rem .8rem; margin: 0; }
 .metadata-list dt { color: var(--muted); }
-.metadata-list dd { margin: 0; font-weight: 600; }
+.metadata-list dd { margin: 0; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
 .source-box { margin-top: 1rem; }
 
 .comparison-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
@@ -182,7 +182,8 @@ footer { border-top: 1px solid var(--line); padding: 1.2rem; text-align: center;
 .site-footer a { color: var(--accent); text-underline-offset: .16em; }
 .api-link-list { display: flex; flex-wrap: wrap; gap: .75rem 1rem; padding-left: 1.2rem; }
 .api-link-list a { color: var(--accent); text-underline-offset: .16em; }
-.content-page { display: grid; gap: 1rem; }
+.content-page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.content-page > * { min-width: 0; }
 .breadcrumbs { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; color: var(--muted); font-size: .95rem; }
 .breadcrumbs a, .text-link { color: #0d3d68; font-weight: 700; text-underline-offset: .15em; }
 .page-heading, .data-section { padding: clamp(1rem, 3vw, 1.5rem); background: var(--paper); border: 1px solid var(--line); border-radius: .9rem; }
@@ -388,8 +389,8 @@ footer { border-top: 1px solid var(--line); padding: 1.2rem; text-align: center;
 .comparison-guides { display: flex; flex-wrap: wrap; gap: .6rem 1rem; margin: 0; padding: .65rem .8rem; border: 1px solid var(--line); border-radius: .6rem; }
 .comparison-guides legend { padding: 0 .25rem; font-weight: 700; }
 .comparison-guides label { display: flex; align-items: center; gap: .4rem; }
-.comparison-share { display: flex; align-items: end; gap: .7rem; }
-.comparison-share label { flex: 1; }
+.comparison-share { display: flex; align-items: end; gap: .7rem; min-width: 0; }
+.comparison-share label { flex: 1; min-width: 0; }
 .comparison-share button { min-height: 2.8rem; padding: .6rem .9rem; border: 1px solid var(--ink); border-radius: .5rem; background: var(--ink); color: white; font: inherit; font-weight: 700; cursor: pointer; }
 .comparison-status { margin: 0; color: var(--muted); }
 .comparison-summary { margin: 0; font-weight: 700; }

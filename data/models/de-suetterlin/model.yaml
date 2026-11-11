@@ -1,0 +1,35 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: de-suetterlin
+name: {de: Sütterlinschrift, en: Sütterlin script}
+aliases: {de: [Sütterlin]}
+country: DE
+languages: [de]
+regions: []
+family: historical-school-script
+classification:
+  joined: true
+  slant: {kind: vertical, nominal_degrees: 0}
+period:
+  from: 1915
+  to: 1941
+  precision: year
+  notes: {de: "Zunächst 1915 in Preußen eingeführt, ab 1935 allgemein verwendet und 1941 durch den Schrifterlass für Schulen verboten. Das Ende bezeichnet den schulischen Einsatz, nicht das Ende privater Handschrift.", en: "Introduced in Prussia in 1915, adopted more broadly from 1935, and prohibited in schools by the 1941 decree. The end date describes school use, not the end of private handwriting."}
+status: {use: historical, verification: source-backed}
+education:
+  level: [primary]
+  role: [connected-script]
+  notes: {de: "Das Handbuch beschreibt Sütterlin als Entwurf für den Schreibunterricht an Schulen.", en: "The manual describes Sütterlin as a script designed for handwriting instruction in schools."}
+characteristics:
+  lowercase: {de: "Der Entwurf vereinfacht Formen der deutschen Schreibschrift und zielt auf bessere Verbindbarkeit.", en: "The design simplifies German handwriting forms and aims to make joining easier."}
+  connections: {de: "Das Handbuch beschreibt das runde s am Wortende und dessen automatische Setzung über Ligaturtabellen. Das belegt keine individuelle Strichfolge.", en: "The manual documents round s at word endings and its automatic selection by ligature tables. This does not establish individual stroke order."}
+character_repertoire: [U+0041-U+005A, U+0061-U+007A, U+00C4, U+00D6, U+00DC, U+00E4, U+00F6, U+00FC, U+00DF, U+0030-U+0039, U+002E, U+002C, U+003F, U+0021]
+character_repertoire_complete: false
+reference_fonts: [font-schulschriften-suetterlin]
+sources: [src-suetterlin-1922, src-ctan-schulschriften-v5, src-schulschriften-manual-2014]
+license: CC-BY-SA-4.0
+demo: false
+examples:
+  words: [{text: Hausaufgabe, language: de, sources: [src-schulschriften-manual-2014]}]
+description:
+  de: "Historisches, im CTAN-Handbuch dokumentiertes Sütterlin-Modell. Die Zeichenliste gibt den dort dokumentierten Paketfontumfang wieder und ist keine vollständige oder verbindliche Unterrichtsrepertoire-Aussage. Die lokale Browser-TTF ist eine abgeleitete digitale Referenz, kein offizieller Quellennachweis und kein Beleg für Strichfolge oder Schreibbewegung."
+  en: "Historical Sütterlin model documented in the CTAN manual. The character list reflects the package font inventory documented there and is not a complete or authoritative teaching repertoire. The local browser TTF is a derived digital reference, not an official source trace or evidence of stroke order or writing movement."

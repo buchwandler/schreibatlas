@@ -5,6 +5,7 @@ import NormalizedGuidelines from "../../../../components/NormalizedGuidelines.as
 import BreadcrumbJsonLd from "../../../../components/BreadcrumbJsonLd.astro";
 import SourceList from "../../../../components/SourceList.astro";
 import VerificationBadge from "../../../../components/VerificationBadge.astro";
+import FontProvenance from "../../../../components/FontProvenance.astro";
 import { messages, type Locale } from "../../../../lib/i18n";
 import { withBase } from "../../../../lib/routes";
 import { localizedLetterPaths, localizedModelPaths, loadContent } from "../../../../../tools/content.mjs";
@@ -178,6 +179,7 @@ const breadcrumbItems = [
               </dl>
               {font.license_file && fontLicenseUrl(font) && <p><strong>{copy.licenseFile}:</strong> <a href={fontLicenseUrl(font)}>{font.license_file}</a></p>}
               {font.correspondence.notes && <p>{font.correspondence.notes}</p>}
+              <FontProvenance lang={lang} font={font} />
               {font.project_url && /^https?:\/\//i.test(font.project_url) && <a href={font.project_url} rel="external">{font.name}</a>}
             </article>
           ))}

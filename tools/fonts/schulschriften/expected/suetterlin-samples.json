@@ -1,0 +1,8 @@
+{
+  "cases": ["A", "Z", "a", "e", "f", "s", "t", "x", "ä", "Ä", "ö", "Ö", "ü", "Ü", "ß", "st", "ss", "ff", "sch", "Haus", "Liebe", "Schule", "Sütterlin", "Deutsche Schrift", "Grüße", "s.", "S.", "Ärger"],
+  "visual_cases": ["st", "sch", "Haus", "Sütterlin", "Deutsche Schrift"],
+  "visual_glyph_cases": ["A", "a", "ä", "Ä", "ß", "s", "S", "t"],
+  "tex_font_size_pt": 48,
+  "browser_font_size_px": 64,
+  "max_advance_error_px": 0.1
+}

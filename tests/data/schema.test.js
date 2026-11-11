@@ -84,6 +84,59 @@ test("font schema captures original license and correspondence limits", () => {
   });
 });
 
+test("font schema keeps archive identity separate from generated font metadata", () => {
+  const record = {
+    id: "font-generated-fixture",
+    name: "Generated font fixture",
+    author: "Fixture author",
+    project_url: "https://ctan.org/pkg/schulschriften",
+    license: "LPPL-1.3c",
+    files: ["assets/fonts/generated.ttf"],
+    license_file: "licenses/LPPL-1.3c-Schulschriften.txt",
+    font_version: "Version 1.0",
+    family_name: "Fixture family",
+    postscript_name: "Fixture-Regular",
+    format: "truetype",
+    weight: 400,
+    style: "normal",
+    upstream: {
+      kind: "archive",
+      project_url: "https://ctan.org/pkg/schulschriften",
+      archive_url: "https://mirrors.ctan.org/fonts/schulschriften.zip",
+      package: "schulschriften",
+      version: "5",
+      retrieved: "2026-11-10",
+      sha256: "b".repeat(64),
+      source_file: "source/wela/wela14.mf",
+    },
+    derivation: {
+      kind: "generated",
+      source_format: "metafont",
+      output_format: "truetype",
+      recipe: "tools/fonts/schulschriften/build.py",
+      toolchain: { metafont: "Metafont 2.71828182" },
+      unicode_mapping: "tools/fonts/schulschriften/mappings/wela.json",
+      unicode_mapping_sha256: "c".repeat(64),
+      connection_mapping: null,
+      tfm_file: "tools/fonts/schulschriften/generated/wela14.tfm",
+      tfm_sha256: "d".repeat(64),
+      provenance_file: "tools/fonts/schulschriften/generated/la-prototype.provenance.json",
+      pipeline: ["METAFONT to TrueType"],
+      notes: "A browser-compatible derivative, not an official upstream TTF.",
+    },
+    integrity: { sha256: "a".repeat(64), bytes: 1024 },
+    shaping: { required_features: ["calt", "kern"], language_tag: "de", direction: "ltr" },
+    calibration: { x_height_em: 0.34, x_height_method: "TrueType cmap U+0078" },
+    correspondence: { model: "demo-round", degree: "partial", notes: "Fixture.", sources: ["src-demo-placeholder"] },
+    sources: ["src-demo-placeholder"],
+  };
+  assertValid("font", record);
+  const validate = ajv.getSchema("https://schreibatlas.de/schema/v1/font.schema.json");
+  assert.equal(validate({ ...record, format: "woff2" }), false);
+  assert.equal(validate({ ...record, derivation: undefined }), false);
+  assert.equal(validate({ ...record, upstream: { ...record.upstream, sha256: "not-a-hash" } }), false);
+});
+
 test("font x-height calibration requires a mapped model and source", () => {
   const record = {
     id: "font-calibrated-fixture",

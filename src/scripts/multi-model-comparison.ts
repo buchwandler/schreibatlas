@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 import type { FontRecord, GlyphRecord } from "../../tools/content.mjs";
 import { normalizeOutline } from "../../tools/geometry.mjs";
+import { appendFontProvenance, fontFeatureSettings, supportsRequiredFontFeatures } from "../lib/font-capabilities";
 
 interface MultiModel {
   id: string; name: string; country: string | null; languages: string[];
-  joined: boolean | null; characters: string[]; glyphs: GlyphRecord[]; url: string;
-  font?: FontRecord & { url: string; supported: string[] };
+  joined: boolean | null; characters: string[]; glyphs: GlyphRecord[]; url: string; capability: string;
+  font?: FontRecord & { url: string; supported: string[]; provenanceUrl?: string };
 }
 const root = document.querySelector<HTMLElement>("[data-multi-comparison]");
 if (root) {
@@ -86,17 +87,29 @@ if (root) {
         target.svg.append(group);
         target.caption.append(`${de ? "Erfasste Kontur" : "Recorded outline"} · ${glyph.verification} · ${glyph.license} · ${glyph.sources.join(", ")}. `);
       } else if (font?.calibration && font.supported.includes(character.value)) {
-        try {
-          const family = `multi-${font.id}`;
-          if (!loaded.has(font.id)) loaded.set(font.id, new FontFace(family, `url("${font.url}")`).load().then((face) => { document.fonts.add(face); return face; }));
-          await loaded.get(font.id);
-          if (current !== generation) return;
-          const text = svgElement("text", { x: "0", y: "0", "font-family": family, "font-size": String(1 / font.calibration.x_height_em), fill: colors[index], opacity: mode.value === "overlay" ? opacity.value : "1", lang: font.shaping?.language_tag ?? lang, direction: font.shaping?.direction ?? "ltr" });
-          text.style.fontFeatureSettings = (font.shaping?.required_features ?? ["calt", "kern"]).map((tag) => `"${tag}" 1`).join(", ");
-          text.textContent = character.value;
-          target.svg.append(text);
-          target.caption.append(`${de ? "Referenzfont" : "Reference font"}: ${font.name} · ${font.font_version ?? ""} · ${font.correspondence.degree} · ${font.license} · ${font.sources.join(", ")}. `);
-        } catch { target.caption.append(de ? "Darstellung nicht verfügbar. " : "Rendering unavailable. "); }
+        const features = font.shaping?.required_features ?? [];
+        const featureSettings = fontFeatureSettings(font);
+        target.caption.append(`${de ? "Referenzfont" : "Reference font"}: ${font.name} · ${font.font_version ?? ""} · ${font.correspondence.degree} · ${font.license} · OpenType: ${features.join(", ") || (de ? "Funktionen nicht dokumentiert" : "features not documented")}. `);
+        appendFontProvenance(target.caption, font, de ? "de" : "en", font.provenanceUrl);
+        if (!supportsRequiredFontFeatures(font)) {
+          target.caption.append(de ? "Erforderliche OpenType-Funktionen nicht verfügbar; keine Ersatzschrift wird verwendet." : "Required OpenType features are unavailable; no substitute font is used.");
+        } else {
+          try {
+            const family = `multi-${font.id}`;
+            if (!loaded.has(font.id)) loaded.set(font.id, new FontFace(family, `url("${font.url}")`).load().then((face) => { document.fonts.add(face); return face; }));
+            await loaded.get(font.id);
+            if (current !== generation) return;
+            const text = svgElement("text", { x: "0", y: "0", "font-family": family, "font-size": String(1 / font.calibration.x_height_em), fill: colors[index], opacity: mode.value === "overlay" ? opacity.value : "1", lang: font.shaping?.language_tag ?? lang, direction: font.shaping?.direction ?? "ltr" });
+            text.style.fontFeatureSettings = featureSettings;
+            text.textContent = character.value;
+            target.svg.append(text);
+          } catch {
+            target.caption.append(de ? "Darstellung nicht verfügbar; es wird keine Ersatzschrift verwendet. " : "Rendering unavailable; no substitute font is used. ");
+          }
+        }
+      } else if (font?.calibration) {
+        target.caption.append(de ? "Die Referenzschrift deckt dieses Zeichen nicht ab; es wird keine Ersatzschrift verwendet. " : "The reference font does not cover this character; no substitute font is used. ");
+        appendFontProvenance(target.caption, font, de ? "de" : "en", font.provenanceUrl);
       } else target.caption.append(de ? "Darstellung nicht verfügbar. " : "Rendering unavailable. ");
       if (!overlay) stage.append(target.figure);
     }

@@ -2,6 +2,7 @@
 import { fontSizeForXHeight, sharedViewBox } from "../../tools/geometry.mjs";
 import type { Metrics } from "../../tools/content.mjs";
 import type { ShapedRun } from "./text-shaper";
+import { requiredFeatureSettings } from "./font-capabilities";
 
 export interface NormalizedTextLayer {
   run: ShapedRun;
@@ -92,7 +93,7 @@ function makeFigure(layers: NormalizedTextLayer[], index: number, viewBox: Retur
         "fill-opacity": options.mode === "overlay" && layerIndex === 1 ? String(options.opacity) : "1",
         lang: layer.run.language ?? "",
       });
-      text.style.fontFeatureSettings = (layer.run.features ?? ["calt", "kern"]).map((tag) => `"${tag}" 1`).join(", ");
+      text.style.fontFeatureSettings = requiredFeatureSettings(layer.run.features);
       text.textContent = line;
       world.append(text);
     });

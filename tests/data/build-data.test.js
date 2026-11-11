@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
+import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import test from "node:test";
 import { buildData, validateGeneratedUrls } from "../../tools/build-data.mjs";
+import { inspectTrueType } from "../../tools/font-metadata.mjs";
 import { draftGlyphRecord } from "./content.test-helper.mjs";
 import { fileURLToPath } from "node:url";
 import { parse, stringify } from "yaml";
@@ -53,6 +55,8 @@ test("glyph exports use Unicode code-point route slugs", (t) => {
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
   cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
   cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
+  cpSync(join(projectRoot, "tools/fonts/schulschriften"), join(root, "tools/fonts/schulschriften"), { recursive: true });
+  cpSync(join(projectRoot, "vendor/ctan/schulschriften"), join(root, "vendor/ctan/schulschriften"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
 
   const modelPath = join(root, "data/models/demo-round/model.yaml");
@@ -98,6 +102,8 @@ test("font assets are copied into their local versioned API endpoint", (t) => {
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
   cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
   cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
+  cpSync(join(projectRoot, "tools/fonts/schulschriften"), join(root, "tools/fonts/schulschriften"), { recursive: true });
+  cpSync(join(projectRoot, "vendor/ctan/schulschriften"), join(root, "vendor/ctan/schulschriften"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
   const modelPath = join(root, "data/models/demo-round/model.yaml");
   const model = parse(readFileSync(modelPath, "utf8"));
@@ -128,9 +134,122 @@ test("font assets are copied into their local versioned API endpoint", (t) => {
   assert.ok(result.files.includes("assets/fonts/font-fixture/1-reference.woff2"));
   const volksschrift = fonts.find(({ id }) => id === "font-volksschrift");
   const licenseUrl = "/schreibatlas/data/v1/assets/fonts/font-volksschrift/OFL-1.1-Volksschrift.txt";
+  assert.ok(volksschrift.supported_characters.includes("b"));
+  assert.equal(volksschrift.supported_characters.includes("😀"), false);
   assert.equal(volksschrift.license_file_url, licenseUrl);
   assert.equal(readFileSync(join(output, "assets/fonts/font-volksschrift/OFL-1.1-Volksschrift.txt"), "utf8"), readFileSync(join(root, "licenses/OFL-1.1-Volksschrift.txt"), "utf8"));
   assert.ok(result.files.includes("assets/fonts/font-volksschrift/OFL-1.1-Volksschrift.txt"));
+});
+
+test("generated font exports include pinned archive and derivation provenance", (t) => {
+  const temporary = mkdtempSync(join(tmpdir(), "schreibatlas-font-provenance-export-"));
+  t.after(() => rmSync(temporary, { recursive: true, force: true }));
+  const root = join(temporary, "project");
+  cpSync(join(projectRoot, "schema"), join(root, "schema"), { recursive: true });
+  cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
+  cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
+  cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
+  cpSync(join(projectRoot, "vendor/ctan/schulschriften"), join(root, "vendor/ctan/schulschriften"), { recursive: true });
+  cpSync(join(projectRoot, "tools/fonts/schulschriften"), join(root, "tools/fonts/schulschriften"), { recursive: true });
+  copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
+
+  const profileRoot = join(root, "tools/fonts/schulschriften");
+  const fontBytes = readFileSync(join(profileRoot, "generated/la-prototype.ttf"));
+  const metadata = inspectTrueType(fontBytes);
+  const provenancePath = "tools/fonts/schulschriften/generated/la-prototype.provenance.json";
+  const provenance = JSON.parse(readFileSync(join(root, provenancePath), "utf8"));
+  const fontAsset = join(root, "assets/fonts/generated.ttf");
+  mkdirSync(join(root, "assets/fonts"), { recursive: true });
+  writeFileSync(fontAsset, fontBytes);
+
+  const modelPath = join(root, "data/models/demo-round/model.yaml");
+  const model = parse(readFileSync(modelPath, "utf8"));
+  model.character_repertoire = ["U+0061"];
+  model.reference_fonts = ["font-generated-fixture"];
+  writeFileSync(modelPath, stringify(model));
+
+  const fontPath = join(root, "data/fonts/font-generated-fixture.yaml");
+  writeFileSync(fontPath, stringify({
+    id: "font-generated-fixture",
+    name: "Schreibatlas Schulschriften LA",
+    author: "Walter Entenmann; browser derivative generated by Schreibatlas",
+    project_url: "https://ctan.org/pkg/schulschriften",
+    license: "LPPL-1.3c",
+    files: ["assets/fonts/generated.ttf"],
+    license_file: "licenses/LPPL-1.3c-Schulschriften.txt",
+    font_version: metadata.version,
+    family_name: metadata.family,
+    postscript_name: metadata.postscriptName,
+    format: "truetype",
+    weight: metadata.weight,
+    style: "normal",
+    upstream: {
+      kind: "archive",
+      project_url: "https://ctan.org/pkg/schulschriften",
+      archive_url: "https://mirrors.ctan.org/fonts/schulschriften.zip",
+      package: provenance.upstream.package,
+      version: String(provenance.upstream.version),
+      retrieved: "2026-11-10",
+      sha256: provenance.upstream.archive_sha256,
+      source_file: "source/wela/wela14.mf",
+    },
+    derivation: {
+      kind: "generated",
+      source_format: "metafont",
+      output_format: "truetype",
+      recipe: provenance.derivation.recipe,
+      toolchain: provenance.derivation.tool_versions,
+      unicode_mapping: provenance.derivation.unicode_mapping,
+      unicode_mapping_sha256: provenance.profile.mapping_sha256,
+      connection_mapping: null,
+      tfm_file: provenance.derivation.tfm_path,
+      tfm_sha256: provenance.derivation.tfm_sha256,
+      provenance_file: provenancePath,
+      pipeline: provenance.derivation.pipeline,
+      notes: "A browser-compatible derivative generated by Schreibatlas, not an official upstream TTF.",
+    },
+    integrity: { sha256: createHash("sha256").update(fontBytes).digest("hex"), bytes: fontBytes.length },
+    shaping: { required_features: metadata.features, language_tag: "de", direction: "ltr" },
+    calibration: {
+      x_height_em: metadata.xHeightEm,
+      x_height_method: "TrueType cmap U+0078 -> glyf.yMax / head.unitsPerEm.",
+      ascender_em: metadata.ascenderEm,
+      descender_em: metadata.descenderEm,
+    },
+    correspondence: {
+      model: "demo-round",
+      degree: "partial",
+      scope: ["visual-letterforms", "contextual-shaping"],
+      excludes: ["authoritative-stroke-order", "official-teaching-sequence", "exact-source-trace"],
+      sources: ["src-ctan-schulschriften-v5"],
+      notes: "Generated browser reference from the CTAN METAFONT implementation.",
+    },
+    sources: ["src-ctan-schulschriften-v5"],
+  }));
+
+  const output = join(temporary, "output");
+  const result = buildData({ root, outputDir: output, basePath: "/schreibatlas" });
+  const fonts = JSON.parse(readFileSync(join(output, "fonts.json"), "utf8"));
+  const exported = fonts.find(({ id }) => id === "font-generated-fixture");
+  assert.deepEqual(exported.supported_characters, metadata.supportedCharacters);
+  assert.ok(exported.supported_characters.includes("ß"));
+  assert.equal(exported.supported_characters.includes("😀"), false);
+  assert.equal(exported.upstream.sha256, provenance.upstream.archive_sha256);
+  assert.equal(exported.integrity.sha256, provenance.artifact.sha256);
+  assert.equal(exported.derivation.unicode_mapping_sha256, provenance.profile.mapping_sha256);
+  const provenanceUrl = "/schreibatlas/data/v1/assets/fonts/font-generated-fixture/provenance/la-prototype.provenance.json";
+  assert.equal(exported.derivation.provenance_file_url, provenanceUrl);
+  assert.deepEqual(JSON.parse(readFileSync(join(output, "assets/fonts/font-generated-fixture/provenance/la-prototype.provenance.json"), "utf8")), provenance);
+  assert.ok(result.files.includes("assets/fonts/font-generated-fixture/provenance/la-prototype.provenance.json"));
+  assert.notEqual(exported.upstream.sha256, exported.integrity.sha256);
+  const changedFont = parse(readFileSync(fontPath, "utf8"));
+  changedFont.upstream.sha256 = "0".repeat(64);
+  writeFileSync(fontPath, stringify(changedFont));
+  assert.throws(() => buildData({ root, outputDir: output, basePath: "/schreibatlas" }), /provenance archive SHA-256 mismatch/);
+  changedFont.upstream.sha256 = provenance.upstream.archive_sha256;
+  changedFont.integrity.sha256 = changedFont.upstream.sha256;
+  writeFileSync(fontPath, stringify(changedFont));
+  assert.throws(() => buildData({ root, outputDir: output, basePath: "/schreibatlas" }), /archive checksum and generated font integrity must remain distinct/);
 });
 
 test("generated API links must resolve to files under their versioned endpoint", () => {
@@ -165,6 +284,8 @@ test("stroke records and normalized SVG assets are exported under local Unicode 
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
   cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
   cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
+  cpSync(join(projectRoot, "tools/fonts/schulschriften"), join(root, "tools/fonts/schulschriften"), { recursive: true });
+  cpSync(join(projectRoot, "vendor/ctan/schulschriften"), join(root, "vendor/ctan/schulschriften"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
   const modelPath = join(root, "data/models/demo-round/model.yaml");
   const model = parse(readFileSync(modelPath, "utf8"));

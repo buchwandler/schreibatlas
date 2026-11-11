@@ -34,7 +34,7 @@ test("localized home copy identifies demo status", () => {
   const germanPage = readFileSync(new URL("../src/pages/de/index.astro", import.meta.url), "utf8");
   const englishPage = readFileSync(new URL("../src/pages/en/index.astro", import.meta.url), "utf8");
   assert.match(messages, /Kleines Teilkorpus, keine vollständigen Standards/);
-  assert.match(messages, /Sechs deutsche Schreibmodelle sind quellenbasiert dokumentiert/);
+  assert.match(messages, /Acht deutsche Schreibmodelle sind quellenbasiert dokumentiert/);
   assert.match(messages, /Small partial corpus, not complete standards/);
   assert.match(messages, /Photo analysis processes images locally/);
   assert.match(germanPage, /messages\.de/);

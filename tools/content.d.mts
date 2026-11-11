@@ -124,6 +124,41 @@ export interface SourceRecord {
   notes: string | null;
 }
 
+export interface GitFontUpstream {
+  repository: string;
+  release: string;
+  commit: string;
+  source_file: string;
+}
+
+export interface ArchiveFontUpstream {
+  kind: "archive";
+  project_url: string;
+  archive_url: string;
+  package: string;
+  version: string;
+  retrieved: string;
+  sha256: string;
+  source_file: string;
+}
+
+export interface FontDerivation {
+  kind: "generated";
+  source_format: string;
+  output_format: "truetype" | "opentype" | "woff" | "woff2";
+  recipe: string;
+  toolchain: Record<string, string>;
+  unicode_mapping: string;
+  unicode_mapping_sha256: string;
+  connection_mapping?: string | null;
+  tfm_file: string;
+  tfm_sha256: string;
+  provenance_file: string;
+  provenance_file_url?: string;
+  pipeline: string[];
+  notes: string;
+}
+
 export interface FontRecord {
   id: string;
   name: string;
@@ -139,13 +174,18 @@ export interface FontRecord {
   style?: "normal" | "italic" | "oblique";
   family_name?: string;
   postscript_name?: string;
-  upstream?: { repository: string; release: string; commit: string; source_file: string };
+  upstream?: GitFontUpstream | ArchiveFontUpstream;
+  derivation?: FontDerivation;
   integrity?: { sha256: string; bytes: number };
   shaping?: { required_features: string[]; language_tag: string; direction: "ltr" | "rtl" };
   calibration?: { x_height_em: number; x_height_method?: string; ascender_em?: number | null; descender_em?: number | null } | null;
   file_urls?: string[];
   correspondence: { model: string | null; degree: "complete" | "partial" | "visual-only" | "unknown"; notes: string | null; scope?: string[]; excludes?: string[]; sources?: string[] };
   sources: string[];
+}
+
+export interface FontExport extends FontRecord {
+  supported_characters: string[];
 }
 
 export interface StrokeRecord {

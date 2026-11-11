@@ -1,0 +1,684 @@
+{
+  "allowed_advance_error_px": 0.1,
+  "browser": "Chromium 157.0.8103.38",
+  "browser_font_family": "Schreibatlas Schulschriften Deutsche Normalschrift",
+  "calibration": {
+    "outline_x_glyph_y_min_units": -103,
+    "outline_x_height_em": 0.4395,
+    "outline_x_height_units": 4395,
+    "space_advance_units": 4286,
+    "tfm_x_height_em": 0.428572
+  },
+  "cases": [
+    {
+      "browser_advance_px": 22.859375,
+      "difference_px": 0.002561666666665019,
+      "tex_advance_pt": 17.14261,
+      "tex_advance_px": 22.856813333333335,
+      "text": "!"
+    },
+    {
+      "browser_advance_px": 22.859375,
+      "difference_px": 0.002561666666665019,
+      "tex_advance_pt": 17.14261,
+      "tex_advance_px": 22.856813333333335,
+      "text": ","
+    },
+    {
+      "browser_advance_px": 22.859375,
+      "difference_px": 0.002561666666665019,
+      "tex_advance_pt": 17.14261,
+      "tex_advance_px": 22.856813333333335,
+      "text": "."
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "0"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "1"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "2"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "3"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "4"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "5"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "6"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "7"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "8"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "9"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "?"
+    },
+    {
+      "browser_advance_px": 43.4375,
+      "difference_px": 0.0095799999999997,
+      "tex_advance_pt": 32.57094,
+      "tex_advance_px": 43.42792,
+      "text": "A"
+    },
+    {
+      "browser_advance_px": 36.578125,
+      "difference_px": 0.007258333333339806,
+      "tex_advance_pt": 27.42815,
+      "tex_advance_px": 36.57086666666666,
+      "text": "B"
+    },
+    {
+      "browser_advance_px": 31.09375,
+      "difference_px": 0.014896666666668779,
+      "tex_advance_pt": 23.30914,
+      "tex_advance_px": 31.07885333333333,
+      "text": "C"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "D"
+    },
+    {
+      "browser_advance_px": 20.578125,
+      "difference_px": 0.007018333333334681,
+      "tex_advance_pt": 15.42833,
+      "tex_advance_px": 20.571106666666665,
+      "text": "E"
+    },
+    {
+      "browser_advance_px": 36.578125,
+      "difference_px": 0.007258333333339806,
+      "tex_advance_pt": 27.42815,
+      "tex_advance_px": 36.57086666666666,
+      "text": "F"
+    },
+    {
+      "browser_advance_px": 43.4375,
+      "difference_px": 0.0095799999999997,
+      "tex_advance_pt": 32.57094,
+      "tex_advance_px": 43.42792,
+      "text": "G"
+    },
+    {
+      "browser_advance_px": 47.78125,
+      "difference_px": 0.010556666666666104,
+      "tex_advance_pt": 35.82802,
+      "tex_advance_px": 47.770693333333334,
+      "text": "H"
+    },
+    {
+      "browser_advance_px": 27.4375,
+      "difference_px": 0.009339999999998128,
+      "tex_advance_pt": 20.57112,
+      "tex_advance_px": 27.428160000000002,
+      "text": "I"
+    },
+    {
+      "browser_advance_px": 29.71875,
+      "difference_px": 0.004883333333332018,
+      "tex_advance_pt": 22.2854,
+      "tex_advance_px": 29.713866666666668,
+      "text": "J"
+    },
+    {
+      "browser_advance_px": 53.5,
+      "difference_px": 0.015066666666662343,
+      "tex_advance_pt": 40.1137,
+      "tex_advance_px": 53.48493333333334,
+      "text": "K"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016051666666662356,
+      "tex_advance_pt": 23.99968,
+      "tex_advance_px": 31.999573333333338,
+      "text": "L"
+    },
+    {
+      "browser_advance_px": 61.71875,
+      "difference_px": 0.00537666666667036,
+      "tex_advance_pt": 46.28503,
+      "tex_advance_px": 61.71337333333333,
+      "text": "M"
+    },
+    {
+      "browser_advance_px": 64.015625,
+      "difference_px": 0.016598333333327275,
+      "tex_advance_pt": 47.99927,
+      "tex_advance_px": 63.99902666666667,
+      "text": "N"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "O"
+    },
+    {
+      "browser_advance_px": 34.296875,
+      "difference_px": 0.01166166666666868,
+      "tex_advance_pt": 25.71391,
+      "tex_advance_px": 34.28521333333333,
+      "text": "P"
+    },
+    {
+      "browser_advance_px": 41.140625,
+      "difference_px": -0.001641666666664321,
+      "tex_advance_pt": 30.8567,
+      "tex_advance_px": 41.142266666666664,
+      "text": "Q"
+    },
+    {
+      "browser_advance_px": 45.71875,
+      "difference_px": 0.005123333333330038,
+      "tex_advance_pt": 34.28522,
+      "tex_advance_px": 45.71362666666667,
+      "text": "R"
+    },
+    {
+      "browser_advance_px": 29.71875,
+      "difference_px": 0.004883333333332018,
+      "tex_advance_pt": 22.2854,
+      "tex_advance_px": 29.713866666666668,
+      "text": "S"
+    },
+    {
+      "browser_advance_px": 36.578125,
+      "difference_px": 0.007258333333339806,
+      "tex_advance_pt": 27.42815,
+      "tex_advance_px": 36.57086666666666,
+      "text": "T"
+    },
+    {
+      "browser_advance_px": 43.015625,
+      "difference_px": -0.0036016666666682795,
+      "tex_advance_pt": 32.26442,
+      "tex_advance_px": 43.01922666666667,
+      "text": "U"
+    },
+    {
+      "browser_advance_px": 39.828125,
+      "difference_px": 0.00884500000000088,
+      "tex_advance_pt": 29.86446,
+      "tex_advance_px": 39.81928,
+      "text": "V"
+    },
+    {
+      "browser_advance_px": 59.078125,
+      "difference_px": 0.011591666666667777,
+      "tex_advance_pt": 44.2999,
+      "tex_advance_px": 59.06653333333333,
+      "text": "W"
+    },
+    {
+      "browser_advance_px": 44.34375,
+      "difference_px": -0.0002500000000011937,
+      "tex_advance_pt": 33.258,
+      "tex_advance_px": 44.344,
+      "text": "X"
+    },
+    {
+      "browser_advance_px": 39.828125,
+      "difference_px": 0.008791666666667197,
+      "tex_advance_pt": 29.8645,
+      "tex_advance_px": 39.81933333333333,
+      "text": "Y"
+    },
+    {
+      "browser_advance_px": 34.296875,
+      "difference_px": 0.01166166666666868,
+      "tex_advance_pt": 25.71391,
+      "tex_advance_px": 34.28521333333333,
+      "text": "Z"
+    },
+    {
+      "browser_advance_px": 28.265625,
+      "difference_px": -0.0009750000000003922,
+      "tex_advance_pt": 21.19995,
+      "tex_advance_px": 28.2666,
+      "text": "a"
+    },
+    {
+      "browser_advance_px": 36.640625,
+      "difference_px": 0.003905000000003156,
+      "tex_advance_pt": 27.47754,
+      "tex_advance_px": 36.63672,
+      "text": "b"
+    },
+    {
+      "browser_advance_px": 14.078125,
+      "difference_px": 0.006591666666666995,
+      "tex_advance_pt": 10.55365,
+      "tex_advance_px": 14.071533333333333,
+      "text": "c"
+    },
+    {
+      "browser_advance_px": 28.265625,
+      "difference_px": -0.0009750000000003922,
+      "tex_advance_pt": 21.19995,
+      "tex_advance_px": 28.2666,
+      "text": "d"
+    },
+    {
+      "browser_advance_px": 29.71875,
+      "difference_px": 0.004883333333332018,
+      "tex_advance_pt": 22.2854,
+      "tex_advance_px": 29.713866666666668,
+      "text": "e"
+    },
+    {
+      "browser_advance_px": 13.265625,
+      "difference_px": 0.008665000000000589,
+      "tex_advance_pt": 9.94272,
+      "tex_advance_px": 13.25696,
+      "text": "f"
+    },
+    {
+      "browser_advance_px": 23.703125,
+      "difference_px": 0.007871666666670052,
+      "tex_advance_pt": 17.77144,
+      "tex_advance_px": 23.69525333333333,
+      "text": "g"
+    },
+    {
+      "browser_advance_px": 34.359375,
+      "difference_px": 0.00830833333333203,
+      "tex_advance_pt": 25.7633,
+      "tex_advance_px": 34.35106666666667,
+      "text": "h"
+    },
+    {
+      "browser_advance_px": 16.921875,
+      "difference_px": 0.007808333333333195,
+      "tex_advance_pt": 12.68555,
+      "tex_advance_px": 16.914066666666667,
+      "text": "i"
+    },
+    {
+      "browser_advance_px": 12.34375,
+      "difference_px": 0.001043333333333507,
+      "tex_advance_pt": 9.25703,
+      "tex_advance_px": 12.342706666666666,
+      "text": "j"
+    },
+    {
+      "browser_advance_px": 32.515625,
+      "difference_px": 0.010491666666666788,
+      "tex_advance_pt": 24.37885,
+      "tex_advance_px": 32.50513333333333,
+      "text": "k"
+    },
+    {
+      "browser_advance_px": 17.828125,
+      "difference_px": -0.0001816666666698552,
+      "tex_advance_pt": 13.37123,
+      "tex_advance_px": 17.82830666666667,
+      "text": "l"
+    },
+    {
+      "browser_advance_px": 52.9375,
+      "difference_px": 0.008486666666669862,
+      "tex_advance_pt": 39.69676,
+      "tex_advance_px": 52.92901333333333,
+      "text": "m"
+    },
+    {
+      "browser_advance_px": 36.40625,
+      "difference_px": 0.0008499999999997954,
+      "tex_advance_pt": 27.30405,
+      "tex_advance_px": 36.4054,
+      "text": "n"
+    },
+    {
+      "browser_advance_px": 28.46875,
+      "difference_px": -0.0007966666666696653,
+      "tex_advance_pt": 21.35216,
+      "tex_advance_px": 28.46954666666667,
+      "text": "o"
+    },
+    {
+      "browser_advance_px": 33.4375,
+      "difference_px": 0.0006733333333315272,
+      "tex_advance_pt": 25.07762,
+      "tex_advance_px": 33.43682666666667,
+      "text": "p"
+    },
+    {
+      "browser_advance_px": 23.703125,
+      "difference_px": 0.007871666666670052,
+      "tex_advance_pt": 17.77144,
+      "tex_advance_px": 23.69525333333333,
+      "text": "q"
+    },
+    {
+      "browser_advance_px": 27.890625,
+      "difference_px": 0.008118333333332117,
+      "tex_advance_pt": 20.91188,
+      "tex_advance_px": 27.882506666666668,
+      "text": "r"
+    },
+    {
+      "browser_advance_px": 18.140625,
+      "difference_px": 0.009705000000000297,
+      "tex_advance_pt": 13.59819,
+      "tex_advance_px": 18.13092,
+      "text": "s"
+    },
+    {
+      "browser_advance_px": 11.4375,
+      "difference_px": 0.009099999999998332,
+      "tex_advance_pt": 8.5713,
+      "tex_advance_px": 11.428400000000002,
+      "text": "t"
+    },
+    {
+      "browser_advance_px": 33.4375,
+      "difference_px": 0.0006733333333315272,
+      "tex_advance_pt": 25.07762,
+      "tex_advance_px": 33.43682666666667,
+      "text": "u"
+    },
+    {
+      "browser_advance_px": 38.703125,
+      "difference_px": 0.012084999999999013,
+      "tex_advance_pt": 29.01828,
+      "tex_advance_px": 38.69104,
+      "text": "v"
+    },
+    {
+      "browser_advance_px": 55.21875,
+      "difference_px": 0.0040300000000002,
+      "tex_advance_pt": 41.41104,
+      "tex_advance_px": 55.21472,
+      "text": "w"
+    },
+    {
+      "browser_advance_px": 29.234375,
+      "difference_px": 0.0023216666666669994,
+      "tex_advance_pt": 21.92404,
+      "tex_advance_px": 29.232053333333333,
+      "text": "x"
+    },
+    {
+      "browser_advance_px": 31.84375,
+      "difference_px": 0.009709999999998331,
+      "tex_advance_pt": 23.87553,
+      "tex_advance_px": 31.83404,
+      "text": "y"
+    },
+    {
+      "browser_advance_px": 26.53125,
+      "difference_px": 0.01190333333333271,
+      "tex_advance_pt": 19.88951,
+      "tex_advance_px": 26.519346666666667,
+      "text": "z"
+    },
+    {
+      "browser_advance_px": 43.4375,
+      "difference_px": 0.0095799999999997,
+      "tex_advance_pt": 32.57094,
+      "tex_advance_px": 43.42792,
+      "text": "Ä"
+    },
+    {
+      "browser_advance_px": 32.015625,
+      "difference_px": 0.016118333333331236,
+      "tex_advance_pt": 23.99963,
+      "tex_advance_px": 31.99950666666667,
+      "text": "Ö"
+    },
+    {
+      "browser_advance_px": 43.015625,
+      "difference_px": -0.0036016666666682795,
+      "tex_advance_pt": 32.26442,
+      "tex_advance_px": 43.01922666666667,
+      "text": "Ü"
+    },
+    {
+      "browser_advance_px": 25.421875,
+      "difference_px": 0.005075000000001495,
+      "tex_advance_pt": 19.0626,
+      "tex_advance_px": 25.4168,
+      "text": "ß"
+    },
+    {
+      "browser_advance_px": 28.265625,
+      "difference_px": -0.0009750000000003922,
+      "tex_advance_pt": 21.19995,
+      "tex_advance_px": 28.2666,
+      "text": "ä"
+    },
+    {
+      "browser_advance_px": 28.46875,
+      "difference_px": -0.0007966666666696653,
+      "tex_advance_pt": 21.35216,
+      "tex_advance_px": 28.46954666666667,
+      "text": "ö"
+    },
+    {
+      "browser_advance_px": 33.4375,
+      "difference_px": 0.0006733333333315272,
+      "tex_advance_pt": 25.07762,
+      "tex_advance_px": 33.43682666666667,
+      "text": "ü"
+    },
+    {
+      "browser_advance_px": 47.3125,
+      "difference_px": 0.008913333333325113,
+      "tex_advance_pt": 35.47769,
+      "tex_advance_px": 47.303586666666675,
+      "text": "be"
+    },
+    {
+      "browser_advance_px": 53.15625,
+      "difference_px": 0.00866333333333813,
+      "tex_advance_pt": 39.86069,
+      "tex_advance_px": 53.14758666666666,
+      "text": "ch"
+    },
+    {
+      "browser_advance_px": 77.25,
+      "difference_px": 0.004946666666654664,
+      "tex_advance_pt": 57.93379,
+      "tex_advance_px": 77.24505333333335,
+      "text": "en"
+    },
+    {
+      "browser_advance_px": 31.25,
+      "difference_px": 0.0101866666666659,
+      "tex_advance_pt": 23.42986,
+      "tex_advance_px": 31.239813333333334,
+      "text": "ff"
+    },
+    {
+      "browser_advance_px": 41.328125,
+      "difference_px": 0.017645000000001687,
+      "tex_advance_pt": 30.98286,
+      "tex_advance_px": 41.31048,
+      "text": "ss"
+    },
+    {
+      "browser_advance_px": 45.5625,
+      "difference_px": 0.00335333333333665,
+      "tex_advance_pt": 34.16936,
+      "tex_advance_px": 45.55914666666666,
+      "text": "st"
+    },
+    {
+      "browser_advance_px": 82.734375,
+      "difference_px": 0.0073216666666553465,
+      "tex_advance_pt": 62.04529,
+      "tex_advance_px": 82.72705333333334,
+      "text": "sch"
+    },
+    {
+      "browser_advance_px": 174.859375,
+      "difference_px": -0.0015850000000341424,
+      "tex_advance_pt": 131.14572,
+      "tex_advance_px": 174.86096000000003,
+      "text": "Schule"
+    },
+    {
+      "browser_advance_px": 667.109375,
+      "difference_px": -0.0025583333333543123,
+      "tex_advance_pt": 500.33395,
+      "tex_advance_px": 667.1119333333334,
+      "text": "Deutsche Normalschrift"
+    },
+    {
+      "browser_advance_px": 409.09375,
+      "difference_px": 0.0128166666666516,
+      "tex_advance_pt": 306.8107,
+      "tex_advance_px": 409.08093333333335,
+      "text": "Normalschrift"
+    },
+    {
+      "browser_advance_px": 178.359375,
+      "difference_px": 0.013308333333355904,
+      "tex_advance_pt": 133.75955,
+      "tex_advance_px": 178.34606666666664,
+      "text": "Franz"
+    },
+    {
+      "browser_advance_px": 203.953125,
+      "difference_px": 0.0009783333333359678,
+      "tex_advance_pt": 152.96411,
+      "tex_advance_px": 203.95214666666666,
+      "text": "Müller"
+    },
+    {
+      "browser_advance_px": 169.3125,
+      "difference_px": 0.006899999999973261,
+      "tex_advance_pt": 126.9792,
+      "tex_advance_px": 169.30560000000003,
+      "text": "Grüße"
+    },
+    {
+      "browser_advance_px": 166.640625,
+      "difference_px": 0.015438333333321452,
+      "tex_advance_pt": 124.96889,
+      "tex_advance_px": 166.62518666666668,
+      "text": "Ärger"
+    },
+    {
+      "browser_advance_px": 41,
+      "difference_px": 0.012266666666668868,
+      "tex_advance_pt": 30.7408,
+      "tex_advance_px": 40.98773333333333,
+      "text": "s."
+    },
+    {
+      "browser_advance_px": 41,
+      "difference_px": 0.012266666666668868,
+      "tex_advance_pt": 30.7408,
+      "tex_advance_px": 40.98773333333333,
+      "text": "s,"
+    },
+    {
+      "browser_advance_px": 61.71875,
+      "difference_px": 0.00537666666667036,
+      "tex_advance_pt": 46.28503,
+      "tex_advance_px": 61.71337333333333,
+      "text": "e?"
+    }
+  ],
+  "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
+  "display_name": "Deutsche Normalschrift",
+  "font": "tools/fonts/schulschriften/generated/deutsche-normalschrift-prototype.ttf",
+  "font_sha256": "ba7da2e34c55ac9c07a0ba8d9926682f6087b512561dd4e32056cca6dc034237",
+  "maximum_absolute_advance_error_px": 0.017645000000001687,
+  "node": "v22.23.4",
+  "opentype_features": [
+    "calt",
+    "kern"
+  ],
+  "playwright": "1.65.0",
+  "profile_id": "deutsche-normalschrift",
+  "required_character_count": 74,
+  "source_stem": "wedn",
+  "status": "pass",
+  "tfm": "tools/fonts/schulschriften/generated/wedn14.tfm",
+  "tfm_sha256": "c0c0e61489f4959759cd16ccfc6399c7e3267bc07898d56c49a31114d3c5326a",
+  "unicode_coverage_count": 96,
+  "visual_artifacts": [
+    "tools/fonts/schulschriften/reports/deutsche-normalschrift-font-ctan-reference.png",
+    "tools/fonts/schulschriften/reports/deutsche-normalschrift-font-browser-reference.png",
+    "tools/fonts/schulschriften/reports/deutsche-normalschrift-font-visual-comparison.png"
+  ],
+  "visual_cases": [
+    "be",
+    "ff",
+    "Schule",
+    "Deutsche Normalschrift",
+    "Müller"
+  ],
+  "visual_glyph_cases": [
+    "A",
+    "a",
+    "ä",
+    "Ä",
+    "ß",
+    "s",
+    "t",
+    "f"
+  ]
+}

@@ -1,0 +1,15 @@
+Package: schulschriften
+Version: 5
+Author and maintainer: Walter Entenmann
+Publisher: CTAN
+CTAN package page: https://ctan.org/pkg/schulschriften
+CTAN archive directory: https://ctan.org/tex-archive/fonts/schulschriften
+Exact archive URL used: https://mirrors.ctan.org/fonts/schulschriften.zip
+Retrieved: 2026-11-10
+Archive file: schulschriften-v5.zip
+Archive SHA-256: b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc
+License: LPPL-1.3c
+License evidence: The archive README states "free lppl"; CTAN labels the package LPPL; Fedora package metadata identifies texlive-schulschriften as LPPL-1.3c. The verbatim LPPL 1.3c license text is retained at licenses/LPPL-1.3c-Schulschriften.txt.
+Upstream source font files: wesu14, wedn14, wela14, wesa14, weva14, with associated METAFONT definition and ligature files.
+Manual included in archive: doc/schulschriften.pdf, Version 4, dated 30 November 2014. It is documented separately from package Version 5.
+Archive status: Complete archive retained unmodified. SHA256SUMS records its actual downloaded bytes.

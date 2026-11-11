@@ -1,0 +1,9 @@
+{
+  "profiles": [
+    { "id": "la", "source_stem": "wela", "display_name": "Lateinische Ausgangsschrift", "short_name": "LA" },
+    { "id": "sas", "source_stem": "wesa", "display_name": "Schulausgangsschrift", "short_name": "SAS" },
+    { "id": "va", "source_stem": "weva", "display_name": "Vereinfachte Ausgangsschrift", "short_name": "VA" },
+    { "id": "suetterlin", "source_stem": "wesu", "display_name": "Sütterlinschrift", "short_name": "Sütterlin" },
+    { "id": "deutsche-normalschrift", "source_stem": "wedn", "display_name": "Deutsche Normalschrift", "short_name": "DN" }
+  ]
+}

@@ -1,0 +1,38 @@
+---
+// SPDX-License-Identifier: Apache-2.0
+import { basename } from "node:path";
+import type { FontRecord } from "../../tools/content.mjs";
+import { fontProvenanceInfo } from "../lib/font-capabilities";
+import { withBase } from "../lib/routes";
+import type { Locale } from "../lib/i18n";
+
+interface Props {
+  font: FontRecord;
+  lang: Locale;
+}
+
+const { font, lang } = Astro.props;
+const provenancePath = font.derivation?.provenance_file
+  ? withBase(`data/v1/assets/fonts/${font.id}/provenance/${basename(font.derivation.provenance_file)}`)
+  : undefined;
+const info = fontProvenanceInfo(font, lang, provenancePath);
+---
+<details class="font-provenance">
+  <summary>{info.title}</summary>
+  <dl class="metadata-list">
+    {info.rows.map((row) => <>
+      <dt>{row.label}</dt>
+      <dd>{row.href ? <a href={row.href} rel={row.href.startsWith("https://") ? "external" : undefined}>{row.value}</a> : row.value}</dd>
+    </>)}
+  </dl>
+  {info.pipeline.length > 0 && <>
+    <h4>{lang === "de" ? "Konvertierungsschritte" : "Conversion pipeline"}</h4>
+    <ol>{info.pipeline.map((step) => <li>{step}</li>)}</ol>
+  </>}
+  {info.provenanceUrl && <p><a href={info.provenanceUrl}>{lang === "de" ? "Vollständigen Ableitungsbericht öffnen" : "Open full derivation report"}</a></p>}
+</details>
+<style>
+  .font-provenance { margin-block: 0.75rem; font-size: 0.9em; }
+  .font-provenance summary { cursor: pointer; font-weight: 600; }
+  .font-provenance dl { margin-block: 0.75rem; }
+</style>

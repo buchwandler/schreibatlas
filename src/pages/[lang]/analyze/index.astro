@@ -66,6 +66,7 @@ const clientCopy = {
   referenceSection: copy.analysisReferenceSection,
   referenceUnavailable: copy.analysisReferenceUnavailable,
   referenceFontUnavailable: copy.analysisReferenceFontUnavailable,
+  referenceUnsupported: copy.analysisReferenceUnsupported,
   referenceFitUnavailable: copy.analysisReferenceFitUnavailable,
   referenceFitLow: copy.analysisReferenceFitLow,
   referenceFitMedium: copy.analysisReferenceFitMedium,
@@ -148,7 +149,7 @@ const clientCopy = {
       <section class="analysis-reference-comparison" aria-labelledby="analysis-reference-title">
         <h3 id="analysis-reference-title">{copy.analysisReferenceSection}</h3>
         <p data-analysis-reference-status role="status" aria-live="polite">{copy.analysisReferenceUnavailable}</p>
-        <p data-analysis-reference-font></p>
+        <div data-analysis-reference-font></div>
         <p>{copy.analysisReferenceComparisonNote}</p>
         <h4 data-analysis-reference-sources-title hidden>{copy.analysisReferenceSources}</h4>
         <ul data-analysis-reference-sources hidden></ul>

@@ -78,19 +78,19 @@ test("explore filters validated model records using recorded metadata", async ({
   await page.goto("de/explore/");
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
   await expect(page.getByRole("heading", { name: "Handschriftmodelle", level: 1 })).toBeVisible();
-  await expect(page.locator("[data-model-card]")).toHaveCount(9);
+  await expect(page.locator("[data-model-card]")).toHaveCount(11);
   await page.getByRole("searchbox", { name: "Modelle suchen" }).fill("Rundschrift");
   await expect(page.locator("[data-model-card]:visible")).toHaveCount(2);
   await page.getByRole("searchbox", { name: "Modelle suchen" }).fill("not-a-model");
   await expect(page.getByText("Keine Modelle passen zu den aktuellen Filtern.")).toBeVisible();
   await page.getByRole("searchbox", { name: "Modelle suchen" }).fill("");
   await page.locator('[data-model-filter="joined"]').selectOption("joined");
-  await expect(page.locator("[data-model-card]:visible")).toHaveCount(4);
+  await expect(page.locator("[data-model-card]:visible")).toHaveCount(5);
   await expect(page.locator("[data-model-card]:visible").filter({ hasText: "Deutsche Volksschrift" })).toHaveCount(1);
   await expect(page.locator("[data-model-card]:visible").first()).toContainText("Verbundene Schrift: Vorhanden");
   await page.locator('[data-model-filter="joined"]').selectOption("");
   await page.locator('[data-model-filter="use"]').selectOption("historical");
-  await expect(page.locator("[data-model-card]:visible")).toHaveCount(2);
+  await expect(page.locator("[data-model-card]:visible")).toHaveCount(4);
 
   await page.goto("de/models/demo-round/");
   await expect(page.getByRole("heading", { name: "Demo Rundschrift", level: 1 })).toBeVisible();
@@ -209,51 +209,52 @@ test("letter comparison normalizes vector outlines and shares filter and overlay
 });
 
 
-test("word comparison treats hostile Unicode input as literal text and loads local reference fonts", async ({ page }) => {
-  const fontRequests: string[] = [];
-  page.on("request", (request) => {
-    if (/fonts\/font-(?:langula-kurrent|volksschrift)/.test(request.url())) fontRequests.push(request.url());
-  });
+test("word comparison keeps hostile Unicode literal and refuses unsupported text", async ({ page }) => {
   await page.goto("de/compare/words/");
-  await expect(page.locator("#word-font-a")).toBeEnabled();
-  await page.locator("#word-model-a").selectOption("de-kurrent-loth-1866");
-  await page.locator("#word-model-b").selectOption("de-volksschrift");
+  await page.locator("#word-model-a").selectOption("de-la");
+  await page.locator("#word-model-b").selectOption("de-sas");
+  const input = page.getByRole("textbox", { name: "Vergleichstext" });
   const hostileText = '<img src=x onerror="alert(1)"> & ß ﬁ a\u0308';
-  await page.getByRole("textbox", { name: "Vergleichstext" }).fill(hostileText);
+  await input.fill(hostileText);
   await expect(page.locator("#word-literal-preview")).toHaveText(hostileText);
   await expect(page.locator("#word-literal-preview img")).toHaveCount(0);
-  await expect(page.locator("#word-stage svg")).toHaveCount(2);
-  await expect(page.locator("#word-stage text")).toHaveText([hostileText, hostileText]);
+  await expect(page.locator("#word-status")).toContainText("nicht von beiden Referenzschriften abgedeckt");
+  await expect(page.locator("#word-stage text")).toHaveCount(0);
+  await input.fill("Schule");
+  await expect(page.locator("#word-stage text")).toHaveText(["Schule", "Schule"]);
   await expect(page.locator(".comparison-provenance-card")).toHaveCount(2);
-  await expect(page.locator("#word-provenance")).toContainText("Nur visuell");
-  await expect(page.locator("#word-provenance")).toContainText("OFL-1.1");
-  await expect(page.locator("#word-provenance")).toContainText("820 / unitsPerEm 2048");
-  const families = await page.locator("#word-stage text").evaluateAll((elements) => elements.map((element) => element.getAttribute("font-family")));
-  expect(families).toContain("schreibatlas-font-langula-kurrent");
-  expect(families).toContain("schreibatlas-font-volksschrift");
-  expect(fontRequests.some((url) => url.includes("font-langula-kurrent"))).toBe(true);
-  expect(fontRequests.some((url) => url.includes("font-volksschrift"))).toBe(true);
+  await expect(page.locator("#word-provenance")).toContainText("CTAN schulschriften 5");
+  await expect(page.locator("#word-provenance")).toContainText("Version 1.0");
 });
 
-test("word shaping preserves ligature, joining-sequence, and combining-mark fixtures", async ({ page }) => {
+test("word shaping preserves connected words and refuses unsupported combining sequences and ligature characters", async ({ page }) => {
   await page.goto("de/compare/words/");
+  await page.locator("#word-model-a").selectOption("de-la");
+  await page.locator("#word-model-b").selectOption("de-sas");
   const input = page.getByRole("textbox", { name: "Vergleichstext" });
-  for (const fixture of ["office", "Schifffahrt", "ﬁ", "a\u0308"]) {
+  for (const fixture of ["office", "Schifffahrt", "ä"]) {
     await input.fill(fixture);
     await expect(page.locator("#word-stage text")).toHaveText([fixture, fixture]);
+  }
+  for (const unsupported of ["a\u0308", "ﬁ"]) {
+    await input.fill(unsupported);
+    await expect(page.locator("#word-status")).toContainText("nicht von beiden Referenzschriften abgedeckt");
+    await expect(page.locator("#word-stage text")).toHaveCount(0);
   }
 });
 
 test("sentence comparison retains line breaks with explicitly non-empirical spacing", async ({ page }) => {
   await page.goto("de/compare/sentences/");
   await expect(page.getByRole("heading", { name: "Sätze vergleichen", level: 1 })).toBeVisible();
+  await page.locator("#word-model-a").selectOption("de-la");
+  await page.locator("#word-model-b").selectOption("de-sas");
   await page.getByRole("button", { name: "Beispielsatz auf Deutsch einfügen" }).click();
   const input = page.getByRole("textbox", { name: "Satztext" });
   const firstLine = "Fleißige Schüler üben täglich.";
   await expect(input).toHaveValue(firstLine);
   await input.fill(`${firstLine}\nSchreibatlas vergleicht Schriften.`);
-  await expect(page.locator("#word-stage text[data-text-line=\"1\"]")).toHaveCount(2);
-  await expect(page.locator("#word-stage text[data-text-line=\"1\"]").first()).toHaveAttribute("y", "-1.5");
+  await expect(page.locator('#word-stage text[data-text-line="1"]')).toHaveCount(2);
+  await expect(page.locator('#word-stage text[data-text-line="1"]').first()).toHaveAttribute("y", "-1.5");
   await expect(page.locator(".page-heading")).toContainText("festen Abstand von 1,5 x-Höhen");
 });
 
@@ -678,12 +679,14 @@ test("photo reference comparison uses local font evidence and gates measurements
   const report = JSON.parse(readFileSync((await jsonDownload.path())!, "utf8"));
   expect(report.context.referenceFontId).toBe("font-volksschrift");
   expect(report.context.referenceUsedForAlignment).toBe(true);
-  expect(report.metrics.referenceComparison.fit.confidence).toBe("medium");
-  expect(report.metrics.referenceComparison.font.correspondence.degree).toBe("partial");
-  expect(report.metrics.referenceComparison.font.licenseFileUrl).toContain("/data/v1/");
-  expect(report.metrics.referenceComparison.font.sources).toHaveLength(2);
+  expect(report.referenceComparison.fit.confidence).toBe("medium");
+  expect(report.referenceComparison.font.correspondence.degree).toBe("partial");
+  expect(report.referenceComparison.font.licenseFileUrl).toContain("/data/v1/");
+  expect(report.referenceComparison.font.sources).toHaveLength(2);
+  expect(report.referenceComparison.font.fileUrls[0]).toContain("/data/v1/");
+  expect(report.referenceComparison.font.sources[0]).toHaveProperty("id");
   expect(report.unavailable.wordGaps.referenceUsed).toBe(true);
-  expect(report.metrics.referenceComparison.wordSpacing.available).toBe(true);
+  expect(report.referenceComparison.wordSpacing.available).toBe(true);
   expect(report).not.toHaveProperty("score");
 
   await page.getByLabel("Erwarteter Text").fill("blume sonne");
@@ -717,8 +720,8 @@ test("photo reference comparison withholds measurements for a single-line low-co
     page.getByRole("button", { name: "Messdaten als JSON herunterladen" }).click(),
   ]);
   const report = JSON.parse(readFileSync((await jsonDownload.path())!, "utf8"));
-  expect(report.metrics.referenceComparison.fit.confidence).toBe("low");
-  expect(report.metrics.referenceComparison.wordSpacing.available).toBe(false);
+  expect(report.referenceComparison.fit.confidence).toBe("low");
+  expect(report.referenceComparison.wordSpacing.available).toBe(false);
   expect(report.unavailable.wordGaps.available).toBe(false);
 });
 

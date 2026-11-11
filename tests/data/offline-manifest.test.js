@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import test from "node:test";
 import { buildOfflinePrecacheUrls, shouldPrecacheFile, writeOfflinePrecacheManifest } from "../../tools/build-offline-manifest.mjs";
+import { buildData } from "../../tools/build-data.mjs";
 
 test("offline precache includes static routes and resources under the deployment base", () => {
   const urls = buildOfflinePrecacheUrls([
@@ -52,4 +53,35 @@ test("build writes a sorted manifest from static files without the service worke
   assert.ok(manifest.urls.includes("/preview/de/"));
   assert.ok(manifest.urls.includes("/preview/data/v1/fonts.json"));
   assert.ok(!manifest.urls.some((url) => /uploads|sw\.js/.test(url)));
+});
+
+test("CTAN font files, licenses, provenance, sources, and hashes are available offline", (t) => {
+  const root = mkdtempSync(join(tmpdir(), "schreibatlas-offline-fonts-"));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const dataDirectory = join(root, "data/v1");
+  const result = buildData({ outputDir: dataDirectory, basePath: "/preview" });
+  const manifest = writeOfflinePrecacheManifest({ root, basePath: "/preview" });
+  const fonts = JSON.parse(readFileSync(join(dataDirectory, "fonts.json"), "utf8"));
+  const sources = JSON.parse(readFileSync(join(dataDirectory, "sources.json"), "utf8"));
+  const sourceIds = new Set(sources.map(({ id }) => id));
+  assert.ok(manifest.urls.includes("/preview/data/v1/fonts.json"));
+  assert.ok(manifest.urls.includes("/preview/data/v1/sources.json"));
+  for (const id of ["font-schulschriften-la", "font-schulschriften-sas", "font-schulschriften-va", "font-schulschriften-suetterlin", "font-schulschriften-dn"]) {
+    const font = fonts.find((entry) => entry.id === id);
+    assert.ok(font, `${id} should be in the dataset export`);
+    assert.ok(font.integrity?.sha256);
+    assert.ok(font.upstream?.sha256);
+    assert.ok(font.derivation?.recipe);
+    assert.ok(font.derivation?.unicode_mapping_sha256);
+    assert.ok(font.derivation?.tfm_sha256);
+    assert.ok(font.sources.length > 0 && font.sources.every((sourceId) => sourceIds.has(sourceId)));
+    for (const url of [...font.file_urls, font.license_file_url, font.derivation.provenance_file_url]) {
+      assert.ok(url && manifest.urls.includes(url), `${id} asset ${url} should be precached`);
+    }
+    const provenancePath = font.derivation.provenance_file_url.replace("/preview/data/v1/", "");
+    const provenance = JSON.parse(readFileSync(join(dataDirectory, provenancePath), "utf8"));
+    assert.equal(provenance.upstream.archive_sha256, font.upstream.sha256);
+    assert.equal(provenance.artifact.sha256, font.integrity.sha256);
+  }
+  assert.ok(result.files.includes("sources.json"));
 });

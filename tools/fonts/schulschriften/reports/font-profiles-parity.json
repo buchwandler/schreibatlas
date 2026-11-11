@@ -1,0 +1,41 @@
+{
+  "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
+  "profiles": [
+    {
+      "font_sha256": "27e6350ff8ff787887ad98df6fa482cf509957f74879c10995dc2e5eb976e9fc",
+      "maximum_absolute_advance_error_px": 0.020633333333336168,
+      "profile_id": "la",
+      "report": "reports/la-font-parity.json",
+      "tfm_sha256": "959f439dc6e121566680824d2d3562c802585b7afaa201dc2204d3dbe7049ce1"
+    },
+    {
+      "font_sha256": "aa1646241a14f5c4b682e5c62da691ff4c7ae1a71840ff823159b00a78c0d207",
+      "maximum_absolute_advance_error_px": 0.02551833333330933,
+      "profile_id": "sas",
+      "report": "reports/sas-font-parity.json",
+      "tfm_sha256": "6ae45a2a4ce227ee30d621be6713bfc14b1b7486ffc0f0b66208b43b5a5a5d44"
+    },
+    {
+      "font_sha256": "a75a2ba5b403501077475e9fbe136be92ac0c8f90d10e2f1bc69737536acd694",
+      "maximum_absolute_advance_error_px": 0.046143333333361625,
+      "profile_id": "va",
+      "report": "reports/va-font-parity.json",
+      "tfm_sha256": "4fb854d2562b7b15f4dccc0519687ba227e7c0f003598116231bd4051b487be8"
+    },
+    {
+      "font_sha256": "544f433ca93d011b63c5e8b597af0ab7811f036fa1ff6770c20fb1d3668544e4",
+      "maximum_absolute_advance_error_px": 0.04259666666666817,
+      "profile_id": "suetterlin",
+      "report": "reports/suetterlin-font-parity.json",
+      "tfm_sha256": "5e3e7d40fc2f93fc23b9f4183c346464a80211e8777a76f53c309f80f488370a"
+    },
+    {
+      "font_sha256": "ba7da2e34c55ac9c07a0ba8d9926682f6087b512561dd4e32056cca6dc034237",
+      "maximum_absolute_advance_error_px": 0.017645000000001687,
+      "profile_id": "deutsche-normalschrift",
+      "report": "reports/deutsche-normalschrift-font-parity.json",
+      "tfm_sha256": "c0c0e61489f4959759cd16ccfc6399c7e3267bc07898d56c49a31114d3c5326a"
+    }
+  ],
+  "status": "pass"
+}

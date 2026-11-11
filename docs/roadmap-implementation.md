@@ -1,23 +1,23 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
 # Roadmap implementation evidence
 
-Task: task-0003. Source: [01_todo.md](../01_todo.md). This matrix tracks implementation, not approval or dataset release. An existing feature is not evidence that new roadmap acceptance criteria pass.
+Task: task-0003. Source: [01_todo.md](../01_todo.md). This matrix is a historical implementation snapshot, not approval or current dataset status. The CTAN font migration is tracked separately by task-0004.
 
 ## Baseline reconciliation
 
-The checked-in baseline has five models, two fonts, seven sources and eleven glyph records. The modern German models, Playwrite assets, connection record collection, and FontGlyphPreview component are absent. The previous completed Taskledger task does not establish that this version of the roadmap was implemented.
+The baseline below records the earlier task-0003 review: five models, two fonts, seven sources, and eleven glyph records. At that point the German reference set and its derived-font pipeline were absent. Task-0004 later added five distinct CTAN browser derivatives and the corresponding German model records; historical Playwrite references elsewhere in this snapshot describe that earlier state only.
 
 | Roadmap sections | Required work | Existing evidence / remaining gap | Checklist |
 | --- | --- | --- | --- |
 | 1–4 | Preserve static, bilingual, provenance-first foundations | `astro.config.mjs`, `src/lib/i18n.ts`, `tools/build-data.mjs`, `public/sw.js`; corpus gaps remain | 1, 11 |
 | 5.1, 8.3 | Derivation taxonomy, field-specific evidence, structured variants, related characters | `schema/glyph.schema.json` currently lacks these fields | 2 |
 | 5.2, 8.1 | Scoped teaching-core/numeral/punctuation repertoire and completeness | `schema/model.schema.json` has only unscoped inventory and boolean | 2 |
-| 5.3, 5.5–5.6, 6 | Scoped font correspondence, reproducible supply chain, shaping metadata and integrity | `schema/font.schema.json` has calibration and basic correspondence; four pinned German fonts absent | 2, 3 |
+| 5.3, 5.5–5.6, 6 | Scoped font correspondence, reproducible supply chain, shaping metadata and integrity | `schema/font.schema.json` includes pinned CTAN provenance, generated derivation, shaping features, calibration and integrity | 2, 3 |
 | 5.4, 8.5 | Rich source kinds, locators, retrieval and bibliographic metadata | `schema/source.schema.json` only supports publication/placeholder and pages | 2 |
 | 5.7–5.8, 14.1–14.2 | Uniform confidence/method objects, versioned reports, body-height and local slant | `tools/photo-analysis.mjs`, `tools/photo-reference.mjs`; no standardized v2 report | 7 |
 | 5.9, 19.3 | Chromium reference shaping and Firefox/WebKit semantic compatibility | `src/lib/text-shaper.ts`, `tests/e2e/`; expanded fixtures and policy needed | 5, 11 |
 | 5.10 | Schema evolution history and public-release boundary | `docs/dataset-releases.md`; schema history absent | 2 |
-| 6.1–6.5, 7 | Four local Regular 400 Playwrite fonts, independent educational evidence, German model records | `data/fonts/`, `data/models/` contain only historical/demo baseline | 3 |
+| 6.1–6.5, 7 | Five CTAN browser-font derivatives, independent educational evidence, German model records | Task-0004 adds LA, SAS, VA, Sütterlin, and Deutsche Normalschrift references; independent repertoire and movement evidence remains limited | 3 |
 | 8.1 | Aliases, regions, education, characteristics, examples, uncertain periods | `schema/model.schema.json`, `templates/model.yaml` need extension | 2 |
 | 8.2–8.5 | Schemas, API types, templates and cross-record semantics | `tools/content.d.mts`, `tools/validate-data.mjs` need matching changes | 2 |
 | 8.4, 21 P2 | Optional sourced pair/sequence connections and contextual forms | Glyph entry/exit and contextual outline infrastructure exists; pair records absent | 2, 3, 9 |
@@ -32,7 +32,7 @@ The checked-in baseline has five models, two fonts, seven sources and eleven gly
 | 15 | Overlay toggles, opacity, accessible metric cards and unavailable reasons | `src/pages/[lang]/analyze/index.astro`, `src/scripts/photo-analysis.ts` need controls | 8 |
 | 16 | Locally recognized non-sensitive worksheet identity | `tools/worksheet.mjs` has IDs/fiducials; `detectWorksheetGeometry` requires supplied metadata | 8 |
 | 17, 20 PR10, 21 P4 | Bounded 2–3-country pilot, independent evidence, local fonts and English discovery | Only DE/de data currently present | 10 |
-| 18.1 | Restore roadmap target and validate local README links | User-provided `01_todo.md` exists but is untracked; README's claim of an end-of-file current summary is stale | 2 |
+| 18.1 | Restore roadmap target and validate local README links | `01_todo.md` is absent; README now points directly to this implementation matrix | 2 |
 | 18.2 | Correct third-party notices and enforce font coverage | `THIRD_PARTY_NOTICES.md` incorrectly says no bundled assets | 2 |
 | 18.3 | Node minimum consistency | `package.json` declares >=22.23.4; add local version file and enforce CI consistency | 2 |
 | 19.1–19.2 | Schema/data/font/repertoire/integrity/connection/completeness tests | Extend `tests/data/` | 2–4, 11 |
@@ -54,9 +54,9 @@ The checked-in baseline has five models, two fonts, seven sources and eleven gly
 - Repository hygiene implemented: README target restored, current font notices corrected, local-link/font-notice consistency tests added, and all setup-node workflows share `.node-version` (22.23.4).
 - Evidence foundation implemented: rich model/source/font/glyph schemas, derivation checks, structured variants, scoped inventory validation, connection schema/loading/export, API types, templates and contributor/review guidance. Existing canonical records still validate without invented provenance.
 - Checks: typecheck (check-0004), validation (check-0005), baseline unit suite (check-0006), six new evidence tests (check-0007), and static build (check-0008) passed. Browser check-0009 could not launch the downloaded Chromium because system libraries were missing. Explicit system Chromium via `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` passed all 24 browser tests (check-0010). This override is optional; default CI behavior is unchanged.
-- German corpus implemented: four independently documented modern models and four pinned Regular 400 Playwrite v1.003 fonts. Font integrity, internal identity/version, declared character coverage, required features and calibration are checked. Educational inventory completeness remains false; source-traced and movement coverage is not invented.
+- Historical task-0003 checkpoint: four modern German models had four pinned Regular 400 reference fonts. Task-0004 later replaced those references with five generated CTAN derivatives and added distinct Sütterlin and Deutsche Normalschrift models.
 - Repertoire browsing implemented: 873 bilingual pages, labeled local-font previews, font-load refusal, model completeness dimensions and added discovery filters. Check-0026 passed all 30 browser tests, including offline reload and bilingual Axe audits.
 - Comparison implemented: an additional 2–6-model comparison with grid/strip, maximum-three overlay, case controls, country/language/joined filters and shareable model sets. The existing two-outline comparator remains available. Word/sentence provenance includes font version and explicit OpenType features. Check-0030 covers all four German models and fixture strings.
 - Font-backed worksheets implemented: explicit vector/font modes, calibrated local shaping, embedded font bytes and complete OFL text in SVG, font provenance in SVG/PNG/PDF metadata, unsupported-character refusal and preserved vector behavior. Check-0034 passed 33 browser tests; check-0036 verifies actual SVG/PNG/PDF downloads. Check-0037 covers representation round-trip/identity and bounded offline caching.
 - Still open: analysis metrics v2 and segmentation diagnostics; analysis controls and autonomous worksheet identity recognition; lawful movement pilot with human review; bounded international pilot; full final acceptance validation and compatibility-engine runs. These requirements are not marked complete.
-- Current checkpoint: check-0038 typecheck, check-0039 validation, check-0040 all 116 unit tests, check-0041 static build and check-0042 all 34 Chromium browser tests pass. Task remains in implementation at 6/11 todos, with todo-0007 next; no final Taskledger acceptance validation has been recorded.
+- Historical task-0003 checkpoint: check-0038 typecheck, check-0039 validation, check-0040 all 116 unit tests, check-0041 static build and check-0042 all 34 Chromium browser tests passed. That task remained in implementation at 6/11 todos and had no final acceptance validation; current migration progress and validation are tracked by task-0004.

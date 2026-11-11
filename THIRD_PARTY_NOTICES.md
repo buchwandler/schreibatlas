@@ -26,17 +26,13 @@ Bundled third-party fonts retain their original licenses. They are not covered b
 - Scope: partial digital interpretation of Deutsche Volksschrift, not a verified movement reference.
 
 For both fonts, retain the copyright and license text on redistribution and observe the OFL's reserved-name and modification terms. The complete bundled license texts are authoritative.
+## CTAN schulschriften v5 browser derivatives
 
-## Playwrite German reference families
-
-- Records: `font-playwrite-de-grund`, `font-playwrite-de-la`, `font-playwrite-de-sas`, `font-playwrite-de-va`.
-- Families: Playwrite DE Grund, Playwrite DE LA, Playwrite DE SAS, Playwrite DE VA.
-- Creator/copyright: Copyright 2023 The Playwrite Project Authors (TypeTogether project).
-- Source: https://github.com/TypeTogether/Playwrite/releases/tag/v1.003
-- Pinned commit: `36b6ee15dd64a9c64d1adfe19f6a0f602c39b5e4`.
-- License: SIL Open Font License 1.1 (OFL-1.1), retained in `licenses/OFL-1.1-Playwrite.txt` and distributed with each exported font.
-- Files: `assets/fonts/playwrite-de-grund/PlaywriteDEGrund-Regular.ttf`, `assets/fonts/playwrite-de-la/PlaywriteDELA-Regular.ttf`, `assets/fonts/playwrite-de-sas/PlaywriteDESAS-Regular.ttf`, `assets/fonts/playwrite-de-va/PlaywriteDEVA-Regular.ttf`.
-- Modifications: none; only released static Regular 400 TTFs are bundled. Guides variants and other weights are not bundled.
-- Attribution/redistribution: retain the copyright and complete OFL text. Follow the OFL's font-sale, modification and reserved-name conditions.
-- Scope: partial digital visual/shaping references. They do not establish official model outlines, educational repertoire completeness, stroke order or teaching movement. Individual SHA-256, byte size, internal version and measured calibration appear in the corresponding font records.
+- Upstream: Walter Entenmann's CTAN `schulschriften` package, version 5. Source archive SHA-256: `b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc`.
+- License: LPPL-1.3c. The pinned archive is retained in `vendor/ctan/schulschriften/`; the complete license text is `licenses/LPPL-1.3c-Schulschriften.txt`.
+- Profiles and records: `font-schulschriften-la`, `font-schulschriften-sas`, `font-schulschriften-va`, `font-schulschriften-suetterlin`, and `font-schulschriften-dn`.
+- Browser assets: `assets/fonts/schulschriften-{la,sas,va,suetterlin,dn}/`. These TrueType files are generated derivatives, not TrueType fonts distributed by CTAN.
+- Derivation recipe, Unicode mappings, TFM inputs, toolchain, output hashes, and per-font provenance are recorded under `tools/fonts/schulschriften/` and exported with the versioned font API records.
+- Attribution and redistribution: retain the upstream attribution and complete LPPL text, and follow the license conditions for the source and generated derivatives.
+- Scope: the derivatives represent the five corresponding package fonts. They do not establish official source traces, educational repertoire completeness, stroke order, or writing movement. Grundschrift has no assigned substitute font.
 Future third-party material must be listed here with its record ID, name, creator, source URL, original license, bundled files, attribution requirements, and modifications. New font records are checked against this notice during repository validation.

@@ -3,7 +3,8 @@ import { isValidQuadrilateral, type ImagePoint, type PhotoAnalysisResult } from 
 import type { WorksheetMarkerResult, WorksheetWritingResult } from "../../tools/worksheet-analysis.mjs";
 import { BrowserTextShaper, type TextDirection } from "../lib/text-shaper";
 import { fitReferenceText, measureReferenceWordSpacing, type PhotoReferenceFit, type PhotoReferenceLine } from "../../tools/photo-reference.mjs";
-import type { FontRecord, SourceRecord } from "../../tools/content.mjs";
+import type { FontExport, SourceRecord } from "../../tools/content.mjs";
+import { appendFontProvenance, fontSupportsText, supportsRequiredFontFeatures } from "../lib/font-capabilities";
 
 interface AnalysisMessages {
   statusIdle: string;
@@ -57,6 +58,7 @@ interface AnalysisMessages {
   referenceSection: string;
   referenceUnavailable: string;
   referenceFontUnavailable: string;
+  referenceUnsupported: string;
   referenceFitUnavailable: string;
   referenceFitLow: string;
   referenceFitMedium: string;
@@ -73,9 +75,6 @@ interface AnalysisMessages {
   referenceWordSpacingUnavailable: string;
 }
 
-interface FontExport extends FontRecord {
-  file_urls?: string[];
-}
 
 interface DataIndex {
   fonts: string;
@@ -91,7 +90,20 @@ interface ReferenceLayout {
 }
 
 interface ReferenceComparisonData {
-  font: { id: string; name: string; license: string; licenseFileUrl: string | null; fileUrls: string[]; correspondence: FontRecord["correspondence"]; sources: SourceRecord[] };
+  font: {
+    id: string;
+    name: string;
+    license: string;
+    licenseFileUrl: string | null;
+    fileUrls: string[];
+    correspondence: FontExport["correspondence"];
+    sources: SourceRecord[];
+    shaping: FontExport["shaping"];
+    upstream: FontExport["upstream"];
+    derivation: FontExport["derivation"];
+    integrity: FontExport["integrity"];
+    supportedCharacters: string[];
+  };
   fit: PhotoReferenceFit;
   wordSpacing: ReturnType<typeof measureReferenceWordSpacing>;
 }
@@ -309,12 +321,13 @@ function initializePhotoAnalysis(container: HTMLElement): void {
     if (direction === "rtl") throw new Error("RTL reference fitting is not implemented.");
     const language = option?.dataset.language ?? undefined;
     await loadReferenceFont(font);
-    const run = await shaper.shape({ text, fontId: font.id, language, direction });
+    const run = await shaper.shape({ text, fontId: font.id, features: font.shaping?.required_features, language, direction });
     const fontSize = 40 / font.calibration!.x_height_em;
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
     if (!context) throw new Error("Reference text metrics are unavailable.");
     context.font = `${fontSize}px \"${run.fontFamily}\"`;
+    context.fontKerning = font.shaping?.required_features.includes("kern") ? "normal" : "auto";
     context.direction = direction;
     const lineTexts = text.trim().split(/\r\n?|\n/);
     if (lineTexts.some((line) => !line.trim())) throw new Error("Blank reference text lines are not aligned.");
@@ -452,6 +465,7 @@ function initializePhotoAnalysis(container: HTMLElement): void {
     context.save();
     context.setTransform(fit.transform.scaleX, 0, 0, fit.transform.scaleY, fit.transform.translateX, fit.transform.translateY);
     context.font = `${layout.fontSize}px \"${layout.fontFamily}\"`;
+    context.fontKerning = layout.font.shaping?.required_features.includes("kern") ? "normal" : "auto";
     context.direction = layout.direction;
     context.textAlign = "left";
     context.textBaseline = "alphabetic";
@@ -535,15 +549,22 @@ function initializePhotoAnalysis(container: HTMLElement): void {
 
     renderReferenceSources(font);
     const correspondence = `${font.correspondence.degree}${font.correspondence.notes ? ` · ${font.correspondence.notes}` : ""}`;
-    referenceFontOutput.replaceChildren(document.createTextNode(`${font.name} · ${correspondence} · `));
+    referenceFontOutput.replaceChildren(document.createTextNode(`${font.name} · ${correspondence} · OpenType: ${font.shaping?.required_features.join(", ") ?? "not documented"} · `));
     if (font.license_file_url) {
       const licenseLink = document.createElement("a");
       licenseLink.href = localUrl(font.license_file_url);
       licenseLink.textContent = font.license;
       referenceFontOutput.append(licenseLink);
     } else referenceFontOutput.append(document.createTextNode(font.license));
+    appendFontProvenance(referenceFontOutput, font, document.documentElement.lang === "de" ? "de" : "en");
+    const text = expectedTextInput.value.trim();
+    if (!fontSupportsText(font, text) || !supportsRequiredFontFeatures(font)) {
+      referenceStatus.textContent = copy.referenceUnsupported;
+      wordGapsOutput.textContent = copy.referenceWordSpacingUnavailable;
+      return null;
+    }
     try {
-      const text = expectedTextInput.value.trim();
+
       const layout = await shapeReferenceText(font, text);
       if (latestAnalysis !== analysis) return null;
       const fit = fitReferenceText(layout.lines, analysis.lines);
@@ -559,6 +580,11 @@ function initializePhotoAnalysis(container: HTMLElement): void {
           fileUrls: font.file_urls ?? [],
           correspondence: font.correspondence,
           sources: font.sources.map((id) => sourceById.get(id)).filter((source): source is SourceRecord => source !== undefined),
+          shaping: font.shaping,
+          upstream: font.upstream,
+          derivation: font.derivation,
+          integrity: font.integrity,
+          supportedCharacters: font.supported_characters,
         },
         fit,
         wordSpacing,
@@ -772,7 +798,7 @@ function initializePhotoAnalysis(container: HTMLElement): void {
 
   const exportMeasurements = () => {
     if (!latestAnalysis) return;
-    const { preview, mask, ...metrics } = latestAnalysis;
+    const { preview, mask, referenceComparison, ...metrics } = latestAnalysis;
     void preview;
     void mask;
     const model = modelSelect.selectedOptions[0];
@@ -790,6 +816,7 @@ function initializePhotoAnalysis(container: HTMLElement): void {
       },
       imageDimensions: { inputWidth: imageWidth, inputHeight: imageHeight, rectifiedWidth: latestAnalysis.width, rectifiedHeight: latestAnalysis.height },
       metrics,
+      referenceComparison,
       unavailable: { wordGaps: latestAnalysis.referenceComparison?.wordSpacing ?? { available: false, reason: "no-reference-fit", confidence: "unavailable", referenceUsed: false, observations: [] } },
       limitations: ["no_ocr", "no_model_scoring", "reference_font_is_a_digital_interpretation", "reference_fit_uses_bounded_axis_scales_and_translation_only", "line_spacing_is_a_display_convention", "baseline_is_low_confidence_lower_ink_envelope", "worksheet_measurements_require_a_matching_local_svg_and_confident_markers", ...(latestAnalysis.worksheetGeometry?.status === "recognized" ? [] : ["measurements_depend_on_manual_crop"])],
     };

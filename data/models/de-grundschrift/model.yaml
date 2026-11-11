@@ -32,13 +32,13 @@ repertoire:
     sources: [src-reference-inventory]
   numerals: {entries: [U+0030-U+0039], complete: false, sources: [src-reference-inventory]}
   punctuation: {entries: [U+002E, U+002C, U+003F, U+0021], complete: false, sources: [src-reference-inventory]}
-reference_fonts: [font-playwrite-de-grund]
+reference_fonts: []
 sources: [src-kmk-handwriting-2024, src-grundschulverband-grundschrift, src-reference-inventory]
 license: CC-BY-SA-4.0
 demo: false
 description:
-  de: Quellenbasiert beschriebenes Grundschrift-Konzept. Das erklärte Inventar dient dem Browsen und ist keine vollständige offizielle Alphabettafel. Playwrite ist eine gesondert gekennzeichnete digitale Referenz; belegte Einzelkonturen und Bewegungsdaten fehlen noch.
-  en: Source-documented Grundschrift concept. The declared browsing inventory is not a complete official alphabet chart. Playwrite is a separately labeled digital reference; documented individual outlines and movement data are not yet available.
+  de: "Quellenbasiert beschriebenes Grundschrift-Konzept. Das erklärte Inventar dient dem Browsen und ist keine vollständige offizielle Alphabettafel. Für dieses Modell ist derzeit keine lokale digitale Referenzschrift zugeordnet; ein Systemschrift- oder Fremdfont-Fallback wird nicht verwendet. Belegte Einzelkonturen und Bewegungsdaten fehlen noch."
+  en: "Source-documented Grundschrift concept. The declared browsing inventory is not a complete official alphabet chart. No local digital reference font is currently assigned to this model, and no system-font or unrelated-font fallback is used. Documented individual outlines and movement data are not yet available."
 examples:
   words: [{text: Schule, language: de, sources: [src-reference-inventory]}]
   sentences: [{text: Wir schreiben gemeinsam., language: de, sources: [src-reference-inventory]}]

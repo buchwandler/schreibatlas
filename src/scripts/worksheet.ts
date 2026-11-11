@@ -2,7 +2,8 @@
 import { normalizeOutline } from "../../tools/geometry.mjs";
 import { decodeWorksheetSettings, encodeWorksheetSettings, layoutWorksheet, normalizeWorksheetSettings, worksheetId, worksheetMarker, worksheetMarkerLayout } from "../../tools/worksheet.mjs";
 import { appendWorksheetMetadataToPng, createWorksheetPdf } from "../../tools/worksheet-export.mjs";
-import type { FontRecord, GlyphRecord, SourceRecord } from "../../tools/content.mjs";
+import type { FontExport, GlyphRecord, SourceRecord } from "../../tools/content.mjs";
+import { appendFontProvenance, fontFeatureSettings, fontSupportsText, supportsRequiredFontFeatures } from "../lib/font-capabilities";
 import type { WorksheetSettings } from "../../tools/worksheet.mjs";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
@@ -35,6 +36,7 @@ interface WorksheetMessages {
   ready: string;
   noModels: string;
   noOutlines: string;
+  fontFeaturesUnavailable: string;
   missingOutlines: string;
   overflow: string;
   error: string;
@@ -55,11 +57,11 @@ interface ModelWorksheetData {
   direction: "ltr" | "rtl";
   sources: string[];
   fontId: string;
-  fontSupported: string[];
+
 }
 
 interface WorksheetFont {
-  record: FontRecord & { calibration: { x_height_em: number } };
+  record: FontExport & { calibration: { x_height_em: number } };
   family: string;
   dataUrl: string;
   licenseText: string;
@@ -138,7 +140,7 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
   let datasetVersion = "";
   let glyphEntries: GlyphIndexEntry[] = [];
   let sourceRecords: SourceRecord[] = [];
-  let fontRecords: FontRecord[] = [];
+  let fontRecords: FontExport[] = [];
   const fontCache = new Map<string, Promise<WorksheetFont>>();
   const glyphByKey = new Map<string, GlyphIndexEntry>();
   const sourceById = new Map<string, SourceRecord>();
@@ -160,7 +162,7 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
     [glyphEntries, sourceRecords, fontRecords] = await Promise.all([
       fetchLocalJson<GlyphIndexEntry[]>(index.glyphs),
       fetchLocalJson<SourceRecord[]>(index.sources),
-      fetchLocalJson<FontRecord[]>(index.fonts),
+      fetchLocalJson<FontExport[]>(index.fonts),
     ]);
     for (const entry of glyphEntries) glyphByKey.set(`${entry.model}\u0000${entry.character}`, entry);
     for (const source of sourceRecords) sourceById.set(source.id, source);
@@ -192,7 +194,7 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
       direction: option.dataset.direction === "rtl" ? "rtl" : "ltr",
       sources,
       fontId: option.dataset.font ?? "",
-      fontSupported: JSON.parse(option.dataset.supported ?? "[]") as string[],
+
     };
   };
 
@@ -224,6 +226,16 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
   const localize = (template: string, values: Record<string, string>) => template.replace(/\{([A-Za-z]+)\}/g, (_match, key: string) => values[key] ?? "");
   const segmentText = (text: string) => [...new Intl.Segmenter(document.documentElement.lang, { granularity: "grapheme" }).segment(text)].map((item) => item.segment);
 
+
+  const showFontProvenance = (record: FontExport) => {
+    const item = document.createElement("li");
+    const features = record.shaping?.required_features ?? [];
+    const de = document.documentElement.lang === "de";
+    const featureText = features.length ? features.join(", ") : (de ? "nicht dokumentiert" : "not documented");
+    item.textContent = `${de ? "Referenzfont" : "Reference font"}: ${record.name} · ${de ? "OpenType-Funktionen" : "OpenType features"}: ${featureText} · ${record.correspondence.degree}.`;
+    appendFontProvenance(item, record, document.documentElement.lang === "de" ? "de" : "en");
+    provenance.replaceChildren(item);
+  };
   const updateLink = (current: WorksheetSettings) => {
     const url = new URL(location.href);
     url.hash = encodeWorksheetSettings(current).slice(1);
@@ -258,10 +270,21 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
     const characters = [...new Set(segmentText(settings.text).filter((character) => !/^\s+$/u.test(character)))];
     let font: WorksheetFont | undefined;
     if (settings.referenceKind === "font") {
-      if (!model.fontId || characters.some((character) => !model.fontSupported.includes(character))) {
-        status.textContent = document.documentElement.lang === "de" ? "Referenzfont oder Zeichenabdeckung nicht verfügbar." : "Reference font or character coverage unavailable.";
+      const record = fontRecords.find((font) => font.id === model.fontId);
+      if (!model.fontId || !record || !fontSupportsText(record, settings.text)) {
+        status.textContent = document.documentElement.lang === "de" ? "Referenzfont oder Zeichenabdeckung nicht verfügbar. Es wird keine Ersatzschrift verwendet." : "Reference font or character coverage unavailable. No substitute font is used.";
         output.replaceChildren();
         provenance.replaceChildren();
+        if (record) showFontProvenance(record);
+        return;
+      }
+      if (!supportsRequiredFontFeatures(record)) {
+        status.textContent = copy.fontFeaturesUnavailable;
+        output.replaceChildren();
+        provenance.replaceChildren();
+        showFontProvenance(record);
+        const features = record.shaping?.required_features ?? [];
+        status.textContent = `${copy.fontFeaturesUnavailable} (${features.join(", ") || (document.documentElement.lang === "de" ? "nicht dokumentiert" : "not documented")})`;
         return;
       }
       try { font = await loadFont(model.fontId); }
@@ -273,13 +296,16 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
     const supported = characters.filter((character) => Boolean(font || glyphByCharacter.get(character)?.outline));
     const missing = characters.filter((character) => !font && !glyphByCharacter.get(character)?.outline);
     const layout = layoutWorksheet(settings);
-    const result = createWorksheetSvg(settings, layout, model, glyphByCharacter, characters, copy, datasetVersion, font);
+    const fontSourceRecords = font ? font.record.sources.flatMap((id) => sourceById.has(id) ? [sourceById.get(id)!] : []) : [];
+    const result = createWorksheetSvg(settings, layout, model, glyphByCharacter, characters, copy, datasetVersion, font, fontSourceRecords);
     currentSvg = result.svg;
     output.replaceChildren(result.svg);
     updateProvenance(provenance, model, supported.map((character) => glyphByCharacter.get(character)!).filter(Boolean), sourceById, copy);
     if (font) {
       const item = document.createElement("li");
-      item.textContent = `Reference font: ${font.record.name} · ${font.record.font_version} · ${font.record.license} · ${font.record.correspondence.degree}. Not official source traces or writing movement. ${font.record.sources.join(", ")}`;
+      const features = font.record.shaping?.required_features ?? [];
+      item.textContent = `${document.documentElement.lang === "de" ? "Referenzfont" : "Reference font"}: ${font.record.name} · ${font.record.font_version} · ${font.record.license} · OpenType: ${features.join(", ")} · ${font.record.correspondence.degree}. ${document.documentElement.lang === "de" ? "Keine offiziellen Quellkonturen oder Schreibbewegungen." : "Not official source traces or writing movement."} ${font.record.sources.join(", ")}`;
+      appendFontProvenance(item, font.record, document.documentElement.lang === "de" ? "de" : "en");
       provenance.append(item);
     }
     downloadButton.disabled = false;
@@ -457,6 +483,7 @@ function createWorksheetSvg(
   copy: WorksheetMessages,
   datasetVersion: string,
   font?: WorksheetFont,
+  fontSourceRecords: SourceRecord[] = [],
 ): { svg: SVGSVGElement; overflow: boolean } {
   const svg = svgElement("svg", {
     xmlns: svgNamespace,
@@ -498,9 +525,16 @@ function createWorksheetSvg(
     fontVersion: font?.record.font_version ?? null,
     fontLicense: font?.record.license ?? null,
     fontSources: font?.record.sources ?? [],
+    fontCorrespondence: font?.record.correspondence ?? null,
+    fontFileUrl: font?.record.file_urls?.[0] ?? null,
+    fontLicenseFileUrl: font?.record.license_file_url ?? null,
+    fontProvenanceUrl: font?.record.derivation?.provenance_file_url ?? null,
+    fontSourceRecords,
     fontLicenseText: font?.licenseText ?? null,
     fontIntegrity: font?.record.integrity ?? null,
     shaping: font?.record.shaping ?? null,
+    fontUpstream: font?.record.upstream ?? null,
+    fontDerivation: font?.record.derivation ?? null,
     settings,
     worksheetId: markerId,
     worksheetMarker: { ...worksheetMarker, pageWidthMm: layout.width, pageHeightMm: layout.height, positionsMm: markerPositions },
@@ -591,6 +625,7 @@ function createWorksheetSvg(
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d")!;
       context.font = `${fontSize}px "${font.family}"`;
+      context.fontKerning = font.record.shaping?.required_features.includes("kern") ? "normal" : "auto";
       const width = context.measureText(settings.text).width;
       if (width > rightEdge - writingLeft) { overflow = true; continue; }
       const text = addSvgText(svg, settings.text, {
@@ -599,7 +634,7 @@ function createWorksheetSvg(
         "text-anchor": model.direction === "rtl" ? "end" : "start",
         opacity: rowKind === "reference" ? "0.68" : "0.22", "data-reference-kind": "font", "data-row-kind": rowKind,
       });
-      text.style.fontFeatureSettings = (font.record.shaping?.required_features ?? ["calt", "kern"]).map((tag) => `"${tag}" 1`).join(", ");
+      text.style.fontFeatureSettings = fontFeatureSettings(font.record);
       continue;
     }
     let cursorX = model.direction === "rtl" ? rightEdge : writingLeft;

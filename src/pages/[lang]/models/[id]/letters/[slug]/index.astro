@@ -5,6 +5,7 @@ import BreadcrumbJsonLd from "../../../../../../components/BreadcrumbJsonLd.astr
 import NormalizedGuidelines from "../../../../../../components/NormalizedGuidelines.astro";
 import GlyphOutline from "../../../../../../components/GlyphOutline.astro";
 import FontGlyphPreview from "../../../../../../components/FontGlyphPreview.astro";
+import FontProvenance from "../../../../../../components/FontProvenance.astro";
 import { unicodeCodePoints } from "../../../../../../../tools/unicode.mjs";
 import SourceList from "../../../../../../components/SourceList.astro";
 import VerificationBadge from "../../../../../../components/VerificationBadge.astro";
@@ -163,6 +164,7 @@ const directionText: Record<string, string> = { forward: copy.forward, reverse: 
           </dl>
           {font.license_file && fontLicenseUrl && <p><strong>{copy.licenseFile}:</strong> <a href={fontLicenseUrl}>{font.license_file}</a></p>}
           {font.correspondence.notes && <p>{font.correspondence.notes}</p>}
+          <FontProvenance lang={lang} font={font} />
           {font.project_url && /^https?:\/\//i.test(font.project_url) && <a href={font.project_url} rel="external">{font.name}</a>}
         </article>
       ) : (

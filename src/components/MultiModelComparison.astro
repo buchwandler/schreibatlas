@@ -6,22 +6,36 @@ import { inspectTrueType } from "../../tools/font-metadata.mjs";
 import { readFileSync } from "node:fs";
 import { resolve, basename } from "node:path";
 import { withBase } from "../lib/routes";
+import { fontCapability, type FontCapability } from "../lib/font-capabilities";
 import { messages, type Locale } from "../lib/i18n";
 interface Props { content: Content; lang: Locale; }
 const { content, lang } = Astro.props;
 const copy = messages[lang];
 const localized = (text: Record<string, string>) => text[lang] ?? text.en ?? text.de;
+
 const data = content.models.map((model) => {
   const font = content.fonts.find((font) => font.id === model.reference_fonts[0]);
   const metadata = font?.files[0] ? inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))) : undefined;
+  const glyphs = content.glyphs.filter((glyph) => glyph.model === model.id);
+  const hasVector = glyphs.some((glyph) => Boolean(glyph.outline));
+  const hasFont = Boolean(font?.files[0] && font.calibration);
+  const capability: FontCapability = fontCapability(hasVector, hasFont);
+  const provenanceUrl = font?.derivation?.provenance_file
+    ? withBase(`data/v1/assets/fonts/${font.id}/provenance/${basename(font.derivation.provenance_file)}`)
+    : undefined;
   return {
     id: model.id, name: localized(model.name), country: model.country, languages: model.languages,
-    joined: model.classification?.joined ?? null, characters: repertoireCharacters(model),
-    glyphs: content.glyphs.filter((glyph) => glyph.model === model.id),
+    joined: model.classification?.joined ?? null, characters: repertoireCharacters(model), glyphs, capability,
     url: withBase(`${lang}/models/${model.id}/`),
-    font: font?.files[0] && font.calibration ? { ...font, url: withBase(`data/v1/assets/fonts/${font.id}/1-${basename(font.files[0])}`), supported: repertoireCharacters(model).filter((character) => metadata?.hasCharacter(character)) } : undefined,
+    font: hasFont && font?.files[0] && font.calibration ? { ...font, url: withBase(`data/v1/assets/fonts/${font.id}/1-${basename(font.files[0])}`), provenanceUrl, supported: repertoireCharacters(model).filter((character) => metadata?.hasCharacter(character)) } : undefined,
   };
 });
+const capabilityLabels = {
+  both: lang === "de" ? "Vektor + Font" : "Vector + font",
+  vector: lang === "de" ? "nur Vektor" : "vector only",
+  font: lang === "de" ? "nur Font" : "font only",
+  none: lang === "de" ? "keine Referenzform" : "no reference form",
+};
 ---
 <section class="data-section" data-multi-comparison data-lang={lang} aria-labelledby="multi-title">
   <h2 id="multi-title">{lang === "de" ? "Mehrere Modelle vergleichen (2–6)" : "Compare multiple models (2–6)"}</h2>
@@ -37,7 +51,7 @@ const data = content.models.map((model) => {
     <label>{copy.opacity}<input data-multi-opacity type="range" min="0.1" max="1" step="0.05" value="0.5" /></label>
   </div>
   <fieldset><legend>{lang === "de" ? "Modellauswahl" : "Model set"}</legend>
-    {data.map((model) => <label data-multi-option><input type="checkbox" value={model.id} checked={["de-grundschrift", "de-la", "de-sas", "de-va"].includes(model.id)} /> {model.name}</label>)}
+    {data.map((model) => <label data-multi-option><input type="checkbox" value={model.id} checked={["de-grundschrift", "de-la", "de-sas", "de-va", "de-suetterlin", "de-deutsche-normalschrift"].includes(model.id)} /> {model.name} <small>({capabilityLabels[model.capability]})</small></label>)}
   </fieldset>
   <p data-multi-status role="status" aria-live="polite"></p>
   <div data-multi-stage class="multi-stage"></div>
@@ -50,7 +64,7 @@ const data = content.models.map((model) => {
 <style>
   .multi-controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; }
   label { display: flex; flex-direction: column; gap: 0.3rem; }
-  fieldset { margin: 1rem 0; display: flex; flex-wrap: wrap; gap: 1rem; }
+  fieldset { margin: 1rem 0; display: flex; flex-wrap: wrap; gap: 1rem; min-width: 0; }
   fieldset label { flex-direction: row; align-items: center; }
   [hidden] { display: none; }
   .multi-stage { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; }

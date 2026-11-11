@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { relative, resolve, sep } from "node:path";
+import { basename, relative, resolve, sep } from "node:path";
 import { unicodeCodePoints } from "./unicode.mjs";
 import { fontMetadataErrors, inspectTrueType } from "./font-metadata.mjs";
 
@@ -29,6 +29,76 @@ export function evidenceErrors(records, root) {
     }
     if (requireEvidence && !(ids ?? []).some((id) => sources.has(id) && sources.get(id).kind !== "project-placeholder")) {
       errors.push(`${path}: claimed evidence requires at least one non-placeholder source.`);
+    }
+  }
+  function localFile(filePath, label) {
+    const target = resolve(root, filePath);
+    if (!target.startsWith(`${resolve(root)}${sep}`)) {
+      errors.push(`${label}: referenced file must stay inside the repository: "${filePath}".`);
+      return null;
+    }
+    if (!existsSync(target)) {
+      errors.push(`${label}: referenced file does not exist: "${filePath}".`);
+      return null;
+    }
+    return readFileSync(target);
+  }
+  const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
+  function generatedFontErrors(name, font) {
+    const derivation = font.derivation;
+    if (font.upstream?.kind === "archive" && !derivation) errors.push(`${name}: archive-backed font requires generated derivation metadata.`);
+    if (!derivation) return;
+    if (font.upstream?.kind !== "archive") errors.push(`${name}: generated derivation requires archive upstream metadata.`);
+    if (derivation.output_format !== font.format) errors.push(`${name}: generated output format does not match font format.`);
+
+    localFile(derivation.recipe, name);
+    const mapping = localFile(derivation.unicode_mapping, name);
+    if (mapping && sha256(mapping) !== derivation.unicode_mapping_sha256) errors.push(`${name}: Unicode mapping SHA-256 mismatch.`);
+    if (derivation.connection_mapping) localFile(derivation.connection_mapping, name);
+    const tfm = localFile(derivation.tfm_file, name);
+    if (tfm && sha256(tfm) !== derivation.tfm_sha256) errors.push(`${name}: TFM SHA-256 mismatch.`);
+    const provenanceBytes = localFile(derivation.provenance_file, name);
+    if (!provenanceBytes) return;
+
+    let provenance;
+    try {
+      provenance = JSON.parse(provenanceBytes.toString("utf8"));
+    } catch (error) {
+      errors.push(`${name}: derivation provenance is invalid JSON: ${error.message}.`);
+      return;
+    }
+    const upstream = font.upstream;
+    const record = provenance.upstream ?? {};
+    if (upstream?.kind === "archive") {
+      if (record.archive_sha256 !== upstream.sha256) errors.push(`${name}: provenance archive SHA-256 mismatch.`);
+      if (record.archive) {
+        const archive = localFile(record.archive, name);
+        if (archive && sha256(archive) !== upstream.sha256) errors.push(`${name}: pinned archive SHA-256 mismatch.`);
+      }
+      if (font.integrity?.sha256 === upstream.sha256) errors.push(`${name}: archive checksum and generated font integrity must remain distinct.`);
+      if (record.package !== upstream.package || String(record.version) !== upstream.version) errors.push(`${name}: provenance upstream package or version mismatch.`);
+      const member = upstream.source_file.replaceAll("\\", "/");
+      if (member.startsWith("/") || member.split("/").includes("..")) errors.push(`${name}: upstream source file must be an archive-relative path.`);
+      if (!record.source_files?.[basename(member)]) errors.push(`${name}: upstream source file is absent from provenance.`);
+      if (font.license !== record.license) errors.push(`${name}: provenance upstream license mismatch.`);
+    }
+    const actual = provenance.derivation ?? {};
+    if (actual.recipe !== derivation.recipe) errors.push(`${name}: provenance recipe mismatch.`);
+    if (actual.tfm_path !== derivation.tfm_file || actual.tfm_sha256 !== derivation.tfm_sha256) errors.push(`${name}: provenance TFM metadata mismatch.`);
+    if (actual.unicode_mapping !== derivation.unicode_mapping || provenance.profile?.mapping_sha256 !== derivation.unicode_mapping_sha256) errors.push(`${name}: provenance Unicode mapping metadata mismatch.`);
+    if (JSON.stringify(actual.pipeline) !== JSON.stringify(derivation.pipeline)) errors.push(`${name}: provenance pipeline mismatch.`);
+    const sorted = (value) => JSON.stringify(Object.fromEntries(Object.entries(value ?? {}).sort(([left], [right]) => left.localeCompare(right))));
+    if (sorted(actual.tool_versions) !== sorted(derivation.toolchain)) errors.push(`${name}: provenance toolchain mismatch.`);
+    if (font.integrity?.sha256 !== provenance.artifact?.sha256) errors.push(`${name}: provenance artifact SHA-256 mismatch.`);
+    const facts = actual.font_facts ?? {};
+    if (font.family_name !== facts.family_name || font.family_name !== provenance.artifact?.family_name) errors.push(`${name}: provenance family name mismatch.`);
+    if (font.postscript_name !== facts.postscript_name || font.postscript_name !== provenance.artifact?.postscript_name) errors.push(`${name}: provenance PostScript name mismatch.`);
+    const features = (font.shaping?.required_features ?? []).slice().sort();
+    const emittedFeatures = (facts.opentype_features ?? []).slice().sort();
+    if (JSON.stringify(features) !== JSON.stringify(emittedFeatures)) errors.push(`${name}: declared shaping features do not match the generated font features.`);
+    if (provenance.artifact?.path) {
+      const artifact = localFile(provenance.artifact.path, name);
+      if (artifact && sha256(artifact) !== provenance.artifact.sha256) errors.push(`${name}: provenance artifact file SHA-256 mismatch.`);
     }
   }
   function outlineErrors(path, outline) {
@@ -64,6 +134,7 @@ export function evidenceErrors(records, root) {
     const model = models.get(font.correspondence.model);
     if (model && !model.reference_fonts.includes(font.id)) errors.push(`${name}: corresponding model must reference font "${font.id}" back.`);
     sourceRefs(`${name} correspondence`, font.correspondence.sources);
+    generatedFontErrors(name, font);
     if (font.integrity) {
       const asset = resolve(root, font.files[0]);
       if (asset.startsWith(`${resolve(root)}${sep}`) && existsSync(asset)) {

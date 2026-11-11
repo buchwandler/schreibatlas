@@ -5,7 +5,7 @@ Schreibatlas is a bilingual, source-backed handwriting reference atlas in develo
 
 ## Corpus and evidence limits
 
-The canonical dataset currently contains one country, one language, nine model records (six source-documented German models and three synthetic demos), thirteen source records, eleven glyph outlines, and six locally packaged reference fonts. Grundschrift, LA, SAS and VA use pinned Playwrite v1.003 visual/shaping references. Their declared browsing inventories are explicitly incomplete as educational-model inventories. No verified production stroke sequences are available.
+The canonical dataset currently contains one country, one language, eleven model records (eight source-documented German models and three synthetic demos), thirteen source records, eleven glyph outlines, and seven locally packaged reference fonts. LA, SAS, VA, Sütterlin, and Deutsche Normalschrift use pinned, reproducibly generated derivatives of CTAN `schulschriften` v5. Grundschrift has no assigned reference font. Declared browsing inventories remain explicitly incomplete as educational-model inventories. No verified production stroke sequences are available.
 
 The Volksschrift font correspondence is partial. Langula Kurrent is a modern visual-only adaptation, not an authoritative reconstruction of Johann Thomas Loth's 1866 chart. Recorded outlines describe final contours only. They do not establish pen movement, stroke order, or writing instruction. No complete repertoire is claimed.
 
@@ -13,11 +13,16 @@ The Volksschrift font correspondence is partial. Langula Kurrent is a modern vis
 
 - The German and English atlas pages expose recorded models, repertoires, glyph outlines, sources, licenses, and verification states. Missing outlines remain missing. System-font shapes are never substituted for handwriting records.
 - Letter comparison normalizes recorded outlines and labeled local-font references to shared baseline/x-height guides, with 2–6-model grid/strip views and overlays limited to three. Word and sentence comparison uses local browser shaping with explicit OpenType feature settings and font-version provenance. Cross-browser equivalence remains unverified; sentence spacing is a display aid, not a measured handwriting rhythm.
-- Worksheets offer recorded-vector and reference-font modes, with independent guidelines and SVG, PNG, and PDF exports. Font-mode SVGs embed the pinned local font and complete OFL text; all formats preserve font/version/license metadata and visibly label the reference font. PNG and PDF render locally at a fixed resolution; cross-platform pixel equivalence is not claimed.
+- Worksheets offer recorded-vector and reference-font modes, with independent guidelines and SVG, PNG, and PDF exports. Font-mode SVGs embed the pinned local font and its complete license text; every format preserves correspondence, source records, archive and derivative hashes, conversion recipe, mapping, TFM and provenance links. PNG and PDF render locally at a fixed resolution; cross-platform pixel equivalence is not claimed.
 - Direct writing captures pointer or keyboard input locally in the browser tab. Movement observations require verified, sourced stroke sequences. None are currently available for the model records, so movement comparison is unavailable for them.
 - Photo analysis keeps selected images local. It supports manual page corners, optional matching worksheet fiducials, and bounded reference fitting against a bundled digital font. Reference, overlay, and difference views are provided; uncertain measurements are withheld. This is not OCR, a handwriting-quality score, or a comparison with an exact historical handwriting sample.
 - The static build generates an offline precache manifest for built pages and assets. User-selected images and generated analysis reports are excluded.
 - The versioned static API is generated under `public/data/v1/` and includes country, language, model, source, font, glyph, and stroke exports.
+
+
+## Font regeneration
+
+The five Schulschriften browser fonts are generated derivatives of the pinned CTAN v5 package, not official upstream TrueType files. Reproduce and verify them in the isolated Nix environment documented in [`tools/fonts/schulschriften/README.md`](tools/fonts/schulschriften/README.md). Normal site builds use the checked-in assets and do not require TeX or METAFONT.
 
 ## Development
 
@@ -64,4 +69,4 @@ The original `index.html`, `app.js`, and `styles.css` prototype are retained tem
 - Original project content and data: CC BY-SA 4.0, see `LICENSE-CONTENT`.
 - Third-party assets retain their original licenses. See `THIRD_PARTY_NOTICES.md` and the license files distributed with each asset.
 
-The gap review and implementation roadmap are preserved in [`01_todo.md`](01_todo.md). Track current implementation evidence and remaining gaps in [the roadmap implementation matrix](docs/roadmap-implementation.md).
+The implementation roadmap is preserved in the [roadmap implementation matrix](docs/roadmap-implementation.md), which tracks current evidence and remaining gaps.

@@ -32,13 +32,13 @@ repertoire:
     sources: [src-reference-inventory]
   numerals: {entries: [U+0030-U+0039], complete: false, sources: [src-reference-inventory]}
   punctuation: {entries: [U+002E, U+002C, U+003F, U+0021], complete: false, sources: [src-reference-inventory]}
-reference_fonts: [font-playwrite-de-va]
+reference_fonts: [font-schulschriften-va]
 sources: [src-kmk-handwriting-2024, src-isb-va, src-reference-inventory]
 license: CC-BY-SA-4.0
 demo: false
 description:
-  de: Quellenbasiert beschriebenes deutsches Ausgangsschriftmodell. Das Browsing-Inventar ist keine vollständige offizielle Alphabettafel. Die lokale Playwrite-Referenz ersetzt keine belegten Einzelkonturen oder Bewegungsanweisungen.
-  en: Source-documented German initial-script model. The browsing inventory is not a complete official alphabet chart. The local Playwrite reference does not replace documented individual outlines or movement instructions.
+  de: "Quellenbasiert beschriebenes deutsches Ausgangsschriftmodell. Das Browsing-Inventar ist keine vollständige offizielle Alphabettafel. Die lokale TrueType-Referenz ist ein aus dem CTAN-METAFONT-Paket abgeleiteter digitaler Vergleich und belegt keine Strichfolge oder Schreibbewegung."
+  en: "Source-documented German initial-script model. The browsing inventory is not a complete official alphabet chart. The local TrueType reference is a digital comparison derived from the CTAN METAFONT package and does not establish stroke order or writing movement."
 examples:
   words: [{text: Schule, language: de, sources: [src-reference-inventory]}]
   sentences: [{text: Wir schreiben gemeinsam., language: de, sources: [src-reference-inventory]}]

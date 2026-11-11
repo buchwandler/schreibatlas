@@ -1,0 +1,664 @@
+{
+  "allowed_advance_error_px": 0.1,
+  "browser": "Chromium 157.0.8103.38",
+  "browser_font_family": "Schreibatlas Schulschriften VA",
+  "calibration": {
+    "outline_x_glyph_y_min_units": -105,
+    "outline_x_height_em": 0.3438,
+    "outline_x_height_units": 3438,
+    "space_advance_units": 3571,
+    "tfm_x_height_em": 0.333358
+  },
+  "cases": [
+    {
+      "browser_advance_px": 21.3125,
+      "difference_px": 0.00946000000000069,
+      "tex_advance_pt": 15.97728,
+      "tex_advance_px": 21.30304,
+      "text": "!"
+    },
+    {
+      "browser_advance_px": 15.984375,
+      "difference_px": 0.007134999999998115,
+      "tex_advance_pt": 11.98293,
+      "tex_advance_px": 15.977240000000002,
+      "text": ","
+    },
+    {
+      "browser_advance_px": 15.984375,
+      "difference_px": 0.007134999999998115,
+      "tex_advance_pt": 11.98293,
+      "tex_advance_px": 15.977240000000002,
+      "text": "."
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "0"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "1"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "2"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "3"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "4"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "5"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "6"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "7"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "8"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "9"
+    },
+    {
+      "browser_advance_px": 37.28125,
+      "difference_px": 0.0009833333333304495,
+      "tex_advance_pt": 27.9602,
+      "tex_advance_px": 37.28026666666667,
+      "text": "?"
+    },
+    {
+      "browser_advance_px": 46.90625,
+      "difference_px": 0.006650000000000489,
+      "tex_advance_pt": 35.1747,
+      "tex_advance_px": 46.8996,
+      "text": "A"
+    },
+    {
+      "browser_advance_px": 26.640625,
+      "difference_px": 0.011838333333333395,
+      "tex_advance_pt": 19.97159,
+      "tex_advance_px": 26.628786666666667,
+      "text": "B"
+    },
+    {
+      "browser_advance_px": 32.625,
+      "difference_px": 0.004760000000004538,
+      "tex_advance_pt": 24.46518,
+      "tex_advance_px": 32.620239999999995,
+      "text": "C"
+    },
+    {
+      "browser_advance_px": 33.03125,
+      "difference_px": 0.011596666666669364,
+      "tex_advance_pt": 24.76474,
+      "tex_advance_px": 33.01965333333333,
+      "text": "D"
+    },
+    {
+      "browser_advance_px": 32.625,
+      "difference_px": 0.004760000000004538,
+      "tex_advance_pt": 24.46518,
+      "tex_advance_px": 32.620239999999995,
+      "text": "E"
+    },
+    {
+      "browser_advance_px": 29.296875,
+      "difference_px": 0.0052483333333341875,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "F"
+    },
+    {
+      "browser_advance_px": 40.609375,
+      "difference_px": 0.00048166666667270874,
+      "tex_advance_pt": 30.45667,
+      "tex_advance_px": 40.60889333333333,
+      "text": "G"
+    },
+    {
+      "browser_advance_px": 45.28125,
+      "difference_px": 0.01232999999999862,
+      "tex_advance_pt": 33.95169,
+      "tex_advance_px": 45.26892,
+      "text": "H"
+    },
+    {
+      "browser_advance_px": 18.65625,
+      "difference_px": 0.016116666666665225,
+      "tex_advance_pt": 13.9801,
+      "tex_advance_px": 18.640133333333335,
+      "text": "I"
+    },
+    {
+      "browser_advance_px": 29.96875,
+      "difference_px": 0.011350000000000193,
+      "tex_advance_pt": 22.46805,
+      "tex_advance_px": 29.9574,
+      "text": "J"
+    },
+    {
+      "browser_advance_px": 36.359375,
+      "difference_px": 0.011108333333339715,
+      "tex_advance_pt": 27.2612,
+      "tex_advance_px": 36.34826666666666,
+      "text": "K"
+    },
+    {
+      "browser_advance_px": 36.359375,
+      "difference_px": 0.011108333333339715,
+      "tex_advance_pt": 27.2612,
+      "tex_advance_px": 36.34826666666666,
+      "text": "L"
+    },
+    {
+      "browser_advance_px": 66.453125,
+      "difference_px": 0.01433833333334178,
+      "tex_advance_pt": 49.82909,
+      "tex_advance_px": 66.43878666666666,
+      "text": "M"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "N"
+    },
+    {
+      "browser_advance_px": 29.296875,
+      "difference_px": 0.0052483333333341875,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "O"
+    },
+    {
+      "browser_advance_px": 26.640625,
+      "difference_px": 0.011838333333333395,
+      "tex_advance_pt": 19.97159,
+      "tex_advance_px": 26.628786666666667,
+      "text": "P"
+    },
+    {
+      "browser_advance_px": 44.609375,
+      "difference_px": 0.006228333333332614,
+      "tex_advance_pt": 33.45236,
+      "tex_advance_px": 44.60314666666667,
+      "text": "Q"
+    },
+    {
+      "browser_advance_px": 45.40625,
+      "difference_px": 0.004210000000000491,
+      "tex_advance_pt": 34.05153,
+      "tex_advance_px": 45.40204,
+      "text": "R"
+    },
+    {
+      "browser_advance_px": 22.375,
+      "difference_px": 0.006840000000000401,
+      "tex_advance_pt": 16.77612,
+      "tex_advance_px": 22.36816,
+      "text": "S"
+    },
+    {
+      "browser_advance_px": 29.296875,
+      "difference_px": 0.0052483333333341875,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "T"
+    },
+    {
+      "browser_advance_px": 45.9375,
+      "difference_px": 0.0028733333333335054,
+      "tex_advance_pt": 34.45097,
+      "tex_advance_px": 45.93462666666667,
+      "text": "U"
+    },
+    {
+      "browser_advance_px": 34.359375,
+      "difference_px": 0.008241666666670255,
+      "tex_advance_pt": 25.76335,
+      "tex_advance_px": 34.35113333333333,
+      "text": "V"
+    },
+    {
+      "browser_advance_px": 51.34375,
+      "difference_px": 0.0034833333333281757,
+      "tex_advance_pt": 38.5052,
+      "tex_advance_px": 51.34026666666667,
+      "text": "W"
+    },
+    {
+      "browser_advance_px": 44.875,
+      "difference_px": 0.005493333333333794,
+      "tex_advance_pt": 33.65213,
+      "tex_advance_px": 44.869506666666666,
+      "text": "X"
+    },
+    {
+      "browser_advance_px": 40.609375,
+      "difference_px": 0.00048166666667270874,
+      "tex_advance_pt": 30.45667,
+      "tex_advance_px": 40.60889333333333,
+      "text": "Y"
+    },
+    {
+      "browser_advance_px": 39.015625,
+      "difference_px": 0.004451666666668075,
+      "tex_advance_pt": 29.25838,
+      "tex_advance_px": 39.01117333333333,
+      "text": "Z"
+    },
+    {
+      "browser_advance_px": 32.109375,
+      "difference_px": 0.006774999999997533,
+      "tex_advance_pt": 24.07695,
+      "tex_advance_px": 32.1026,
+      "text": "a"
+    },
+    {
+      "browser_advance_px": 26.234375,
+      "difference_px": 0.005001666666668569,
+      "tex_advance_pt": 19.67203,
+      "tex_advance_px": 26.22937333333333,
+      "text": "b"
+    },
+    {
+      "browser_advance_px": 23.046875,
+      "difference_px": -0.0019516666666667959,
+      "tex_advance_pt": 17.28662,
+      "tex_advance_px": 23.048826666666667,
+      "text": "c"
+    },
+    {
+      "browser_advance_px": 32.109375,
+      "difference_px": 0.006774999999997533,
+      "tex_advance_pt": 24.07695,
+      "tex_advance_px": 32.1026,
+      "text": "d"
+    },
+    {
+      "browser_advance_px": 23.046875,
+      "difference_px": -0.0019516666666667959,
+      "tex_advance_pt": 17.28662,
+      "tex_advance_px": 23.048826666666667,
+      "text": "e"
+    },
+    {
+      "browser_advance_px": 19.3125,
+      "difference_px": 0.006646666666668466,
+      "tex_advance_pt": 14.47939,
+      "tex_advance_px": 19.30585333333333,
+      "text": "f"
+    },
+    {
+      "browser_advance_px": 26.78125,
+      "difference_px": 0.004396666666664828,
+      "tex_advance_pt": 20.08264,
+      "tex_advance_px": 26.776853333333335,
+      "text": "g"
+    },
+    {
+      "browser_advance_px": 34.234375,
+      "difference_px": 0.016415000000002067,
+      "tex_advance_pt": 25.66347,
+      "tex_advance_px": 34.21796,
+      "text": "h"
+    },
+    {
+      "browser_advance_px": 19.3125,
+      "difference_px": 0.006646666666668466,
+      "tex_advance_pt": 14.47939,
+      "tex_advance_px": 19.30585333333333,
+      "text": "i"
+    },
+    {
+      "browser_advance_px": 13.984375,
+      "difference_px": 0.004268333333333985,
+      "tex_advance_pt": 10.48508,
+      "tex_advance_px": 13.980106666666666,
+      "text": "j"
+    },
+    {
+      "browser_advance_px": 33.6875,
+      "difference_px": 0.00207333333333537,
+      "tex_advance_pt": 25.26407,
+      "tex_advance_px": 33.685426666666665,
+      "text": "k"
+    },
+    {
+      "browser_advance_px": 23.046875,
+      "difference_px": 0.013008333333331734,
+      "tex_advance_pt": 17.2754,
+      "tex_advance_px": 23.03386666666667,
+      "text": "l"
+    },
+    {
+      "browser_advance_px": 49.140625,
+      "difference_px": 0.010558333333335668,
+      "tex_advance_pt": 36.84755,
+      "tex_advance_px": 49.130066666666664,
+      "text": "m"
+    },
+    {
+      "browser_advance_px": 34.234375,
+      "difference_px": 0.016415000000002067,
+      "tex_advance_pt": 25.66347,
+      "tex_advance_px": 34.21796,
+      "text": "n"
+    },
+    {
+      "browser_advance_px": 24.65625,
+      "difference_px": 0.009703333333334285,
+      "tex_advance_pt": 18.48491,
+      "tex_advance_px": 24.646546666666666,
+      "text": "o"
+    },
+    {
+      "browser_advance_px": 34.234375,
+      "difference_px": 0.016415000000002067,
+      "tex_advance_pt": 25.66347,
+      "tex_advance_px": 34.21796,
+      "text": "p"
+    },
+    {
+      "browser_advance_px": 28.390625,
+      "difference_px": 0.016051666666662356,
+      "tex_advance_pt": 21.28093,
+      "tex_advance_px": 28.374573333333338,
+      "text": "q"
+    },
+    {
+      "browser_advance_px": 19.3125,
+      "difference_px": 0.006646666666668466,
+      "tex_advance_pt": 14.47939,
+      "tex_advance_px": 19.30585333333333,
+      "text": "r"
+    },
+    {
+      "browser_advance_px": 15.984375,
+      "difference_px": 0.007081666666667985,
+      "tex_advance_pt": 11.98297,
+      "tex_advance_px": 15.977293333333332,
+      "text": "s"
+    },
+    {
+      "browser_advance_px": 29.96875,
+      "difference_px": 0.011350000000000193,
+      "tex_advance_pt": 22.46805,
+      "tex_advance_px": 29.9574,
+      "text": "t"
+    },
+    {
+      "browser_advance_px": 34.234375,
+      "difference_px": 0.016415000000002067,
+      "tex_advance_pt": 25.66347,
+      "tex_advance_px": 34.21796,
+      "text": "u"
+    },
+    {
+      "browser_advance_px": 26.765625,
+      "difference_px": 0.0037183333333352664,
+      "tex_advance_pt": 20.07143,
+      "tex_advance_px": 26.761906666666665,
+      "text": "v"
+    },
+    {
+      "browser_advance_px": 41.6875,
+      "difference_px": 0.013486666666665315,
+      "tex_advance_pt": 31.25551,
+      "tex_advance_px": 41.674013333333335,
+      "text": "w"
+    },
+    {
+      "browser_advance_px": 25.703125,
+      "difference_px": 0.0063516666666671995,
+      "tex_advance_pt": 19.27258,
+      "tex_advance_px": 25.696773333333333,
+      "text": "x"
+    },
+    {
+      "browser_advance_px": 28.890625,
+      "difference_px": -0.001588333333334191,
+      "tex_advance_pt": 21.66916,
+      "tex_advance_px": 28.892213333333334,
+      "text": "y"
+    },
+    {
+      "browser_advance_px": 23.578125,
+      "difference_px": 0.011658333333333104,
+      "tex_advance_pt": 17.67485,
+      "tex_advance_px": 23.566466666666667,
+      "text": "z"
+    },
+    {
+      "browser_advance_px": 46.90625,
+      "difference_px": 0.006650000000000489,
+      "tex_advance_pt": 35.1747,
+      "tex_advance_px": 46.8996,
+      "text": "Ä"
+    },
+    {
+      "browser_advance_px": 29.296875,
+      "difference_px": 0.0052483333333341875,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "Ö"
+    },
+    {
+      "browser_advance_px": 45.9375,
+      "difference_px": 0.0028733333333335054,
+      "tex_advance_pt": 34.45097,
+      "tex_advance_px": 45.93462666666667,
+      "text": "Ü"
+    },
+    {
+      "browser_advance_px": 20.25,
+      "difference_px": 0.012146666666666306,
+      "tex_advance_pt": 15.17839,
+      "tex_advance_px": 20.237853333333334,
+      "text": "ß"
+    },
+    {
+      "browser_advance_px": 32.109375,
+      "difference_px": 0.006534999999999513,
+      "tex_advance_pt": 24.07713,
+      "tex_advance_px": 32.10284,
+      "text": "ä"
+    },
+    {
+      "browser_advance_px": 24.65625,
+      "difference_px": 0.009463333333332713,
+      "tex_advance_pt": 18.48509,
+      "tex_advance_px": 24.646786666666667,
+      "text": "ö"
+    },
+    {
+      "browser_advance_px": 34.234375,
+      "difference_px": 0.016415000000002067,
+      "tex_advance_pt": 25.66347,
+      "tex_advance_px": 34.21796,
+      "text": "ü"
+    },
+    {
+      "browser_advance_px": 64.0625,
+      "difference_px": 0.00536666666666008,
+      "tex_advance_pt": 48.04285,
+      "tex_advance_px": 64.05713333333334,
+      "text": "at"
+    },
+    {
+      "browser_advance_px": 51.265625,
+      "difference_px": 0.005251666666673316,
+      "tex_advance_pt": 38.44528,
+      "tex_advance_px": 51.26037333333333,
+      "text": "rt"
+    },
+    {
+      "browser_advance_px": 48.609375,
+      "difference_px": 0.01184166666666897,
+      "tex_advance_pt": 36.44815,
+      "tex_advance_px": 48.59753333333333,
+      "text": "st"
+    },
+    {
+      "browser_advance_px": 44.875,
+      "difference_px": 0.005493333333333794,
+      "tex_advance_pt": 33.65213,
+      "tex_advance_px": 44.869506666666666,
+      "text": "tz"
+    },
+    {
+      "browser_advance_px": 86.5625,
+      "difference_px": 0.004086666666680117,
+      "tex_advance_pt": 64.91881,
+      "tex_advance_px": 86.55841333333332,
+      "text": "sch"
+    },
+    {
+      "browser_advance_px": 109.328125,
+      "difference_px": 0.0020716666666658057,
+      "tex_advance_pt": 81.99454,
+      "tex_advance_px": 109.32605333333333,
+      "text": "Satz"
+    },
+    {
+      "browser_advance_px": 156.484375,
+      "difference_px": 0.010441666666679339,
+      "tex_advance_pt": 117.35545,
+      "tex_advance_px": 156.47393333333332,
+      "text": "Stadt"
+    },
+    {
+      "browser_advance_px": 81.25,
+      "difference_px": -0.0007333333333292558,
+      "tex_advance_pt": 60.93805,
+      "tex_advance_px": 81.25073333333333,
+      "text": "VA"
+    },
+    {
+      "browser_advance_px": 776.53125,
+      "difference_px": 0.046143333333361625,
+      "tex_advance_pt": 582.36383,
+      "tex_advance_px": 776.4851066666666,
+      "text": "Vereinfachte Ausgangsschrift"
+    },
+    {
+      "browser_advance_px": 108.265625,
+      "difference_px": 0.004825000000010959,
+      "tex_advance_pt": 81.1956,
+      "tex_advance_px": 108.26079999999999,
+      "text": "weiß"
+    },
+    {
+      "browser_advance_px": 152.078125,
+      "difference_px": 0.013004999999992606,
+      "tex_advance_pt": 114.04884,
+      "tex_advance_px": 152.06512,
+      "text": "Grüße"
+    },
+    {
+      "browser_advance_px": 31.953125,
+      "difference_px": -0.0014083333333338999,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "s."
+    },
+    {
+      "browser_advance_px": 31.953125,
+      "difference_px": -0.0014083333333338999,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "s,"
+    },
+    {
+      "browser_advance_px": 60.328125,
+      "difference_px": -0.0009816666666750962,
+      "tex_advance_pt": 45.24683,
+      "tex_advance_px": 60.329106666666675,
+      "text": "e?"
+    }
+  ],
+  "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
+  "display_name": "Vereinfachte Ausgangsschrift",
+  "font": "tools/fonts/schulschriften/generated/va-prototype.ttf",
+  "font_sha256": "a75a2ba5b403501077475e9fbe136be92ac0c8f90d10e2f1bc69737536acd694",
+  "maximum_absolute_advance_error_px": 0.046143333333361625,
+  "node": "v22.23.4",
+  "opentype_features": [
+    "calt",
+    "kern"
+  ],
+  "playwright": "1.65.0",
+  "profile_id": "va",
+  "required_character_count": 74,
+  "source_stem": "weva",
+  "status": "pass",
+  "tfm": "tools/fonts/schulschriften/generated/weva14.tfm",
+  "tfm_sha256": "4fb854d2562b7b15f4dccc0519687ba227e7c0f003598116231bd4051b487be8",
+  "unicode_coverage_count": 96,
+  "visual_artifacts": [
+    "tools/fonts/schulschriften/reports/va-font-ctan-reference.png",
+    "tools/fonts/schulschriften/reports/va-font-browser-reference.png",
+    "tools/fonts/schulschriften/reports/va-font-visual-comparison.png"
+  ],
+  "visual_cases": [
+    "at",
+    "rt",
+    "tz",
+    "Satz",
+    "Stadt",
+    "Vereinfachte Ausgangsschrift"
+  ],
+  "visual_glyph_cases": [
+    "A",
+    "a",
+    "ä",
+    "Ä",
+    "ß",
+    "s",
+    "t",
+    "z"
+  ]
+}

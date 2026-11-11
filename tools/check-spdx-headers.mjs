@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 const scannedDirectories = ["src", "tools", "tests", "data", ".github", "docs", "templates"];
-const rootFiles = ["01_todo.md", ".codecrate.toml", "CONTRIBUTING.md", "README.md", "THIRD_PARTY_NOTICES.md", "app.js", "astro.config.mjs", "index.html", "playwright.config.ts", "styles.css", "public/sw.js"];
+const rootFiles = [".codecrate.toml", "CONTRIBUTING.md", "README.md", "THIRD_PARTY_NOTICES.md", "app.js", "astro.config.mjs", "index.html", "playwright.config.ts", "styles.css", "public/sw.js"];
 const commentableExtensions = new Set([".astro", ".cjs", ".css", ".html", ".js", ".md", ".mjs", ".mts", ".toml", ".ts", ".tsx", ".yaml", ".yml"]);
 const contentLicense = "CC-BY-SA-4.0";
 const softwareLicense = "Apache-2.0";
@@ -21,7 +21,7 @@ function listFiles(directory) {
 function expectedLicense(path) {
   if (path.startsWith("data/") || path.startsWith("docs/") || path.startsWith("templates/")) return contentLicense;
   if (path.startsWith(".github/ISSUE_TEMPLATE/") || path === ".github/PULL_REQUEST_TEMPLATE.md") return contentLicense;
-  if (["01_todo.md", "CONTRIBUTING.md", "README.md", "THIRD_PARTY_NOTICES.md", "plan.md"].includes(path)) return contentLicense;
+  if (["CONTRIBUTING.md", "README.md", "THIRD_PARTY_NOTICES.md", "plan.md"].includes(path)) return contentLicense;
   return softwareLicense;
 }
 

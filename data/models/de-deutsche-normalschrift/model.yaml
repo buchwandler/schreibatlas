@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: de-deutsche-normalschrift
+name: {de: Deutsche Normalschrift, en: German Normal Script}
+country: DE
+languages: [de]
+regions: []
+family: historical-school-script
+classification: null
+period:
+  from: 1941
+  to: 1953
+  precision: year
+  notes: {de: "Der Schrifterlass von 1941 ordnete die Deutsche Normalschrift an; laut Handbuch war sie bis 1953 an deutschen Schulen in Gebrauch.", en: "The 1941 decree prescribed Deutsche Normalschrift; the manual records its use in German schools through 1953."}
+status: {use: historical, verification: source-backed}
+education:
+  level: [primary]
+  role: [connected-script]
+  notes: {de: "Das Handbuch beschreibt die Schrift als lateinische Schreibschrift für Schulen.", en: "The manual describes the script as Latin cursive handwriting for schools."}
+character_repertoire: [U+0041-U+005A, U+0061-U+007A, U+00C4, U+00D6, U+00DC, U+00E4, U+00F6, U+00FC, U+00DF, U+0030-U+0039, U+002E, U+002C, U+003F, U+0021]
+character_repertoire_complete: false
+reference_fonts: [font-schulschriften-dn]
+sources: [src-ctan-schulschriften-v5, src-schulschriften-manual-2014]
+license: CC-BY-SA-4.0
+demo: false
+educational_context:
+  de: "Das CTAN-Handbuch dokumentiert ein Ober-, Mittel- und Unterlängensystem im Verhältnis 2:3:2 sowie eine Rechtsneigung von 75 bis 80 Grad. Diese technische Beschreibung ist keine vollständige Unterrichtsrepertoire-Aussage."
+  en: "The CTAN manual documents an ascender, x-height and descender zone ratio of 2:3:2 and a right slant of 75 to 80 degrees. This technical description is not a complete teaching repertoire."
+description:
+  de: "Historisches, im CTAN-Handbuch dokumentiertes Modell der Deutschen Normalschrift. Die Zeichenliste gibt den dokumentierten Paketfontumfang wieder und ist keine vollständige oder verbindliche Unterrichtsrepertoire-Aussage. Die lokale Browser-TTF ist eine abgeleitete digitale Referenz, kein offizieller Quellennachweis und kein Beleg für Strichfolge oder Schreibbewegung."
+  en: "Historical Deutsche Normalschrift model documented in the CTAN manual. The character list reflects the documented package font inventory and is not a complete or authoritative teaching repertoire. The local browser TTF is a derived digital reference, not an official source trace or evidence of stroke order or writing movement."

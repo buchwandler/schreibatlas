@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { basename, relative, resolve, sep } from "node:path";
+import { basename, dirname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { glyphRouteSlug } from "./unicode.mjs";
 import { validateDataset } from "./validate-data.mjs";
 import { parseStrokeSvg } from "./stroke-assets.mjs";
+import { inspectTrueType } from "./font-metadata.mjs";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 
@@ -93,6 +94,10 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
       generatedFiles.add(assetPath);
       return `${apiPrefix}/${assetPath}`;
     });
+    const fontBytes = font.files[0] ? readFileSync(resolve(repositoryRoot, font.files[0])) : null;
+    const supported_characters = fontBytes?.length >= 4 && fontBytes.readUInt32BE(0) === 0x00010000
+      ? inspectTrueType(fontBytes).supportedCharacters
+      : [];
     let license_file_url = null;
     if (font.license_file) {
       const assetPath = `assets/fonts/${font.id}/${basename(font.license_file)}`;
@@ -103,7 +108,19 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
       generatedFiles.add(assetPath);
       license_file_url = `${apiPrefix}/${assetPath}`;
     }
-    return { ...font, file_urls, license_file_url };
+    let derivation = font.derivation;
+    if (derivation?.provenance_file) {
+      const assetPath = `assets/fonts/${font.id}/provenance/${basename(derivation.provenance_file)}`;
+      const sourcePath = resolve(repositoryRoot, derivation.provenance_file);
+      if (!sourcePath.startsWith(`${repositoryRoot}${sep}`)) throw new Error(`Font provenance path is outside the repository: ${derivation.provenance_file}`);
+      const outputPath = resolve(targetDirectory, assetPath);
+      if (!outputPath.startsWith(`${targetDirectory}${sep}`)) throw new Error(`Font provenance path is outside the data output: ${assetPath}`);
+      mkdirSync(dirname(outputPath), { recursive: true });
+      copyFileSync(sourcePath, outputPath);
+      generatedFiles.add(assetPath);
+      derivation = { ...derivation, provenance_file_url: `${apiPrefix}/${assetPath}` };
+    }
+    return { ...font, derivation, file_urls, license_file_url, supported_characters };
   });
 
   const strokes = records.strokes.map(({ value }) => value).sort((left, right) => {
@@ -162,7 +179,25 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
   };
   writeJson("index.json", index);
 
-  const expectedUrls = [index.countries, index.languages, index.models, index.sources, index.fonts, index.glyphs, index.strokes, index.connections, ...models.map((model) => `${apiPrefix}/models/${model.id}.json`), ...glyphIndex.map((glyph) => glyph.url), ...fontExports.flatMap((font) => [...font.file_urls, ...(font.license_file_url ? [font.license_file_url] : [])]), ...strokeIndex.map((stroke) => stroke.url), ...strokeExports.flatMap((stroke) => stroke.strokes.map((step) => step.file_url))];
+  const expectedUrls = [
+    index.countries,
+    index.languages,
+    index.models,
+    index.sources,
+    index.fonts,
+    index.glyphs,
+    index.strokes,
+    index.connections,
+    ...models.map((model) => `${apiPrefix}/models/${model.id}.json`),
+    ...glyphIndex.map((glyph) => glyph.url),
+    ...fontExports.flatMap((font) => [
+      ...font.file_urls,
+      ...(font.license_file_url ? [font.license_file_url] : []),
+      ...(font.derivation?.provenance_file_url ? [font.derivation.provenance_file_url] : []),
+    ]),
+    ...strokeIndex.map((stroke) => stroke.url),
+    ...strokeExports.flatMap((stroke) => stroke.strokes.map((step) => step.file_url)),
+  ];
   validateGeneratedUrls(expectedUrls, { apiPrefix, targetDirectory, generatedFiles });
 
   return {

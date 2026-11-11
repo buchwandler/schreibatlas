@@ -1,0 +1,258 @@
+{
+  "allowed_advance_error_px": 0.1,
+  "browser": "Chromium 157.0.8103.38",
+  "browser_font_family": "Schreibatlas Schulschriften SAS",
+  "cases": [
+    {
+      "browser_advance_px": 37.3125,
+      "difference_px": 0.03223333333333045,
+      "tex_advance_pt": 27.9602,
+      "tex_advance_px": 37.28026666666667,
+      "text": "A"
+    },
+    {
+      "browser_advance_px": 32.578125,
+      "difference_px": -0.0037816666666685705,
+      "tex_advance_pt": 24.43643,
+      "tex_advance_px": 32.58190666666667,
+      "text": "a"
+    },
+    {
+      "browser_advance_px": 32.578125,
+      "difference_px": -0.0037816666666685705,
+      "tex_advance_pt": 24.43643,
+      "tex_advance_px": 32.58190666666667,
+      "text": "ä"
+    },
+    {
+      "browser_advance_px": 37.3125,
+      "difference_px": 0.03223333333333045,
+      "tex_advance_pt": 27.9602,
+      "tex_advance_px": 37.28026666666667,
+      "text": "Ä"
+    },
+    {
+      "browser_advance_px": 29.3125,
+      "difference_px": 0.020873333333334188,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "ß"
+    },
+    {
+      "browser_advance_px": 20.609375,
+      "difference_px": 0.015748333333331033,
+      "tex_advance_pt": 15.44522,
+      "tex_advance_px": 20.59362666666667,
+      "text": "s"
+    },
+    {
+      "browser_advance_px": 25.28125,
+      "difference_px": 0.049916666666668164,
+      "tex_advance_pt": 18.9235,
+      "tex_advance_px": 25.231333333333332,
+      "text": "t"
+    },
+    {
+      "browser_advance_px": 25.03125,
+      "difference_px": 0.034303333333330244,
+      "tex_advance_pt": 18.74771,
+      "tex_advance_px": 24.99694666666667,
+      "text": "r"
+    },
+    {
+      "browser_advance_px": 35.015625,
+      "difference_px": 0.04247833333333517,
+      "tex_advance_pt": 26.22986,
+      "tex_advance_px": 34.973146666666665,
+      "text": "h"
+    },
+    {
+      "browser_advance_px": 50.890625,
+      "difference_px": -0.021428333333332716,
+      "tex_advance_pt": 38.18404,
+      "tex_advance_px": 50.91205333333333,
+      "text": "ae"
+    },
+    {
+      "browser_advance_px": 32.140625,
+      "difference_px": -0.036495000000002165,
+      "tex_advance_pt": 24.13284,
+      "tex_advance_px": 32.17712,
+      "text": "ei"
+    },
+    {
+      "browser_advance_px": 55.046875,
+      "difference_px": -0.011845000000008099,
+      "tex_advance_pt": 41.29404,
+      "tex_advance_px": 55.05872000000001,
+      "text": "io"
+    },
+    {
+      "browser_advance_px": 58.25,
+      "difference_px": -0.004213333333332514,
+      "tex_advance_pt": 43.69066,
+      "tex_advance_px": 58.25421333333333,
+      "text": "ou"
+    },
+    {
+      "browser_advance_px": 84.296875,
+      "difference_px": -0.016178333333328965,
+      "tex_advance_pt": 63.23479,
+      "tex_advance_px": 84.31305333333333,
+      "text": "um"
+    },
+    {
+      "browser_advance_px": 61.953125,
+      "difference_px": 0.042298333333327776,
+      "tex_advance_pt": 46.43312,
+      "tex_advance_px": 61.91082666666667,
+      "text": "nr"
+    },
+    {
+      "browser_advance_px": 52.875,
+      "difference_px": 0.02862666666666769,
+      "tex_advance_pt": 39.63478,
+      "tex_advance_px": 52.84637333333333,
+      "text": "rb"
+    },
+    {
+      "browser_advance_px": 62.859375,
+      "difference_px": 0.03680166666666196,
+      "tex_advance_pt": 47.11693,
+      "tex_advance_px": 62.82257333333334,
+      "text": "bh"
+    },
+    {
+      "browser_advance_px": 63.625,
+      "difference_px": 0.06634666666666789,
+      "tex_advance_pt": 47.66899,
+      "tex_advance_px": 63.55865333333333,
+      "text": "hk"
+    },
+    {
+      "browser_advance_px": 53.890625,
+      "difference_px": 0.0493716666666657,
+      "tex_advance_pt": 40.38094,
+      "tex_advance_px": 53.841253333333334,
+      "text": "kl"
+    },
+    {
+      "browser_advance_px": 42.703125,
+      "difference_px": 0.05132499999999851,
+      "tex_advance_pt": 31.98885,
+      "tex_advance_px": 42.6518,
+      "text": "ls"
+    },
+    {
+      "browser_advance_px": 45.453125,
+      "difference_px": 0.08619166666667155,
+      "tex_advance_pt": 34.0252,
+      "tex_advance_px": 45.36693333333333,
+      "text": "st"
+    },
+    {
+      "browser_advance_px": 53.0625,
+      "difference_px": 0.04248666666666878,
+      "tex_advance_pt": 39.76501,
+      "tex_advance_px": 53.02001333333333,
+      "text": "tg"
+    },
+    {
+      "browser_advance_px": 143.109375,
+      "difference_px": 0.011721666666659303,
+      "tex_advance_pt": 107.32324,
+      "tex_advance_px": 143.09765333333334,
+      "text": "Schule"
+    },
+    {
+      "browser_advance_px": 171.90625,
+      "difference_px": 0.04114333333330933,
+      "tex_advance_pt": 128.89883,
+      "tex_advance_px": 171.8651066666667,
+      "text": "Wasser"
+    },
+    {
+      "browser_advance_px": 167.375,
+      "difference_px": -0.028253333333339015,
+      "tex_advance_pt": 125.55244,
+      "tex_advance_px": 167.40325333333334,
+      "text": "Malen"
+    },
+    {
+      "browser_advance_px": 218.3125,
+      "difference_px": 0.04296666666667193,
+      "tex_advance_pt": 163.70215,
+      "tex_advance_px": 218.26953333333333,
+      "text": "Sütterlin"
+    },
+    {
+      "browser_advance_px": 130.375,
+      "difference_px": 0.03790666666665743,
+      "tex_advance_pt": 97.75282,
+      "tex_advance_px": 130.33709333333334,
+      "text": "Grüße"
+    },
+    {
+      "browser_advance_px": 141.453125,
+      "difference_px": 0.07147166666666749,
+      "tex_advance_pt": 106.03624,
+      "tex_advance_px": 141.38165333333333,
+      "text": "Ärger"
+    },
+    {
+      "browser_advance_px": 41.921875,
+      "difference_px": 0.025208333333331723,
+      "tex_advance_pt": 31.4225,
+      "tex_advance_px": 41.89666666666667,
+      "text": "s."
+    },
+    {
+      "browser_advance_px": 41.921875,
+      "difference_px": 0.025208333333331723,
+      "tex_advance_pt": 31.4225,
+      "tex_advance_px": 41.89666666666667,
+      "text": "s,"
+    },
+    {
+      "browser_advance_px": 51.90625,
+      "difference_px": 0.02386333333332402,
+      "tex_advance_pt": 38.91179,
+      "tex_advance_px": 51.882386666666676,
+      "text": "e?"
+    }
+  ],
+  "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
+  "font": "tools/fonts/schulschriften/generated/sas-prototype.ttf",
+  "font_sha256": "1564f29de5d3c28ff6301ea0c82b5c97633e014b7da59cfeec4d65f7d925cf66",
+  "maximum_absolute_advance_error_px": 0.08619166666667155,
+  "node": "v22.23.4",
+  "opentype_features": [
+    "calt",
+    "kern"
+  ],
+  "playwright": "1.65.0",
+  "status": "pass",
+  "tfm_sha256": "6ae45a2a4ce227ee30d621be6713bfc14b1b7486ffc0f0b66208b43b5a5a5d44",
+  "visual_artifacts": [
+    "tools/fonts/schulschriften/reports/sas-ctan-reference.png",
+    "tools/fonts/schulschriften/reports/sas-browser-reference.png",
+    "tools/fonts/schulschriften/reports/sas-visual-comparison.png"
+  ],
+  "visual_cases": [
+    "ae",
+    "Wasser",
+    "Sütterlin",
+    "Grüße"
+  ],
+  "visual_glyph_cases": [
+    "A",
+    "a",
+    "ä",
+    "Ä",
+    "ß",
+    "s",
+    "t",
+    "r",
+    "h"
+  ]
+}

@@ -177,6 +177,7 @@ type MessageSet = {
   practiceReady: string;
   practiceNoModels: string;
   practiceNoOutlines: string;
+  practiceFontFeaturesUnavailable: string;
   practiceMissingOutlines: string;
   practiceOverflow: string;
   practiceReference: string;
@@ -326,6 +327,7 @@ type MessageSet = {
   analysisReferenceSection: string;
   analysisReferenceUnavailable: string;
   analysisReferenceFontUnavailable: string;
+  analysisReferenceUnsupported: string;
   analysisReferenceFitUnavailable: string;
   analysisReferenceFitLow: string;
   analysisReferenceFitMedium: string;
@@ -376,6 +378,8 @@ type MessageSet = {
   wordNoFont: string;
   wordNoCalibration: string;
   wordNoFiles: string;
+  wordUnsupportedCharacters: string;
+  wordUnsupportedFeatures: string;
   wordEmptyText: string;
   wordLoadError: string;
   wordLoading: string;
@@ -422,7 +426,7 @@ export const messages: Record<Locale, MessageSet> = {
     heroTitle: "Handschriftmodelle offen erkunden",
     heroIntro: "Schreibatlas dokumentiert ein quellenbasiertes, maschinenlesbares Teilkorpus deutscher Handschriftmodelle und Buchstabenformen.",
     demoTitle: "Kleines Teilkorpus, keine vollständigen Standards",
-    demoDescription: "Sechs deutsche Schreibmodelle sind quellenbasiert dokumentiert; drei weitere Einträge sind synthetische Demos. Vier moderne Modelle haben lokale Playwrite-Referenzfonts. Elf Buchstabenumrisse sind erfasst. Fonts und Umrisse belegen keine Schreibbewegungen oder vollständigen offiziellen Repertoires.",
+    demoDescription: "Acht deutsche Schreibmodelle sind quellenbasiert dokumentiert; drei weitere Einträge sind synthetische Demos. Fünf Modelle nutzen lokal gebündelte, aus CTAN-schulschriften abgeleitete Referenzfonts; Grundschrift hat keine digitale Referenzschrift. Elf Buchstabenumrisse sind erfasst. Fonts und Umrisse belegen keine Schreibbewegungen oder vollständigen offiziellen Repertoires.",
     pillarsTitle: "Vier miteinander verbundene Bereiche",
     pillars: [
       { title: "Erkunden", description: "Modelle, Repertoires und Buchstaben anhand nachvollziehbarer Quellen dokumentieren." },
@@ -569,6 +573,7 @@ export const messages: Record<Locale, MessageSet> = {
     practiceReady: "Übungsblatt erstellt. Belegte Konturen: {supported}.",
     practiceNoModels: "Es sind keine Modelle für Übungsblätter verfügbar.",
     practiceNoOutlines: "Für den Text liegen keine belegten Vektorkonturen vor. Es werden nur der Text-Hinweis und leere Übungszeilen ausgegeben.",
+    practiceFontFeaturesUnavailable: "Erforderliche OpenType-Funktionen sind nicht verfügbar. Es wird keine Ersatzschrift verwendet.",
     practiceMissingOutlines: "Für einige Zeichen fehlen belegte Konturen. Diese Stellen bleiben leer.",
     practiceOverflow: "Einige Konturen passen nicht in die Zeile und wurden ausgelassen.",
     practiceReference: "Referenz",
@@ -718,6 +723,7 @@ export const messages: Record<Locale, MessageSet> = {
     analysisReferenceSection: "Referenzschriftvergleich",
     analysisReferenceUnavailable: "Für dieses Modell ist keine lokal verfügbare, kalibrierte Referenzschrift zugeordnet. Die allgemeine Bildanalyse bleibt verfügbar.",
     analysisReferenceFontUnavailable: "Die lokale Referenzschrift konnte nicht geladen werden. Es wird keine Referenzanpassung ausgegeben.",
+    analysisReferenceUnsupported: "Der Text enthält nicht unterstützte Zeichen oder OpenType-Funktionen. Es wird keine Ersatzschrift verwendet.",
     analysisReferenceFitUnavailable: "Keine Referenzanpassung: Zeilenanzahl, Bildgeometrie oder begrenzte Transformationsgrenzen passen nicht.",
     analysisReferenceFitLow: "Die Anpassung hat niedrige Konfidenz. Die Ansicht dient nur der Orientierung; Messwerte werden zurückgehalten.",
     analysisReferenceFitMedium: "Mittlere Konfidenz. Die Zeilenbereiche passen innerhalb der begrenzten Anpassung.",
@@ -772,10 +778,12 @@ export const messages: Record<Locale, MessageSet> = {
     wordFontB: "Referenzschrift für Modell B",
     wordPreview: "Wörtliche Texteingabe, keine Handschriftprobe",
     wordShapingNotice: "Der Browser übernimmt OpenType-Textformung. Eine normalisierte Darstellung setzt eine belegte x-Höhenkalibrierung voraus.",
-    wordFontLimitations: "Schriftkonturen zeigen Endformen, keine Schreibbewegungen. Der Übereinstimmungsgrad und seine Grenzen bleiben sichtbar. Fehlen Zeichen in der Datei, kann der Browser auf eine andere Schrift zurückgreifen; solche Formen sind nicht dem Modell zuzurechnen.",
+    wordFontLimitations: "Schriftkonturen zeigen Endformen, keine Schreibbewegungen. Der Übereinstimmungsgrad und seine Grenzen bleiben sichtbar. Nicht unterstützte Zeichen oder OpenType-Funktionen machen den Vergleich nicht verfügbar; es wird keine Ersatzschrift verwendet.",
     wordNoFont: "Für dieses Modell ist keine lokale Referenzschrift registriert. Es wird keine Systemschrift als Handschrift-Ersatz verwendet.",
     wordNoCalibration: "Für diese Referenzschrift fehlt eine belegte x-Höhenkalibrierung. Eine normalisierte Darstellung ist nicht verfügbar.",
     wordNoFiles: "Für diese Referenzschrift sind keine lokal nutzbaren Schriftdateien registriert.",
+    wordUnsupportedCharacters: "Mindestens ein Zeichen wird nicht von beiden Referenzschriften abgedeckt. Es wird keine Ersatzschrift verwendet.",
+    wordUnsupportedFeatures: "Erforderliche OpenType-Funktionen werden nicht unterstützt. Die Darstellung bleibt nicht verfügbar.",
     wordEmptyText: "Gib Text ein, um den wörtlichen Vorschautext zu sehen.",
     wordLoadError: "Die lokale Referenzschrift konnte nicht geladen werden.",
     wordLoading: "Lokale Referenzschriften werden geladen …",
@@ -821,7 +829,7 @@ export const messages: Record<Locale, MessageSet> = {
     heroTitle: "Explore handwriting models openly",
     heroIntro: "Schreibatlas documents a source-backed, machine-readable partial corpus of German handwriting models and letterforms.",
     demoTitle: "Small partial corpus, not complete standards",
-    demoDescription: "Six German handwriting models are documented with sources; three other entries are synthetic demos. Four modern models have local Playwrite reference fonts. Eleven letter outlines are recorded. Fonts and outlines do not establish stroke movement or complete official repertoires.",
+    demoDescription: "Eight German handwriting models are documented with sources; three other entries are synthetic demos. Five models use locally bundled derivatives of CTAN schulschriften fonts; Grundschrift has no digital reference font. Eleven letter outlines are recorded. Fonts and outlines do not establish stroke movement or complete official repertoires.",
     pillarsTitle: "Four connected areas",
     pillars: [
       { title: "Explore", description: "Document models, repertoires, and letters with traceable sources." },
@@ -968,6 +976,7 @@ export const messages: Record<Locale, MessageSet> = {
     practiceReady: "Practice sheet generated. Sourced outlines: {supported}.",
     practiceNoModels: "No models are available for practice sheets.",
     practiceNoOutlines: "No sourced vector outlines are available for this text. Only the text prompt and blank writing rows are shown.",
+    practiceFontFeaturesUnavailable: "Required OpenType features are unavailable. No substitute font is used.",
     practiceMissingOutlines: "Some characters have no sourced outlines. Those positions remain blank.",
     practiceOverflow: "Some outlines do not fit the row and were omitted.",
     practiceReference: "Reference",
@@ -1117,6 +1126,7 @@ export const messages: Record<Locale, MessageSet> = {
     analysisReferenceSection: "Reference-font comparison",
     analysisReferenceUnavailable: "No locally available, calibrated reference font is mapped to this model. General image analysis remains available.",
     analysisReferenceFontUnavailable: "The local reference font could not be loaded. No reference fit is reported.",
+    analysisReferenceUnsupported: "The text contains unsupported characters or OpenType features. No substitute font is used.",
     analysisReferenceFitUnavailable: "No reference fit is available because the line count, image geometry, or bounded transform limits do not match.",
     analysisReferenceFitLow: "The fit has low confidence. The view is for orientation only, so measurements are withheld.",
     analysisReferenceFitMedium: "Medium confidence. The detected line regions fit within the bounded transform.",
@@ -1171,10 +1181,12 @@ export const messages: Record<Locale, MessageSet> = {
     wordFontB: "Reference font for model B",
     wordPreview: "Literal text input, not a handwriting sample",
     wordShapingNotice: "The browser performs OpenType text shaping. Normalized rendering requires a sourced x-height calibration.",
-    wordFontLimitations: "Font contours show final forms, not writing movements. The recorded correspondence degree and limitations remain visible. If the file lacks characters, the browser may use another font; those forms must not be attributed to the model.",
+    wordFontLimitations: "Font contours show final forms, not writing movements. The recorded correspondence degree and limitations remain visible. Unsupported characters or OpenType features make the comparison unavailable; no substitute font is used.",
     wordNoFont: "No local reference font is registered for this model. A system font is not substituted as handwriting.",
     wordNoCalibration: "This reference font has no sourced x-height calibration. Normalized rendering is unavailable.",
     wordNoFiles: "No locally usable font files are registered for this reference font.",
+    wordUnsupportedCharacters: "At least one character is not covered by both reference fonts. No substitute font is used.",
+    wordUnsupportedFeatures: "Required OpenType features are unavailable. Rendering remains unavailable.",
     wordEmptyText: "Enter text to see a literal text preview.",
     wordLoadError: "The local reference font could not be loaded.",
     wordLoading: "Loading local reference fonts …",

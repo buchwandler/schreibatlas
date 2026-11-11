@@ -1,0 +1,50 @@
+{
+  "id": "wedn-v5-deutsche-normalschrift-unicode",
+  "family_name": "Schreibatlas Schulschriften Deutsche Normalschrift",
+  "postscript_name": "SchreibatlasSchulschriftenDeutscheNormalschrift-Regular",
+  "unique_name_id": "Schreibatlas:SchulschriftenDeutscheNormalschrift:1.0",
+  "unicode_mapping": {
+    "ascii_identity_range": {
+      "start": "U+0021",
+      "end": "U+007E"
+    },
+    "space": "U+0020",
+    "explicit_tfm_codes": {
+      "U+00C4": 196,
+      "U+00D6": 214,
+      "U+00DC": 220,
+      "U+00DF": 255,
+      "U+00E4": 228,
+      "U+00F6": 246,
+      "U+00FC": 252
+    }
+  },
+  "word_boundary_markers": {
+    "start": {
+      "codepoint": "U+00A7",
+      "glyph_name": "normalschriftWordStart"
+    },
+    "end": {
+      "codepoint": "U+00B6",
+      "glyph_name": "normalschriftWordEnd"
+    }
+  },
+  "required_character_ranges": [
+    { "start": "U+0020", "end": "U+0020" },
+    { "start": "U+0030", "end": "U+0039" },
+    { "start": "U+0041", "end": "U+005A" },
+    { "start": "U+0061", "end": "U+007A" },
+    { "start": "U+0021", "end": "U+0021" },
+    { "start": "U+002C", "end": "U+002C" },
+    { "start": "U+002E", "end": "U+002E" },
+    { "start": "U+003F", "end": "U+003F" },
+    { "start": "U+00C4", "end": "U+00C4" },
+    { "start": "U+00D6", "end": "U+00D6" },
+    { "start": "U+00DC", "end": "U+00DC" },
+    { "start": "U+00DF", "end": "U+00DF" },
+    { "start": "U+00E4", "end": "U+00E4" },
+    { "start": "U+00F6", "end": "U+00F6" },
+    { "start": "U+00FC", "end": "U+00FC" }
+  ],
+  "notes": "ASCII character codes map identically in the CTAN T1Encoding. TFM code 32 is the right-boundary character and has no glyph, so U+0020 receives a synthesized space glyph using the TFM SPACE metric. U+00A7 and U+00B6 are reserved zero-width shaping controls inserted by the reference renderer, not supported script characters. The ranges below define minimum test coverage, not a complete script repertoire."
+}

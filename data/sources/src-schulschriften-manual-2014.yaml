@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: src-schulschriften-manual-2014
+kind: publication
+title: "Das METAFONT-Paket schulschriften fuer die Schulausgangsschriften von Suetterlin bis heute"
+author: [Walter Entenmann]
+publisher: CTAN
+year: 2014
+locator:
+  section: "Version 4, 30 November 2014; design parameters, font tables, examples, ligatures, and historical discussion"
+  pages: [1, 2, 12, 13, 21, 22, 23, 24, 25]
+url: https://mirrors.ctan.org/fonts/schulschriften.zip
+retrieved: "2026-11-10"
+rights:
+  type: licensed
+  license: LPPL-1.3c
+notes: "The PDF is doc/schulschriften.pdf in the pinned package Version 5 archive, but the manual identifies itself as Version 4 dated 30 November 2014. Use this manual for documented design parameters, font tables, examples, ligature behavior, and historical discussion. Use the package README for Version 5 release facts."

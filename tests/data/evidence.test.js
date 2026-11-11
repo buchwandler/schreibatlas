@@ -13,7 +13,7 @@ import { buildData } from "../../tools/build-data.mjs";
 const projectRoot = fileURLToPath(new URL("../../", import.meta.url));
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), "schreibatlas-evidence-"));
-  for (const dir of ["schema", "data", "assets", "licenses"]) cpSync(join(projectRoot, dir), join(root, dir), { recursive: true });
+  for (const dir of ["schema", "data", "assets", "licenses", "tools/fonts/schulschriften", "vendor/ctan/schulschriften"]) cpSync(join(projectRoot, dir), join(root, dir), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   return root;
@@ -33,6 +33,43 @@ function expectError(root, fragment) {
   const { errors } = validateDataset({ root });
   assert.ok(errors.some((error) => error.includes(fragment)), errors.join("\n"));
 }
+
+test("CTAN models use distinct supported fonts and Grundschrift has no substitute", () => {
+  const { errors, records } = validateDataset();
+  assert.deepEqual(errors, []);
+  const models = new Map(records.models.map(({ value }) => [value.id, value]));
+  const fonts = new Map(records.fonts.map(({ value }) => [value.id, value]));
+  const pairs = [
+    ["de-la", "font-schulschriften-la"],
+    ["de-sas", "font-schulschriften-sas"],
+    ["de-va", "font-schulschriften-va"],
+    ["de-suetterlin", "font-schulschriften-suetterlin"],
+    ["de-deutsche-normalschrift", "font-schulschriften-dn"],
+  ];
+  for (const [modelId, fontId] of pairs) {
+    const model = models.get(modelId);
+    const font = fonts.get(fontId);
+    assert.deepEqual(model.reference_fonts, [fontId]);
+    assert.equal(model.character_repertoire_complete, false);
+    assert.equal(font.correspondence.model, modelId);
+    assert.equal(font.upstream.kind, "archive");
+    assert.equal(font.derivation.kind, "generated");
+    assert.notEqual(font.upstream.sha256, font.integrity.sha256);
+    assert.deepEqual(font.shaping.required_features, ["calt", "kern"]);
+  }
+  assert.deepEqual(models.get("de-grundschrift").reference_fonts, []);
+  assert.notEqual(models.get("de-suetterlin").reference_fonts[0], "font-langula-kurrent");
+  assert.notEqual(models.get("de-deutsche-normalschrift").reference_fonts[0], "font-volksschrift");
+  assert.deepEqual(records.fonts.map(({ value }) => value).filter((font) => font.upstream?.package === "CTAN schulschriften").map((font) => font.id).sort(), [
+    "font-schulschriften-dn",
+    "font-schulschriften-la",
+    "font-schulschriften-sas",
+    "font-schulschriften-suetterlin",
+    "font-schulschriften-va",
+  ]);
+  assert.ok(records.sources.some(({ value }) => value.id === "src-ctan-schulschriften-v5"));
+  assert.ok(records.sources.some(({ value }) => value.id === "src-schulschriften-manual-2014"));
+});
 
 test("rich model and source metadata validate without changing legacy records", (t) => {
   const root = fixture(t);

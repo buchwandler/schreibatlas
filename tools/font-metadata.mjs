@@ -60,6 +60,38 @@ export function inspectTrueType(bytes) {
     }
     return 0;
   }
+  function supportedCharacters() {
+    const points = new Set();
+    for (const { start, format } of subtables) {
+      if (format === 12) {
+        const groups = bytes.readUInt32BE(start + 12);
+        for (let group = 0; group < groups; group += 1) {
+          const row = start + 16 + group * 12;
+          const first = bytes.readUInt32BE(row);
+          const last = bytes.readUInt32BE(row + 4);
+          const firstGlyph = bytes.readUInt32BE(row + 8);
+          for (let point = first; point <= last; point += 1) {
+            if (firstGlyph + point - first !== 0) points.add(point);
+          }
+        }
+        continue;
+      }
+      const count = bytes.readUInt16BE(start + 6) / 2;
+      for (let segment = 0; segment < count; segment += 1) {
+        const last = bytes.readUInt16BE(start + 14 + segment * 2);
+        const first = bytes.readUInt16BE(start + 16 + count * 2 + segment * 2);
+        const delta = bytes.readInt16BE(start + 16 + count * 4 + segment * 2);
+        const rangePosition = start + 16 + count * 6 + segment * 2;
+        const range = bytes.readUInt16BE(rangePosition);
+        for (let point = first; point <= last; point += 1) {
+          const glyph = range === 0 ? (point + delta) & 0xffff : bytes.readUInt16BE(rangePosition + range + (point - first) * 2);
+          const index = range === 0 ? glyph : glyph ? (glyph + delta) & 0xffff : 0;
+          if (index !== 0) points.add(point);
+        }
+      }
+    }
+    return [...points].sort((a, b) => a - b).map((point) => String.fromCodePoint(point));
+  }
   const features = new Set();
   for (const tag of ["GSUB", "GPOS"]) {
     if (!tables.has(tag)) continue;
@@ -85,6 +117,7 @@ export function inspectTrueType(bytes) {
     ascenderEm: bytes.readInt16BE(os2 + 68) / em,
     descenderEm: Math.abs(bytes.readInt16BE(os2 + 70)) / em,
     features: [...features].sort(),
+    supportedCharacters: supportedCharacters(),
     hasCharacter: (character) => [...character].every((point) => glyphIndex(point.codePointAt(0)) !== 0),
   };
 }

@@ -1,0 +1,663 @@
+{
+  "allowed_advance_error_px": 0.1,
+  "browser": "Chromium 157.0.8103.38",
+  "browser_font_family": "Schreibatlas Schulschriften LA",
+  "calibration": {
+    "outline_x_glyph_y_min_units": -100,
+    "outline_x_height_em": 0.3431,
+    "outline_x_height_units": 3431,
+    "space_advance_units": 3571,
+    "tfm_x_height_em": 0.332857
+  },
+  "cases": [
+    {
+      "browser_advance_px": 21.3125,
+      "difference_px": 0.00946000000000069,
+      "tex_advance_pt": 15.97728,
+      "tex_advance_px": 21.30304,
+      "text": "!"
+    },
+    {
+      "browser_advance_px": 21.3125,
+      "difference_px": 0.00946000000000069,
+      "tex_advance_pt": 15.97728,
+      "tex_advance_px": 21.30304,
+      "text": ","
+    },
+    {
+      "browser_advance_px": 21.3125,
+      "difference_px": 0.00946000000000069,
+      "tex_advance_pt": 15.97728,
+      "tex_advance_px": 21.30304,
+      "text": "."
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "0"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "1"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "2"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "3"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "4"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "5"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "6"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "7"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "8"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "9"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "?"
+    },
+    {
+      "browser_advance_px": 35.6875,
+      "difference_px": 0.004940000000004829,
+      "tex_advance_pt": 26.76192,
+      "tex_advance_px": 35.682559999999995,
+      "text": "A"
+    },
+    {
+      "browser_advance_px": 34.625,
+      "difference_px": 0.0076266666666668925,
+      "tex_advance_pt": 25.96303,
+      "tex_advance_px": 34.61737333333333,
+      "text": "B"
+    },
+    {
+      "browser_advance_px": 30.71875,
+      "difference_px": 0.013669999999997628,
+      "tex_advance_pt": 23.02881,
+      "tex_advance_px": 30.705080000000002,
+      "text": "C"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "D"
+    },
+    {
+      "browser_advance_px": 17.046875,
+      "difference_px": 0.004461666666667696,
+      "tex_advance_pt": 12.78181,
+      "tex_advance_px": 17.042413333333332,
+      "text": "E"
+    },
+    {
+      "browser_advance_px": 29.296875,
+      "difference_px": 0.0052483333333341875,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "F"
+    },
+    {
+      "browser_advance_px": 35.6875,
+      "difference_px": 0.004940000000004829,
+      "tex_advance_pt": 26.76192,
+      "tex_advance_px": 35.682559999999995,
+      "text": "G"
+    },
+    {
+      "browser_advance_px": 39.015625,
+      "difference_px": 0.004451666666668075,
+      "tex_advance_pt": 29.25838,
+      "tex_advance_px": 39.01117333333333,
+      "text": "H"
+    },
+    {
+      "browser_advance_px": 18.65625,
+      "difference_px": 0.016116666666665225,
+      "tex_advance_pt": 13.9801,
+      "tex_advance_px": 18.640133333333335,
+      "text": "I"
+    },
+    {
+      "browser_advance_px": 22.375,
+      "difference_px": 0.006840000000000401,
+      "tex_advance_pt": 16.77612,
+      "tex_advance_px": 22.36816,
+      "text": "J"
+    },
+    {
+      "browser_advance_px": 41.015625,
+      "difference_px": 0.0073183333333375344,
+      "tex_advance_pt": 30.75623,
+      "tex_advance_px": 41.00830666666666,
+      "text": "K"
+    },
+    {
+      "browser_advance_px": 28.765625,
+      "difference_px": 0.011838333333329842,
+      "tex_advance_pt": 21.56534,
+      "tex_advance_px": 28.75378666666667,
+      "text": "L"
+    },
+    {
+      "browser_advance_px": 55.40625,
+      "difference_px": 0.018436666666666213,
+      "tex_advance_pt": 41.54086,
+      "tex_advance_px": 55.387813333333334,
+      "text": "M"
+    },
+    {
+      "browser_advance_px": 53.265625,
+      "difference_px": 0.00811833333333567,
+      "tex_advance_pt": 39.94313,
+      "tex_advance_px": 53.257506666666664,
+      "text": "N"
+    },
+    {
+      "browser_advance_px": 33.34375,
+      "difference_px": 0.015203333333332125,
+      "tex_advance_pt": 24.99641,
+      "tex_advance_px": 33.32854666666667,
+      "text": "O"
+    },
+    {
+      "browser_advance_px": 31.96875,
+      "difference_px": 0.0142166666666661,
+      "tex_advance_pt": 23.9659,
+      "tex_advance_px": 31.954533333333334,
+      "text": "P"
+    },
+    {
+      "browser_advance_px": 30.375,
+      "difference_px": 0.01818666666666502,
+      "tex_advance_pt": 22.76761,
+      "tex_advance_px": 30.356813333333335,
+      "text": "Q"
+    },
+    {
+      "browser_advance_px": 35.6875,
+      "difference_px": 0.004940000000004829,
+      "tex_advance_pt": 26.76192,
+      "tex_advance_px": 35.682559999999995,
+      "text": "R"
+    },
+    {
+      "browser_advance_px": 29.296875,
+      "difference_px": 0.0052483333333341875,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "S"
+    },
+    {
+      "browser_advance_px": 29.296875,
+      "difference_px": 0.0052483333333341875,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "T"
+    },
+    {
+      "browser_advance_px": 34.625,
+      "difference_px": 0.0076266666666668925,
+      "tex_advance_pt": 25.96303,
+      "tex_advance_px": 34.61737333333333,
+      "text": "U"
+    },
+    {
+      "browser_advance_px": 37.046875,
+      "difference_px": 0.0030483333333393148,
+      "tex_advance_pt": 27.78287,
+      "tex_advance_px": 37.04382666666666,
+      "text": "V"
+    },
+    {
+      "browser_advance_px": 58.359375,
+      "difference_px": 0.013614999999994382,
+      "tex_advance_pt": 43.75932,
+      "tex_advance_px": 58.345760000000006,
+      "text": "W"
+    },
+    {
+      "browser_advance_px": 29.296875,
+      "difference_px": 0.0052483333333341875,
+      "tex_advance_pt": 21.96872,
+      "tex_advance_px": 29.291626666666666,
+      "text": "X"
+    },
+    {
+      "browser_advance_px": 32.5,
+      "difference_px": 0.012880000000002667,
+      "tex_advance_pt": 24.36534,
+      "tex_advance_px": 32.48712,
+      "text": "Y"
+    },
+    {
+      "browser_advance_px": 25.046875,
+      "difference_px": 0.015808333333335867,
+      "tex_advance_pt": 18.7733,
+      "tex_advance_px": 25.031066666666664,
+      "text": "Z"
+    },
+    {
+      "browser_advance_px": 32.203125,
+      "difference_px": 0.010005000000006703,
+      "tex_advance_pt": 24.14484,
+      "tex_advance_px": 32.19311999999999,
+      "text": "a"
+    },
+    {
+      "browser_advance_px": 37.8125,
+      "difference_px": 0.006046666666662759,
+      "tex_advance_pt": 28.35484,
+      "tex_advance_px": 37.80645333333334,
+      "text": "b"
+    },
+    {
+      "browser_advance_px": 21.53125,
+      "difference_px": 0.008850000000002467,
+      "tex_advance_pt": 16.1418,
+      "tex_advance_px": 21.522399999999998,
+      "text": "c"
+    },
+    {
+      "browser_advance_px": 32.203125,
+      "difference_px": 0.010005000000006703,
+      "tex_advance_pt": 24.14484,
+      "tex_advance_px": 32.19311999999999,
+      "text": "d"
+    },
+    {
+      "browser_advance_px": 16.8125,
+      "difference_px": 0.0182466666666663,
+      "tex_advance_pt": 12.59569,
+      "tex_advance_px": 16.794253333333334,
+      "text": "e"
+    },
+    {
+      "browser_advance_px": 15.9375,
+      "difference_px": 0.01776666666666671,
+      "tex_advance_pt": 11.9398,
+      "tex_advance_px": 15.919733333333333,
+      "text": "f"
+    },
+    {
+      "browser_advance_px": 29,
+      "difference_px": 0.0023200000000045407,
+      "tex_advance_pt": 21.74826,
+      "tex_advance_px": 28.997679999999995,
+      "text": "g"
+    },
+    {
+      "browser_advance_px": 30.890625,
+      "difference_px": 0.007625000000000881,
+      "tex_advance_pt": 23.16225,
+      "tex_advance_px": 30.883,
+      "text": "h"
+    },
+    {
+      "browser_advance_px": 20.25,
+      "difference_px": 0.012146666666666306,
+      "tex_advance_pt": 15.17839,
+      "tex_advance_px": 20.237853333333334,
+      "text": "i"
+    },
+    {
+      "browser_advance_px": 17.046875,
+      "difference_px": 0.004461666666667696,
+      "tex_advance_pt": 12.78181,
+      "tex_advance_px": 17.042413333333332,
+      "text": "j"
+    },
+    {
+      "browser_advance_px": 28.75,
+      "difference_px": 0.011106666666666598,
+      "tex_advance_pt": 21.55417,
+      "tex_advance_px": 28.738893333333333,
+      "text": "k"
+    },
+    {
+      "browser_advance_px": 20.1875,
+      "difference_px": 0.007139999999999702,
+      "tex_advance_pt": 15.13527,
+      "tex_advance_px": 20.18036,
+      "text": "l"
+    },
+    {
+      "browser_advance_px": 37.75,
+      "difference_px": 0.013853333333337048,
+      "tex_advance_pt": 28.30211,
+      "tex_advance_px": 37.73614666666666,
+      "text": "m"
+    },
+    {
+      "browser_advance_px": 24.921875,
+      "difference_px": 0.01862166666666809,
+      "tex_advance_pt": 18.67744,
+      "tex_advance_px": 24.903253333333332,
+      "text": "n"
+    },
+    {
+      "browser_advance_px": 37.125,
+      "difference_px": 0.006653333333332512,
+      "tex_advance_pt": 27.83876,
+      "tex_advance_px": 37.11834666666667,
+      "text": "o"
+    },
+    {
+      "browser_advance_px": 33.078125,
+      "difference_px": 0.00732500000000158,
+      "tex_advance_pt": 24.8031,
+      "tex_advance_px": 33.0708,
+      "text": "p"
+    },
+    {
+      "browser_advance_px": 29,
+      "difference_px": 0.0023200000000045407,
+      "tex_advance_pt": 21.74826,
+      "tex_advance_px": 28.997679999999995,
+      "text": "q"
+    },
+    {
+      "browser_advance_px": 23.265625,
+      "difference_px": 0.012331666666668184,
+      "tex_advance_pt": 17.43997,
+      "tex_advance_px": 23.253293333333332,
+      "text": "r"
+    },
+    {
+      "browser_advance_px": 22.203125,
+      "difference_px": 0.011778333333335667,
+      "tex_advance_pt": 16.64351,
+      "tex_advance_px": 22.191346666666664,
+      "text": "s"
+    },
+    {
+      "browser_advance_px": 21.3125,
+      "difference_px": 0.00946000000000069,
+      "tex_advance_pt": 15.97728,
+      "tex_advance_px": 21.30304,
+      "text": "t"
+    },
+    {
+      "browser_advance_px": 33.078125,
+      "difference_px": 0.00732500000000158,
+      "tex_advance_pt": 24.8031,
+      "tex_advance_px": 33.0708,
+      "text": "u"
+    },
+    {
+      "browser_advance_px": 30.765625,
+      "difference_px": 0.004024999999998613,
+      "tex_advance_pt": 23.0712,
+      "tex_advance_px": 30.7616,
+      "text": "v"
+    },
+    {
+      "browser_advance_px": 43.609375,
+      "difference_px": 0.01494833333333645,
+      "tex_advance_pt": 32.69582,
+      "tex_advance_px": 43.59442666666666,
+      "text": "w"
+    },
+    {
+      "browser_advance_px": 20.78125,
+      "difference_px": 0.010796666666667676,
+      "tex_advance_pt": 15.57784,
+      "tex_advance_px": 20.770453333333332,
+      "text": "x"
+    },
+    {
+      "browser_advance_px": 29.890625,
+      "difference_px": 0.015264999999999418,
+      "tex_advance_pt": 22.40652,
+      "tex_advance_px": 29.87536,
+      "text": "y"
+    },
+    {
+      "browser_advance_px": 20.25,
+      "difference_px": 0.012146666666666306,
+      "tex_advance_pt": 15.17839,
+      "tex_advance_px": 20.237853333333334,
+      "text": "z"
+    },
+    {
+      "browser_advance_px": 35.6875,
+      "difference_px": 0.004940000000004829,
+      "tex_advance_pt": 26.76192,
+      "tex_advance_px": 35.682559999999995,
+      "text": "Ä"
+    },
+    {
+      "browser_advance_px": 33.34375,
+      "difference_px": 0.015203333333332125,
+      "tex_advance_pt": 24.99641,
+      "tex_advance_px": 33.32854666666667,
+      "text": "Ö"
+    },
+    {
+      "browser_advance_px": 34.625,
+      "difference_px": 0.0076266666666668925,
+      "tex_advance_pt": 25.96303,
+      "tex_advance_px": 34.61737333333333,
+      "text": "Ü"
+    },
+    {
+      "browser_advance_px": 20.109375,
+      "difference_px": 0.014215000000000089,
+      "tex_advance_pt": 15.07137,
+      "tex_advance_px": 20.09516,
+      "text": "ß"
+    },
+    {
+      "browser_advance_px": 32.203125,
+      "difference_px": 0.010005000000006703,
+      "tex_advance_pt": 24.14484,
+      "tex_advance_px": 32.19311999999999,
+      "text": "ä"
+    },
+    {
+      "browser_advance_px": 37.125,
+      "difference_px": 0.006653333333332512,
+      "tex_advance_pt": 27.83876,
+      "tex_advance_px": 37.11834666666667,
+      "text": "ö"
+    },
+    {
+      "browser_advance_px": 33.078125,
+      "difference_px": 0.00732500000000158,
+      "tex_advance_pt": 24.8031,
+      "tex_advance_px": 33.0708,
+      "text": "ü"
+    },
+    {
+      "browser_advance_px": 45.8125,
+      "difference_px": 0.020633333333336168,
+      "tex_advance_pt": 34.3439,
+      "tex_advance_px": 45.791866666666664,
+      "text": "ae"
+    },
+    {
+      "browser_advance_px": 42.375,
+      "difference_px": 0.011839999999999407,
+      "tex_advance_pt": 31.77237,
+      "tex_advance_px": 42.36316,
+      "text": "be"
+    },
+    {
+      "browser_advance_px": 50.8125,
+      "difference_px": 0.004766666666661479,
+      "tex_advance_pt": 38.1058,
+      "tex_advance_px": 50.80773333333334,
+      "text": "ch"
+    },
+    {
+      "browser_advance_px": 50.65625,
+      "difference_px": 0.014769999999998618,
+      "tex_advance_pt": 37.98111,
+      "tex_advance_px": 50.64148,
+      "text": "er"
+    },
+    {
+      "browser_advance_px": 33.84375,
+      "difference_px": 0.007136666666667679,
+      "tex_advance_pt": 25.37746,
+      "tex_advance_px": 33.83661333333333,
+      "text": "ie"
+    },
+    {
+      "browser_advance_px": 41.375,
+      "difference_px": 0.010919999999998709,
+      "tex_advance_pt": 31.02306,
+      "tex_advance_px": 41.36408,
+      "text": "st"
+    },
+    {
+      "browser_advance_px": 72.078125,
+      "difference_px": 0.0035916666666651054,
+      "tex_advance_pt": 54.0559,
+      "tex_advance_px": 72.07453333333333,
+      "text": "sch"
+    },
+    {
+      "browser_advance_px": 133.71875,
+      "difference_px": 0.0028700000000014825,
+      "tex_advance_pt": 100.28691,
+      "tex_advance_px": 133.71588,
+      "text": "Schule"
+    },
+    {
+      "browser_advance_px": 640.78125,
+      "difference_px": 0.018556666666654564,
+      "tex_advance_pt": 480.57202,
+      "tex_advance_px": 640.7626933333333,
+      "text": "Lateinische Ausgangsschrift"
+    },
+    {
+      "browser_advance_px": 137.828125,
+      "difference_px": 0.012578333333351566,
+      "tex_advance_pt": 103.36166,
+      "tex_advance_px": 137.81554666666665,
+      "text": "Grüße"
+    },
+    {
+      "browser_advance_px": 136.796875,
+      "difference_px": -0.0024449999999944794,
+      "tex_advance_pt": 102.59949,
+      "tex_advance_px": 136.79932,
+      "text": "Ärger"
+    },
+    {
+      "browser_advance_px": 43.5,
+      "difference_px": 0.005613333333336357,
+      "tex_advance_pt": 32.62079,
+      "tex_advance_px": 43.494386666666664,
+      "text": "s."
+    },
+    {
+      "browser_advance_px": 43.5,
+      "difference_px": 0.005613333333336357,
+      "tex_advance_pt": 32.62079,
+      "tex_advance_px": 43.494386666666664,
+      "text": "s,"
+    },
+    {
+      "browser_advance_px": 48.765625,
+      "difference_px": 0.016851666666667597,
+      "tex_advance_pt": 36.56158,
+      "tex_advance_px": 48.74877333333333,
+      "text": "e?"
+    }
+  ],
+  "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
+  "display_name": "Lateinische Ausgangsschrift",
+  "font": "tools/fonts/schulschriften/generated/la-prototype.ttf",
+  "font_sha256": "27e6350ff8ff787887ad98df6fa482cf509957f74879c10995dc2e5eb976e9fc",
+  "maximum_absolute_advance_error_px": 0.020633333333336168,
+  "node": "v22.23.4",
+  "opentype_features": [
+    "calt",
+    "kern"
+  ],
+  "playwright": "1.65.0",
+  "profile_id": "la",
+  "required_character_count": 74,
+  "source_stem": "wela",
+  "status": "pass",
+  "tfm": "tools/fonts/schulschriften/generated/wela14.tfm",
+  "tfm_sha256": "959f439dc6e121566680824d2d3562c802585b7afaa201dc2204d3dbe7049ce1",
+  "unicode_coverage_count": 96,
+  "visual_artifacts": [
+    "tools/fonts/schulschriften/reports/la-font-ctan-reference.png",
+    "tools/fonts/schulschriften/reports/la-font-browser-reference.png",
+    "tools/fonts/schulschriften/reports/la-font-visual-comparison.png"
+  ],
+  "visual_cases": [
+    "ab",
+    "be",
+    "Schule",
+    "Lateinische Ausgangsschrift",
+    "Grüße"
+  ],
+  "visual_glyph_cases": [
+    "A",
+    "a",
+    "ä",
+    "Ä",
+    "ß",
+    "e",
+    "s",
+    "t"
+  ]
+}

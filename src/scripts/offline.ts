@@ -30,8 +30,7 @@ if (!("serviceWorker" in navigator)) {
       const pageUrl = new URL(location.href);
       pageUrl.search = "";
       pageUrl.hash = "";
-      const resourceUrls = performance.getEntriesByType("resource").map((entry) => entry.name);
-      const urls = [...new Set([...manifest.urls, pageUrl.href, ...resourceUrls])];
+      const urls = [...new Set([...manifest.urls, pageUrl.href])];
       const channel = new MessageChannel();
       channel.port1.onmessage = ({ data }: MessageEvent<{ type: string; complete: boolean }>) => {
         if (data.type !== "cached") return;

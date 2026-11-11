@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 import { renderNormalizedTextStage } from "../lib/normalized-text-stage";
 import { BrowserTextShaper } from "../lib/text-shaper";
-import type { FontRecord, Metrics, SourceRecord } from "../../tools/content.mjs";
+import { appendFontProvenance, fontSupportsText, supportsRequiredFontFeatures } from "../lib/font-capabilities";
+import type { FontExport, Metrics, SourceRecord } from "../../tools/content.mjs";
 
 interface WordModel {
   id: string;
@@ -17,9 +18,6 @@ interface WordLanguage {
   direction: string;
 }
 
-interface FontExport extends FontRecord {
-  file_urls?: string[];
-}
 
 interface WordPageData {
   models: WordModel[];
@@ -33,6 +31,8 @@ interface Messages {
   wordNoFont: string;
   wordNoCalibration: string;
   wordNoFiles: string;
+  wordUnsupportedCharacters: string;
+  wordUnsupportedFeatures: string;
   wordEmptyText: string;
   wordLoadError: string;
   wordLoading: string;
@@ -174,6 +174,7 @@ if (page) {
         }
         card.append(list);
       }
+      appendFontProvenance(card, font, document.documentElement.lang === "de" ? "de" : "en");
       provenance.append(card);
     }
   }
@@ -225,6 +226,14 @@ if (page) {
     }
     if (!fontA.calibration || !fontB.calibration) {
       status.textContent = messages.wordNoCalibration;
+      return;
+    }
+    if (!fontSupportsText(fontA, text) || !fontSupportsText(fontB, text)) {
+      status.textContent = messages.wordUnsupportedCharacters;
+      return;
+    }
+    if (!supportsRequiredFontFeatures(fontA) || !supportsRequiredFontFeatures(fontB)) {
+      status.textContent = messages.wordUnsupportedFeatures;
       return;
     }
     status.textContent = messages.wordLoading;

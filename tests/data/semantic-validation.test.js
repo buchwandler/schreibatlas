@@ -18,6 +18,8 @@ function fixtureRoot(t) {
   cpSync(join(projectRoot, "data"), join(root, "data"), { recursive: true });
   cpSync(join(projectRoot, "assets"), join(root, "assets"), { recursive: true });
   cpSync(join(projectRoot, "licenses"), join(root, "licenses"), { recursive: true });
+  cpSync(join(projectRoot, "tools/fonts/schulschriften"), join(root, "tools/fonts/schulschriften"), { recursive: true });
+  cpSync(join(projectRoot, "vendor/ctan/schulschriften"), join(root, "vendor/ctan/schulschriften"), { recursive: true });
   copyFileSync(join(projectRoot, "package.json"), join(root, "package.json"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   return root;
