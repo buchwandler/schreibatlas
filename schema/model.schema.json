@@ -59,8 +59,15 @@
           "type": ["object", "null"],
           "required": ["kind", "nominal_degrees"],
           "properties": {
-            "kind": { "type": "string", "enum": ["right", "left", "vertical", "unknown"] },
-            "nominal_degrees": { "type": ["number", "null"] }
+            "kind": {
+              "type": "string",
+              "enum": ["right", "left", "vertical", "unknown"],
+              "description": "The direction of inclination; use vertical for a non-inclined design."
+            },
+            "nominal_degrees": {
+              "type": ["number", "null"],
+              "description": "Inclination away from vertical in degrees. Zero is vertical, positive values indicate right inclination, and direction is recorded by kind rather than negative values."
+            }
           },
           "additionalProperties": false
         }

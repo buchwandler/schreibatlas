@@ -5,7 +5,9 @@ country: DE
 languages: [de]
 regions: []
 family: historical-school-script
-classification: null
+classification:
+  joined: true
+  slant: {kind: right, nominal_degrees: 14}
 period:
   from: 1941
   to: 1953
@@ -23,8 +25,8 @@ sources: [src-ctan-schulschriften-v5, src-schulschriften-manual-2014]
 license: CC-BY-SA-4.0
 demo: false
 educational_context:
-  de: "Das CTAN-Handbuch dokumentiert ein Ober-, Mittel- und Unterlängensystem im Verhältnis 2:3:2 sowie eine Rechtsneigung von 75 bis 80 Grad. Diese technische Beschreibung ist keine vollständige Unterrichtsrepertoire-Aussage."
-  en: "The CTAN manual documents an ascender, x-height and descender zone ratio of 2:3:2 and a right slant of 75 to 80 degrees. This technical description is not a complete teaching repertoire."
+  de: "Das CTAN-Handbuch dokumentiert ein Ober-, Mittel- und Unterlängensystem im Verhältnis 2:3:2 und nennt historisch 75 bis 80 Grad Neigung. Die konkrete CTAN-Designtabelle gibt β=76 Grad zur Grundlinie an, entsprechend 14 Grad Rechtsneigung von der Vertikalen. Diese technische Beschreibung ist keine vollständige Unterrichtsrepertoire-Aussage."
+  en: "The CTAN manual documents an ascender, x-height and descender zone ratio of 2:3:2 and historically states a 75 to 80 degree slant. Its CTAN design table specifies β=76 degrees from the baseline, equivalent to 14 degrees of right inclination from vertical. This technical description is not a complete teaching repertoire claim."
 description:
   de: "Historisches, im CTAN-Handbuch dokumentiertes Modell der Deutschen Normalschrift. Die Zeichenliste gibt den dokumentierten Paketfontumfang wieder und ist keine vollständige oder verbindliche Unterrichtsrepertoire-Aussage. Die lokale Browser-TTF ist eine abgeleitete digitale Referenz, kein offizieller Quellennachweis und kein Beleg für Strichfolge oder Schreibbewegung."
   en: "Historical Deutsche Normalschrift model documented in the CTAN manual. The character list reflects the documented package font inventory and is not a complete or authoritative teaching repertoire. The local browser TTF is a derived digital reference, not an official source trace or evidence of stroke order or writing movement."

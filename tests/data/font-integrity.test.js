@@ -12,13 +12,14 @@ import { codePointLabelToCharacter, shapeReferenceWord } from "../../src/lib/ref
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const content = loadContent(root);
 const archiveSha256 = "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc";
+const sourceProfiles = JSON.parse(readFileSync(resolve(root, "tools/fonts/schulschriften/profiles.json"), "utf8")).profiles;
 const germanCore = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÄÖÜäöüß0123456789.,?!";
 const profiles = [
-  { model: "de-la", font: "font-schulschriften-la", source: "wela" },
-  { model: "de-sas", font: "font-schulschriften-sas", source: "wesa" },
-  { model: "de-va", font: "font-schulschriften-va", source: "weva" },
-  { model: "de-suetterlin", font: "font-schulschriften-suetterlin", source: "wesu" },
-  { model: "de-deutsche-normalschrift", font: "font-schulschriften-dn", source: "wedn" },
+  { model: "de-la", font: "font-schulschriften-la", source: "wela", driver: "welasl14", shape: "sl" },
+  { model: "de-sas", font: "font-schulschriften-sas", source: "wesa", driver: "wesasl14", shape: "sl" },
+  { model: "de-va", font: "font-schulschriften-va", source: "weva", driver: "wevasl14", shape: "sl" },
+  { model: "de-suetterlin", font: "font-schulschriften-suetterlin", source: "wesu", driver: "wesu14", shape: "n" },
+  { model: "de-deutsche-normalschrift", font: "font-schulschriften-dn", source: "wedn", driver: "wednsl14", shape: "sl" },
 ];
 
 test("reference font word boundaries wrap a single isolated character", () => {
@@ -30,6 +31,47 @@ test("reference font word boundaries wrap a single isolated character", () => {
 });
 const fontById = new Map(content.fonts.map((font) => [font.id, font]));
 const modelById = new Map(content.models.map((model) => [model.id, model]));
+
+test("Schulschriften profiles select the documented standard METAFONT drivers", () => {
+  assert.deepEqual(
+    Object.fromEntries(sourceProfiles.map(({ id, source_driver }) => [id, source_driver])),
+    {
+      la: "welasl14",
+      sas: "wesasl14",
+      va: "wevasl14",
+      suetterlin: "wesu14",
+      "deutsche-normalschrift": "wednsl14",
+    },
+  );
+  assert.deepEqual(
+    Object.fromEntries(sourceProfiles.map(({ id, source_shape }) => [id, source_shape])),
+    {
+      la: "sl",
+      sas: "sl",
+      va: "sl",
+      suetterlin: "n",
+      "deutsche-normalschrift": "sl",
+    },
+  );
+});
+
+test("model slant metadata uses source-backed inclination from vertical", () => {
+  for (const [modelId, nominalDegrees] of [
+    ["de-sas", 14],
+    ["de-la", 18],
+    ["de-va", 11],
+    ["de-deutsche-normalschrift", 14],
+  ]) {
+    assert.deepEqual(modelById.get(modelId).classification.slant, {
+      kind: "right",
+      nominal_degrees: nominalDegrees,
+    });
+  }
+  assert.deepEqual(modelById.get("de-suetterlin").classification.slant, {
+    kind: "vertical",
+    nominal_degrees: 0,
+  });
+});
 
 test("all five CTAN browser derivatives have distinct source-backed model references", () => {
   assert.deepEqual(content.fonts.filter((font) => font.id.startsWith("font-schulschriften-")).map((font) => font.id).sort(), profiles.map(({ font }) => font).sort());
@@ -47,12 +89,14 @@ test("all five CTAN browser derivatives have distinct source-backed model refere
   assert.deepEqual(modelById.get("de-grundschrift").reference_fonts, []);
 });
 
-for (const { model: modelId, font: fontId, source } of profiles) {
+for (const { model: modelId, font: fontId, source, driver, shape } of profiles) {
   const font = fontById.get(fontId);
   test(`${font.name}: pinned source, derivation, identity, coverage and calibration`, () => {
     const bytes = readFileSync(resolve(root, font.files[0]));
     const metadata = inspectTrueType(bytes);
     const provenance = JSON.parse(readFileSync(resolve(root, font.derivation.provenance_file), "utf8"));
+    const profileId = sourceProfiles.find(({ source_stem }) => source_stem === source).id;
+    const parity = JSON.parse(readFileSync(resolve(root, `tools/fonts/schulschriften/reports/${profileId}-font-parity.json`), "utf8"));
     const mappingBytes = readFileSync(resolve(root, font.derivation.unicode_mapping));
     const mapping = JSON.parse(mappingBytes);
     const model = modelById.get(modelId);
@@ -64,7 +108,8 @@ for (const { model: modelId, font: fontId, source } of profiles) {
     assert.equal(font.upstream.package, "CTAN schulschriften");
     assert.equal(font.upstream.version, "5");
     assert.equal(font.upstream.sha256, archiveSha256);
-    assert.equal(font.upstream.source_file, `source/${source}/${source}14.mf`);
+    assert.equal(font.upstream.source_file, `source/${source}/${driver}.mf`);
+    assert.equal(font.derivation.tfm_file, `tools/fonts/schulschriften/generated/${driver}.tfm`);
     assert.notEqual(font.upstream.sha256, font.integrity.sha256);
     assert.equal(font.derivation.kind, "generated");
     assert.equal(font.derivation.source_format, "metafont");
@@ -75,11 +120,22 @@ for (const { model: modelId, font: fontId, source } of profiles) {
     assert.equal(provenance.upstream.archive_sha256, font.upstream.sha256);
     assert.equal(provenance.artifact.sha256, font.integrity.sha256);
     assert.equal(provenance.profile.source_stem, source);
+    assert.equal(provenance.profile.source_driver, driver);
+    assert.equal(provenance.profile.source_shape, shape);
+    assert.equal(provenance.derivation.tfm_path, font.derivation.tfm_file);
+    assert.equal(parity.source_driver, driver);
+    assert.equal(parity.source_shape, shape);
+    assert.equal(parity.tfm, font.derivation.tfm_file);
     assert.equal(font.font_version, "Version 1.0");
     assert.equal(font.family_name, metadata.family);
     assert.equal(font.postscript_name, metadata.postscriptName);
     assert.equal(font.weight, 400);
     assert.equal(font.style, "normal");
+    assert.equal(metadata.subfamily, "Regular");
+    assert.equal(metadata.typographicSubfamily, "Regular");
+    assert.equal(metadata.fsSelection & 0x40, 0x40);
+    assert.equal(metadata.macStyle, 0);
+    assert.equal(metadata.italicAngle, 0);
     assert.deepEqual(font.shaping.required_features, ["calt", "kern"]);
     assert.deepEqual(font.shaping.word_boundary, {
       start: mapping.word_boundary_markers.start.codepoint,

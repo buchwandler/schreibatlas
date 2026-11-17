@@ -85,7 +85,7 @@ test("explore filters validated model records using recorded metadata", async ({
   await expect(page.getByText("Keine Modelle passen zu den aktuellen Filtern.")).toBeVisible();
   await page.getByRole("searchbox", { name: "Modelle suchen" }).fill("");
   await page.locator('[data-model-filter="joined"]').selectOption("joined");
-  await expect(page.locator("[data-model-card]:visible")).toHaveCount(5);
+  await expect(page.locator("[data-model-card]:visible")).toHaveCount(6);
   await expect(page.locator("[data-model-card]:visible").filter({ hasText: "Deutsche Volksschrift" })).toHaveCount(1);
   await expect(page.locator("[data-model-card]:visible").first()).toContainText("Verbundene Schrift: Vorhanden");
   await page.locator('[data-model-filter="joined"]').selectOption("");

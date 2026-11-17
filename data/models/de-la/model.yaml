@@ -8,7 +8,7 @@ regions: []
 family: modern-school-script
 classification:
   joined: true
-  slant: {kind: unknown, nominal_degrees: null}
+  slant: {kind: right, nominal_degrees: 18}
 period:
   from: 1950
   to: null

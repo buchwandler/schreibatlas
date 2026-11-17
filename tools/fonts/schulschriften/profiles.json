@@ -1,9 +1,44 @@
 {
   "profiles": [
-    { "id": "la", "source_stem": "wela", "display_name": "Lateinische Ausgangsschrift", "short_name": "LA" },
-    { "id": "sas", "source_stem": "wesa", "display_name": "Schulausgangsschrift", "short_name": "SAS" },
-    { "id": "va", "source_stem": "weva", "display_name": "Vereinfachte Ausgangsschrift", "short_name": "VA" },
-    { "id": "suetterlin", "source_stem": "wesu", "display_name": "Sütterlinschrift", "short_name": "Sütterlin" },
-    { "id": "deutsche-normalschrift", "source_stem": "wedn", "display_name": "Deutsche Normalschrift", "short_name": "DN" }
+    {
+      "id": "la",
+      "source_stem": "wela",
+      "source_driver": "welasl14",
+      "source_shape": "sl",
+      "display_name": "Lateinische Ausgangsschrift",
+      "short_name": "LA"
+    },
+    {
+      "id": "sas",
+      "source_stem": "wesa",
+      "source_driver": "wesasl14",
+      "source_shape": "sl",
+      "display_name": "Schulausgangsschrift",
+      "short_name": "SAS"
+    },
+    {
+      "id": "va",
+      "source_stem": "weva",
+      "source_driver": "wevasl14",
+      "source_shape": "sl",
+      "display_name": "Vereinfachte Ausgangsschrift",
+      "short_name": "VA"
+    },
+    {
+      "id": "suetterlin",
+      "source_stem": "wesu",
+      "source_driver": "wesu14",
+      "source_shape": "n",
+      "display_name": "Sütterlinschrift",
+      "short_name": "Sütterlin"
+    },
+    {
+      "id": "deutsche-normalschrift",
+      "source_stem": "wedn",
+      "source_driver": "wednsl14",
+      "source_shape": "sl",
+      "display_name": "Deutsche Normalschrift",
+      "short_name": "DN"
+    }
   ]
 }

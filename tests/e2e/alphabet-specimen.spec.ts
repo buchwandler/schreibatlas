@@ -26,6 +26,8 @@ test("SAS specimen loads its local font and renders every recorded group", async
   const localFontLoaded = await page.evaluate(() => document.fonts.check('16px "alphabet-font-schulschriften-sas"', "ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
   expect(localFontLoaded).toBe(true);
   await expect(specimen.locator(".alphabet-specimen-disclaimer")).toContainText("Keine offizielle Alphabettafel");
+  await expect(specimen.locator('[data-specimen-group="uppercase"] .alphabet-specimen-row')).toHaveScreenshot("sas-standard-inclination-uppercase.png");
+  await expect(specimen.locator('[data-specimen-group="lowercase"] .alphabet-specimen-row')).toHaveScreenshot("sas-standard-inclination-lowercase.png");
 });
 
 test("blocked SAS font stays hidden and reports no substitute font", async ({ page }) => {

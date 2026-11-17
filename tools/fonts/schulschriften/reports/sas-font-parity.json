@@ -3,7 +3,7 @@
   "browser": "Chromium 157.0.8103.38",
   "browser_font_family": "Schreibatlas Schulschriften SAS",
   "calibration": {
-    "outline_x_glyph_y_min_units": -105,
+    "outline_x_glyph_y_min_units": -104,
     "outline_x_height_em": 0.3433,
     "outline_x_height_units": 3433,
     "space_advance_units": 3571,
@@ -679,7 +679,7 @@
   "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
   "display_name": "Schulausgangsschrift",
   "font": "tools/fonts/schulschriften/generated/sas-prototype.ttf",
-  "font_sha256": "aa1646241a14f5c4b682e5c62da691ff4c7ae1a71840ff823159b00a78c0d207",
+  "font_sha256": "8ae2361c5c65e5af4d8d2885e680960570739d5b7e1d0fc1ff51b3775d6075da",
   "maximum_absolute_advance_error_px": 0.02551833333330933,
   "node": "v22.23.4",
   "opentype_features": [
@@ -689,9 +689,11 @@
   "playwright": "1.65.0",
   "profile_id": "sas",
   "required_character_count": 74,
+  "source_driver": "wesasl14",
+  "source_shape": "sl",
   "source_stem": "wesa",
   "status": "pass",
-  "tfm": "tools/fonts/schulschriften/generated/wesa14.tfm",
+  "tfm": "tools/fonts/schulschriften/generated/wesasl14.tfm",
   "tfm_sha256": "6ae45a2a4ce227ee30d621be6713bfc14b1b7486ffc0f0b66208b43b5a5a5d44",
   "unicode_coverage_count": 96,
   "visual_artifacts": [

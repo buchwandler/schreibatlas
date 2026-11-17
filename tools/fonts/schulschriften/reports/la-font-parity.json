@@ -3,9 +3,9 @@
   "browser": "Chromium 157.0.8103.38",
   "browser_font_family": "Schreibatlas Schulschriften LA",
   "calibration": {
-    "outline_x_glyph_y_min_units": -100,
-    "outline_x_height_em": 0.3431,
-    "outline_x_height_units": 3431,
+    "outline_x_glyph_y_min_units": -101,
+    "outline_x_height_em": 0.3429,
+    "outline_x_height_units": 3429,
     "space_advance_units": 3571,
     "tfm_x_height_em": 0.332857
   },
@@ -623,7 +623,7 @@
   "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
   "display_name": "Lateinische Ausgangsschrift",
   "font": "tools/fonts/schulschriften/generated/la-prototype.ttf",
-  "font_sha256": "27e6350ff8ff787887ad98df6fa482cf509957f74879c10995dc2e5eb976e9fc",
+  "font_sha256": "8ba629237b1e734f27dadecc47927bae731d4e2b0aab9c4d096ccae0c8590a18",
   "maximum_absolute_advance_error_px": 0.020633333333336168,
   "node": "v22.23.4",
   "opentype_features": [
@@ -633,9 +633,11 @@
   "playwright": "1.65.0",
   "profile_id": "la",
   "required_character_count": 74,
+  "source_driver": "welasl14",
+  "source_shape": "sl",
   "source_stem": "wela",
   "status": "pass",
-  "tfm": "tools/fonts/schulschriften/generated/wela14.tfm",
+  "tfm": "tools/fonts/schulschriften/generated/welasl14.tfm",
   "tfm_sha256": "959f439dc6e121566680824d2d3562c802585b7afaa201dc2204d3dbe7049ce1",
   "unicode_coverage_count": 96,
   "visual_artifacts": [

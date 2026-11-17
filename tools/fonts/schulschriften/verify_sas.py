@@ -20,10 +20,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 ARCHIVE = ROOT / "vendor/ctan/schulschriften/schulschriften-v5.zip"
 GENERATED = HERE / "generated"
-MAPPING_PATH = HERE / "mappings/wesa.json"
+PROFILES_PATH = HERE / "profiles.json"
 SAMPLES_PATH = HERE / "expected/sas-samples.json"
-UPSTREAM_PREFIX = "schulschriften/source/wesa/"
-
 
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
@@ -55,24 +53,32 @@ def tex_word(word: str, mapping: dict) -> str:
     return "".join("\\ " if character == " " else f"\\char{tex_code(character, mapping)}" for character in word)
 
 
-def extract_wesa_sources(destination: Path) -> None:
+def extract_sources(destination: Path, source_stem: str, source_driver: str) -> None:
+    prefix = f"schulschriften/source/{source_stem}/"
     destination.mkdir(parents=True)
     with zipfile.ZipFile(ARCHIVE) as archive:
         for item in archive.infolist():
-            if not item.filename.startswith(UPSTREAM_PREFIX) or not item.filename.endswith(".mf"):
+            if not item.filename.startswith(prefix) or not item.filename.endswith(".mf"):
                 continue
-            relative = PurePosixPath(item.filename).relative_to(UPSTREAM_PREFIX)
+            relative = PurePosixPath(item.filename).relative_to(prefix)
             target = destination.joinpath(*relative.parts)
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(archive.read(item))
-
+    source_files = {path.name for path in destination.glob("*.mf")}
+    required_files = {
+        f"{source_stem}14.mf",
+        f"{source_stem}14_lig.mf",
+        f"{source_driver}.mf",
+    }
+    if missing := sorted(required_files - source_files):
+        raise FileNotFoundError(f"Missing CTAN source files for {source_stem}: {missing}")
 
 def run_tex(
     tex_file: Path,
     working_dir: Path,
     generated_dir: Path,
     source_dir: Path,
-    font_name: str = "wesa14",
+    font_name: str
 ) -> None:
     environment = os.environ.copy()
     environment["TEXFONTS"] = f"{generated_dir}//"
@@ -100,7 +106,7 @@ def measure_tex(
     mapping: dict,
     work_dir: Path,
     source_dir: Path,
-    font_name: str = "wesa14",
+    font_name: str
 ) -> list[float]:
     lines = [
         "\\nopagenumbers",
@@ -134,7 +140,7 @@ def render_tex_reference(
     work_dir: Path,
     source_dir: Path,
     reports: Path,
-    font_name: str = "wesa14",
+    font_name: str,
     report_prefix: str = "sas",
 ) -> Path:
     page_width_pt = 500
@@ -195,10 +201,19 @@ def render_tex_reference(
 def main() -> None:
     reports = HERE / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    font_path = GENERATED / "sas-prototype.ttf"
-    tfm_path = GENERATED / "wesa14.tfm"
+    profile = next(
+        item
+        for item in json.loads(PROFILES_PATH.read_text(encoding="utf-8"))["profiles"]
+        if item["id"] == "sas"
+    )
+    source_stem = profile["source_stem"]
+    source_driver = profile["source_driver"]
+    source_shape = profile["source_shape"]
+    font_path = GENERATED / f"{profile['id']}-prototype.ttf"
+    tfm_path = GENERATED / f"{source_driver}.tfm"
     samples = json.loads(SAMPLES_PATH.read_text(encoding="utf-8"))
-    mapping = json.loads(MAPPING_PATH.read_text(encoding="utf-8"))
+    mapping_path = HERE / "mappings" / f"{source_stem}.json"
+    mapping = json.loads(mapping_path.read_text(encoding="utf-8"))
     font = TTFont(font_path)
     cmap = {
         character
@@ -222,9 +237,10 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="schulschriften-sas-verify-") as temporary:
         work_dir = Path(temporary)
         source_dir = work_dir / "source"
-        extract_wesa_sources(source_dir)
+        extract_sources(source_dir, source_stem, source_driver)
         tex_widths_pt = measure_tex(
-            samples["cases"], samples["tex_font_size_pt"], mapping, work_dir, source_dir
+            samples["cases"], samples["tex_font_size_pt"], mapping, work_dir, source_dir,
+            font_name=source_driver,
         )
         visual_reference = render_tex_reference(
             samples["visual_cases"] + samples["visual_glyph_cases"],
@@ -233,6 +249,7 @@ def main() -> None:
             work_dir,
             source_dir,
             reports,
+            font_name=source_driver,
         )
 
     browser_result_path = reports / "sas-browser-widths.json"
@@ -279,6 +296,8 @@ def main() -> None:
     result = {
         "status": "pass",
         "font": "tools/fonts/schulschriften/generated/sas-prototype.ttf",
+        "source_driver": source_driver,
+        "source_shape": source_shape,
         "font_sha256": sha256(font_path),
         "tfm_sha256": sha256(tfm_path),
         "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",

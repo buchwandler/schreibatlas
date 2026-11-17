@@ -4,16 +4,16 @@
     "path": "tools/fonts/schulschriften/generated/va-prototype.ttf",
     "postscript_name": "SchreibatlasSchulschriftenVA-Regular",
     "rights": "LPPL-1.3c derivative; preserve upstream and derivation attribution",
-    "sha256": "a75a2ba5b403501077475e9fbe136be92ac0c8f90d10e2f1bc69737536acd694"
+    "sha256": "1728283458ce20617b8469315c67f69472c8fbb8996a63af15d7bf60abbb4d15"
   },
   "artifact_id": "schreibatlas-ctan-schulschriften-va-prototype",
   "derivation": {
     "font_facts": {
       "calibration": {
-        "outline_minus_tfm_x_height_em": 0.010442,
-        "outline_x_glyph_y_min_units": -105,
-        "outline_x_height_em": 0.3438,
-        "outline_x_height_units": 3438,
+        "outline_minus_tfm_x_height_em": 0.010142,
+        "outline_x_glyph_y_min_units": -103,
+        "outline_x_height_em": 0.3435,
+        "outline_x_height_units": 3435,
         "space_advance_units": 3571,
         "tfm_space_advance_em": 0.357142,
         "tfm_x_height_em": 0.333358
@@ -147,7 +147,7 @@
       "units_per_em": 10000
     },
     "pipeline": [
-      "METAFONT source lookup restricted to extracted CTAN files, then TFM and GF generation with mftrace",
+      "METAFONT standard-driver selection from profile metadata; source lookup restricted to the pinned CTAN archive; TFM and GF generation with mftrace",
       "Potrace tracing of generated GF bitmaps to TrueType outlines",
       "Unicode cmap reconstruction from the profile-specific mapping",
       "Outline scaling and TFM advance normalization to 10,000 units per em",
@@ -155,9 +155,9 @@
       "TFM kerning-pair translation to OpenType GPOS kern",
       "Name, timestamp and output metadata normalization"
     ],
-    "raw_mftrace_ttf_sha256": "73280988d46d0033809de4c74d02c9853a6ff212d77e2e5b0f220e55f9a58463",
+    "raw_mftrace_ttf_sha256": "b2e7d10c1d4b587be6fc92946f2671c60bbbcefd3411efe91527c63cbbaa0d2b",
     "recipe": "tools/fonts/schulschriften/build.py",
-    "tfm_path": "tools/fonts/schulschriften/generated/weva14.tfm",
+    "tfm_path": "tools/fonts/schulschriften/generated/wevasl14.tfm",
     "tfm_sha256": "4fb854d2562b7b15f4dccc0519687ba227e7c0f003598116231bd4051b487be8",
     "tool_versions": {
       "fonttools": "4.61.1",
@@ -187,6 +187,8 @@
     "id": "va",
     "mapping": "tools/fonts/schulschriften/mappings/weva.json",
     "mapping_sha256": "7f35823deda1252793d28257808532f1b730dcf7c9c312ac372e3e5b0a93e92d",
+    "source_driver": "wevasl14",
+    "source_shape": "sl",
     "source_stem": "weva",
     "verification_fixtures": "tools/fonts/schulschriften/expected/va-samples.json",
     "verification_fixtures_sha256": "eac8947ce1e50eb33d2aa714490534f13bd37c7e9bb07a82aceab87fc7ac0f71"

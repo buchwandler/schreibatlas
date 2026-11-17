@@ -3,9 +3,9 @@
   "browser": "Chromium 157.0.8103.38",
   "browser_font_family": "Schreibatlas Schulschriften VA",
   "calibration": {
-    "outline_x_glyph_y_min_units": -105,
-    "outline_x_height_em": 0.3438,
-    "outline_x_height_units": 3438,
+    "outline_x_glyph_y_min_units": -103,
+    "outline_x_height_em": 0.3435,
+    "outline_x_height_units": 3435,
     "space_advance_units": 3571,
     "tfm_x_height_em": 0.333358
   },
@@ -623,7 +623,7 @@
   "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
   "display_name": "Vereinfachte Ausgangsschrift",
   "font": "tools/fonts/schulschriften/generated/va-prototype.ttf",
-  "font_sha256": "a75a2ba5b403501077475e9fbe136be92ac0c8f90d10e2f1bc69737536acd694",
+  "font_sha256": "1728283458ce20617b8469315c67f69472c8fbb8996a63af15d7bf60abbb4d15",
   "maximum_absolute_advance_error_px": 0.046143333333361625,
   "node": "v22.23.4",
   "opentype_features": [
@@ -633,9 +633,11 @@
   "playwright": "1.65.0",
   "profile_id": "va",
   "required_character_count": 74,
+  "source_driver": "wevasl14",
+  "source_shape": "sl",
   "source_stem": "weva",
   "status": "pass",
-  "tfm": "tools/fonts/schulschriften/generated/weva14.tfm",
+  "tfm": "tools/fonts/schulschriften/generated/wevasl14.tfm",
   "tfm_sha256": "4fb854d2562b7b15f4dccc0519687ba227e7c0f003598116231bd4051b487be8",
   "unicode_coverage_count": 96,
   "visual_artifacts": [

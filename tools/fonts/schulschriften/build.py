@@ -134,7 +134,9 @@ def tool_versions() -> dict[str, str]:
     }
 
 
-def extract_sources(work_dir: Path, source_stem: str) -> tuple[Path, list[str]]:
+def extract_sources(
+    work_dir: Path, source_stem: str, source_driver: str
+) -> tuple[Path, list[str]]:
     prefix = f"schulschriften/source/{source_stem}/"
     source_dir = work_dir / "source" / source_stem
     source_dir.mkdir(parents=True)
@@ -147,12 +149,15 @@ def extract_sources(work_dir: Path, source_stem: str) -> tuple[Path, list[str]]:
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(archive.read(item))
     source_files = sorted(path.name for path in source_dir.glob("*.mf"))
-    required_files = {f"{source_stem}14.mf", f"{source_stem}14_lig.mf"}
+    required_files = {
+        f"{source_stem}14.mf",
+        f"{source_stem}14_lig.mf",
+        f"{source_driver}.mf",
+    }
     missing = sorted(required_files - set(source_files))
     if missing:
         raise FileNotFoundError(f"Missing CTAN source files for {source_stem}: {missing}")
     return source_dir, source_files
-
 
 def add_empty_glyph(font: TTFont, name: str, advance: int) -> None:
     if name in font.getGlyphOrder():
@@ -382,6 +387,9 @@ def build_font(raw_ttf: Path, tfm_path: Path, mapping: dict, output: Path) -> di
     set_name(font, 14, "https://www.latex-project.org/lppl.txt")
     set_name(font, 16, family)
     set_name(font, 17, "Regular")
+    font["OS/2"].fsSelection = (font["OS/2"].fsSelection & ~0x221) | 0x40
+    font["head"].macStyle = 0
+    font["post"].italicAngle = 0.0
     font["head"].created = FIXED_MAC_TIMESTAMP
     font["head"].modified = FIXED_MAC_TIMESTAMP
     font["head"].fontRevision = 1.0
@@ -449,7 +457,7 @@ def main() -> None:
         "--output-dir",
         type=Path,
         default=HERE / "generated",
-        help="Output directory for generated TTFs, source-named TFMs and provenance JSON",
+        help="Output directory for generated TTFs, driver-named TFMs and provenance JSON",
     )
     parser.add_argument(
         "--profile",
@@ -470,6 +478,7 @@ def main() -> None:
             continue
         profile_id = profile["id"]
         source_stem = profile["source_stem"]
+        source_driver = profile["source_driver"]
         mapping_path = HERE / "mappings" / f"{source_stem}.json"
         mapping = json.loads(mapping_path.read_text(encoding="utf-8"))
         samples_path = HERE / "expected" / f"{profile_id}-samples.json"
@@ -478,9 +487,9 @@ def main() -> None:
 
         with tempfile.TemporaryDirectory(prefix=f"schulschriften-{profile_id}-") as temporary:
             work_dir = Path(temporary)
-            source_dir, source_files = extract_sources(work_dir, source_stem)
+            source_dir, source_files = extract_sources(work_dir, source_stem, source_driver)
             encoding_path = Path(run_text(["kpsewhich", "tex256.enc"]))
-            tfm_name = f"{source_stem}14"
+            tfm_name = source_driver
             mf_environment = os.environ.copy()
             mf_environment["MFINPUTS"] = f"{source_dir}//:"
             run_text(
@@ -502,6 +511,9 @@ def main() -> None:
 
             ttf_output = args.output_dir / f"{profile_id}-prototype.ttf"
             tfm_output = args.output_dir / f"{tfm_name}.tfm"
+            legacy_tfm = args.output_dir / f"{source_stem}14.tfm"
+            if legacy_tfm != tfm_output:
+                legacy_tfm.unlink(missing_ok=True)
             shutil.copyfile(raw_tfm, tfm_output)
             font_facts = build_font(raw_ttf, raw_tfm, mapping, ttf_output)
             source_hashes = {filename: sha256(source_dir / filename) for filename in source_files}
@@ -512,6 +524,8 @@ def main() -> None:
                     "id": profile_id,
                     "display_name": profile["display_name"],
                     "source_stem": source_stem,
+                    "source_driver": profile["source_driver"],
+                    "source_shape": profile["source_shape"],
                     "mapping": mapping_path.relative_to(ROOT).as_posix(),
                     "mapping_sha256": sha256(mapping_path),
                     "verification_fixtures": samples_path.relative_to(ROOT).as_posix(),
@@ -530,7 +544,7 @@ def main() -> None:
                 "derivation": {
                     "recipe": "tools/fonts/schulschriften/build.py",
                     "pipeline": [
-                        "METAFONT source lookup restricted to extracted CTAN files, then TFM and GF generation with mftrace",
+                        "METAFONT standard-driver selection from profile metadata; source lookup restricted to the pinned CTAN archive; TFM and GF generation with mftrace",
                         "Potrace tracing of generated GF bitmaps to TrueType outlines",
                         "Unicode cmap reconstruction from the profile-specific mapping",
                         "Outline scaling and TFM advance normalization to 10,000 units per em",
@@ -566,7 +580,7 @@ def main() -> None:
     checksum_paths = []
     for profile in all_profiles:
         profile_id = profile["id"]
-        tfm_name = f"{profile['source_stem']}14.tfm"
+        tfm_name = f"{profile['source_driver']}.tfm"
         for path in (
             args.output_dir / f"{profile_id}-prototype.ttf",
             args.output_dir / tfm_name,

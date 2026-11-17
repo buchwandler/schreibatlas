@@ -32,6 +32,8 @@ Use `repertoire.teaching_core`, `numerals`, `punctuation`, and `special_characte
 
 Model aliases are locale-keyed string arrays. Regions use country-prefixed ISO subdivision identifiers. Educational roles, characteristics, period uncertainty and examples must remain supported by citations. Project-original example text needs its own project-original source rather than being attributed to an educational publication.
 
+For `models[].classification.slant`, `nominal_degrees` is the inclination away from vertical: 0° is vertical, positive values indicate right inclination, and direction is represented by `kind` rather than a negative angle. Use a source-backed value only when the source defines the design angle; distinguish a measured CTAN design parameter from historical teaching guidance when their angle conventions differ.
+
 Set glyph `derivation.kind` to `source-traced`, `font-derived`, `project-reconstructed`, `project-authored`, or `unknown`, with the actual process, verification and representation limits. Font-derived data requires `source_font`, `source_glyph`, and an explicit `official-stroke-order` exclusion. Use `source_claims` to attach sources to individual fields. New variants should be objects containing `id`, localized `label`, optional `outline`, `status`, and `sources`; legacy string variants remain supported for migration only.
 
 Connection records use `templates/connection.yaml` and live under `data/connections/<model>/`. Cite pair/sequence evidence, use only the model's reference fonts, and resolve variant IDs to structured glyph variants. Start with a small documented subset, not a full connection matrix.

@@ -14,6 +14,7 @@ export function inspectTrueType(bytes) {
   const head = table("head");
   const em = bytes.readUInt16BE(head + 18);
   const os2 = table("OS/2");
+  const post = table("post");
   const nameTable = table("name");
   const names = new Map();
   for (let index = 0; index < bytes.readUInt16BE(nameTable + 2); index += 1) {
@@ -110,7 +111,12 @@ export function inspectTrueType(bytes) {
     family: names.get(16) ?? names.get(1),
     postscriptName: names.get(6),
     version: names.get(5),
+    subfamily: names.get(2),
+    typographicSubfamily: names.get(17),
     weight: bytes.readUInt16BE(os2 + 4),
+    fsSelection: bytes.readUInt16BE(os2 + 62),
+    macStyle: bytes.readUInt16BE(head + 44),
+    italicAngle: bytes.readInt32BE(post + 4) / 65536,
     italic: Boolean(bytes.readUInt16BE(os2 + 62) & 1),
     unitsPerEm: em,
     xHeightEm: xHeight,

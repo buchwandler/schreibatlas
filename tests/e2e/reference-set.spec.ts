@@ -203,7 +203,7 @@ test("font-backed SVG, PNG and PDF exports retain the exact CTAN and derivative 
     expect(record.fontVersion).toBe("Version 1.0");
     expect(record.fontLicenseText).toContain("LPPL Version 1.3c");
     expect(record.fontUpstream.sha256).toBe(archiveSha256);
-    expect(record.fontIntegrity.sha256).toBe("aa1646241a14f5c4b682e5c62da691ff4c7ae1a71840ff823159b00a78c0d207");
+    expect(record.fontIntegrity.sha256).toBe("8ae2361c5c65e5af4d8d2885e680960570739d5b7e1d0fc1ff51b3775d6075da");
     expect(record.fontDerivation.unicode_mapping_sha256).toBe("d3ec5d50b24fe64aa5ff7e85c55c4a736f00ad964220c0b9bfd3e32986b3ceba");
     expect(record.fontDerivation.tfm_sha256).toBe("6ae45a2a4ce227ee30d621be6713bfc14b1b7486ffc0f0b66208b43b5a5a5d44");
     expect(record.fontCorrespondence.model).toBe("de-sas");

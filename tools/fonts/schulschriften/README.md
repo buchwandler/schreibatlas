@@ -10,6 +10,12 @@ The Nix flake and lock pin the conversion and rendering toolchain. From the repo
 nix develop ./tools/fonts/schulschriften --command python3 tools/fonts/schulschriften/build.py
 ```
 
+Publish the generated prototypes into the canonical font assets and synchronize their source-driver, TFM, calibration, and integrity fields:
+
+```sh
+nix develop ./tools/fonts/schulschriften --command python3 tools/fonts/schulschriften/publish.py
+```
+
 Compare all five browser fonts with their CTAN TFM shaping references using Chromium:
 
 ```sh
@@ -24,19 +30,21 @@ The source archive is `vendor/ctan/schulschriften/schulschriften-v5.zip`, SHA-25
 
 The generator builds five distinct profiles from the upstream METAFONT sources:
 
-| Profile | CTAN source | Browser family |
-| --- | --- | --- |
-| LA | `wela` | Schreibatlas Schulschriften LA |
-| SAS | `wesa` | Schreibatlas Schulschriften SAS |
-| VA | `weva` | Schreibatlas Schulschriften VA |
-| Sütterlin | `wesu` | Schreibatlas Schulschriften Sütterlin |
-| Deutsche Normalschrift | `wedn` | Schreibatlas Schulschriften Deutsche Normalschrift |
+| Profile | CTAN source | Standard driver | Shape | Browser family |
+| --- | --- | --- | --- | --- |
+| LA | `wela` | `welasl14.mf` | slanted | Schreibatlas Schulschriften LA |
+| SAS | `wesa` | `wesasl14.mf` | slanted | Schreibatlas Schulschriften SAS |
+| VA | `weva` | `wevasl14.mf` | slanted | Schreibatlas Schulschriften VA |
+| Sütterlin | `wesu` | `wesu14.mf` | upright | Schreibatlas Schulschriften Sütterlin |
+| Deutsche Normalschrift | `wedn` | `wednsl14.mf` | slanted | Schreibatlas Schulschriften Deutsche Normalschrift |
 
-`build.py` extracts each source from the pinned archive and explicitly points METAFONT at that extracted directory. `mftrace` and Potrace produce the initial TrueType outlines. The generator then applies the profile-specific Unicode mapping, preserves TFM advances at 10,000 units per em, and reconstructs ligature and kerning features from the raw TFM instruction tables. It preserves TeX's first-match behavior when a TFM ligature program contains duplicate right-character instructions. Contextual rules are emitted in repeated OpenType `calt` passes ordered by source character; kerning uses `kern`.
+`profiles.json` records the documented standard METAFONT driver and shape for each profile. `build.py` extracts each source from the pinned archive, requires the selected driver, and explicitly points METAFONT at that extracted directory. `mftrace` and Potrace produce the initial TrueType outlines. The generator then applies the profile-specific Unicode mapping, preserves TFM advances at 10,000 units per em, and reconstructs ligature and kerning features from the raw TFM instruction tables. It preserves TeX's first-match behavior when a TFM ligature program contains duplicate right-character instructions. Contextual rules are emitted in repeated OpenType `calt` passes ordered by source character; kerning uses `kern`.
 
 Each font uses distinct zero-width word-boundary controls U+00A7 and U+00B6. The verification renderer surrounds each whitespace-delimited word with these controls so the browser derivative receives the same word-edge context as TeX. These controls are shaping internals, not part of the writing repertoire.
 
 Each generated TTF has a separate browser family name, a complete provenance record, and a checksum entry. The records identify the pinned CTAN source, exact source and mapping hashes, TFM hash, tool versions, shaping configuration, Unicode coverage, calibration measurements, and output hash. The TFM files are retained beside the browser derivatives for reproducible comparison.
+
+The documented `sl` designs have intrinsically right-inclined outlines, but remain single Regular browser faces. The generator normalizes name IDs 2 and 17, the OS/2 regular selection bit, `head.macStyle`, and `post.italicAngle` so browsers do not synthesize another slant.
 
 ## Parity and visual review
 

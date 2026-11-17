@@ -33,7 +33,9 @@ def required_characters(mapping: dict) -> list[int]:
     return sorted(characters)
 
 
-def extract_sources(work_dir: Path, source_stem: str) -> tuple[Path, dict[str, str]]:
+def extract_sources(
+    work_dir: Path, source_stem: str, source_driver: str
+) -> tuple[Path, dict[str, str]]:
     prefix = f"schulschriften/source/{source_stem}/"
     source_dir = work_dir / "source" / source_stem
     source_dir.mkdir(parents=True)
@@ -46,26 +48,36 @@ def extract_sources(work_dir: Path, source_stem: str) -> tuple[Path, dict[str, s
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(archive.read(item))
     source_files = sorted(path.name for path in source_dir.glob("*.mf"))
-    required_files = {f"{source_stem}14.mf", f"{source_stem}14_lig.mf"}
+    required_files = {
+        f"{source_stem}14.mf",
+        f"{source_stem}14_lig.mf",
+        f"{source_driver}.mf",
+    }
     if missing := sorted(required_files - set(source_files)):
         raise FileNotFoundError(f"Missing CTAN source files for {source_stem}: {missing}")
     return source_dir, {filename: sha256(source_dir / filename) for filename in source_files}
 
-
 def verify_profile(profile: dict, reports: Path) -> dict:
     profile_id = profile["id"]
     source_stem = profile["source_stem"]
+    source_driver = profile["source_driver"]
+    source_shape = profile["source_shape"]
     mapping_path = HERE / "mappings" / f"{source_stem}.json"
     samples_path = HERE / "expected" / f"{profile_id}-samples.json"
     provenance_path = GENERATED / f"{profile_id}-prototype.provenance.json"
     font_path = GENERATED / f"{profile_id}-prototype.ttf"
-    tfm_path = GENERATED / f"{source_stem}14.tfm"
+    tfm_path = GENERATED / f"{source_driver}.tfm"
     mapping = json.loads(mapping_path.read_text(encoding="utf-8"))
     samples = json.loads(samples_path.read_text(encoding="utf-8"))
     provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
     font_facts = provenance["derivation"]["font_facts"]
 
     profile_record = provenance["profile"]
+    if (
+        profile_record["source_driver"] != source_driver
+        or profile_record["source_shape"] != source_shape
+    ):
+        raise ValueError(f"{profile_id} provenance names the wrong standard source driver or shape")
     if profile_record["mapping"] != mapping_path.relative_to(ROOT).as_posix():
         raise ValueError(f"{profile_id} provenance names the wrong Unicode mapping")
     if profile_record["verification_fixtures"] != samples_path.relative_to(ROOT).as_posix():
@@ -155,7 +167,7 @@ def verify_profile(profile: dict, reports: Path) -> dict:
 
     with tempfile.TemporaryDirectory(prefix=f"schulschriften-{profile_id}-verify-") as temporary:
         work_dir = Path(temporary)
-        source_dir, source_hashes_actual = extract_sources(work_dir, source_stem)
+        source_dir, source_hashes_actual = extract_sources(work_dir, source_stem, source_driver)
         if source_hashes_actual != source_hashes_recorded:
             raise ValueError(f"{profile_id} source hashes differ from the pinned archive provenance")
         browser_samples_path = work_dir / "browser-samples.json"
@@ -163,7 +175,7 @@ def verify_profile(profile: dict, reports: Path) -> dict:
             json.dumps(browser_samples, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
-        font_name = f"{source_stem}14"
+        font_name = source_driver
         tex_widths_pt = measure_tex(
             cases,
             samples["tex_font_size_pt"],
@@ -233,6 +245,8 @@ def verify_profile(profile: dict, reports: Path) -> dict:
         "profile_id": profile_id,
         "display_name": profile["display_name"],
         "source_stem": source_stem,
+        "source_driver": source_driver,
+        "source_shape": source_shape,
         "font": font_path.relative_to(ROOT).as_posix(),
         "font_sha256": sha256(font_path),
         "tfm": tfm_path.relative_to(ROOT).as_posix(),
@@ -306,6 +320,8 @@ def main() -> None:
                 "profiles": [
                     {
                         "profile_id": result["profile_id"],
+                        "source_driver": result["source_driver"],
+                        "source_shape": result["source_shape"],
                         "report": f"reports/{result['profile_id']}-font-parity.json",
                         "font_sha256": result["font_sha256"],
                         "tfm_sha256": result["tfm_sha256"],

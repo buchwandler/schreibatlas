@@ -616,7 +616,7 @@
   "ctan_archive_sha256": "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc",
   "display_name": "Sütterlinschrift",
   "font": "tools/fonts/schulschriften/generated/suetterlin-prototype.ttf",
-  "font_sha256": "544f433ca93d011b63c5e8b597af0ab7811f036fa1ff6770c20fb1d3668544e4",
+  "font_sha256": "aa86d54ab77186df3ffe3c1138cc202f1fd9b6e2e2e2d509108fc7eba516efde",
   "maximum_absolute_advance_error_px": 0.04259666666666817,
   "node": "v22.23.4",
   "opentype_features": [
@@ -626,6 +626,8 @@
   "playwright": "1.65.0",
   "profile_id": "suetterlin",
   "required_character_count": 74,
+  "source_driver": "wesu14",
+  "source_shape": "n",
   "source_stem": "wesu",
   "status": "pass",
   "tfm": "tools/fonts/schulschriften/generated/wesu14.tfm",
