@@ -211,6 +211,18 @@ footer { border-top: 1px solid var(--line); padding: 1.2rem; text-align: center;
 .data-section h2 { margin: 0 0 .75rem; }
 .data-section h3 { margin-top: 1.1rem; }
 .data-section > p:first-of-type { max-width: 80ch; }
+.visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
+.alphabet-specimen { padding: clamp(1rem, 3vw, 2rem); background: white; }
+.alphabet-specimen-sheet { width: 100%; max-width: 64rem; box-sizing: border-box; margin: 0 auto; padding: clamp(1rem, 4vw, 3rem); background: white; border: 1px solid var(--line); border-radius: .65rem; }
+.alphabet-specimen-title { margin: 0 0 1rem; text-align: center; font-size: clamp(1.25rem, 2.4vw, 2rem); }
+.alphabet-specimen-group { margin-block: 1.5rem; }
+.alphabet-specimen-group h3 { margin: 0; }
+.alphabet-specimen-row { display: flex; min-width: 0; flex-wrap: wrap; justify-content: center; align-items: baseline; column-gap: clamp(.45rem, 1.7vw, 1.35rem); row-gap: .5rem; }
+.alphabet-specimen-glyph { display: inline-block; min-width: .8em; text-align: center; line-height: 1.05; font-size: clamp(2.7rem, 6vw, 5.5rem); }
+.alphabet-specimen-special .alphabet-specimen-glyph, .alphabet-specimen-numerals .alphabet-specimen-glyph, .alphabet-specimen-punctuation .alphabet-specimen-glyph, .alphabet-specimen-other .alphabet-specimen-glyph { font-size: clamp(2.35rem, 5vw, 4.5rem); }
+.alphabet-specimen-coverage, .alphabet-specimen-attribution, .alphabet-specimen-disclaimer { overflow-wrap: anywhere; }
+.alphabet-specimen-disclaimer { font-weight: 700; }
+.alphabet-specimen [data-alphabet-status] { min-height: 1.5em; }
 .detail-list { max-width: 780px; }
 .section-heading-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem; }
 .repertoire-list, .glyph-link-list { display: flex; flex-wrap: wrap; gap: .55rem; padding: 0; list-style: none; }
@@ -268,6 +280,8 @@ footer { border-top: 1px solid var(--line); padding: 1.2rem; text-align: center;
   .pillar-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .header-actions { flex-wrap: wrap; justify-content: space-between; }
   .model-grid, .source-list, .font-list, .detail-grid { grid-template-columns: 1fr; }
+  .metadata-list { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
+  .metadata-list dt { overflow-wrap: anywhere; }
   .site-header { align-items: stretch; }
 }
 
@@ -277,6 +291,12 @@ footer { border-top: 1px solid var(--line); padding: 1.2rem; text-align: center;
   .header-actions { align-items: flex-start; justify-content: flex-start; gap: .5rem; }
   .pillar-grid { grid-template-columns: 1fr; }
   h1 { font-size: clamp(2.2rem, 12vw, 3.2rem); }
+  .alphabet-specimen { padding: 1rem; }
+  .alphabet-specimen-sheet { padding: 1rem; }
+  .alphabet-specimen-row { column-gap: clamp(.25rem, 1vw, .5rem); row-gap: .45rem; }
+  .alphabet-specimen-glyph, .alphabet-specimen-special .alphabet-specimen-glyph, .alphabet-specimen-numerals .alphabet-specimen-glyph, .alphabet-specimen-punctuation .alphabet-specimen-glyph, .alphabet-specimen-other .alphabet-specimen-glyph { min-width: .72em; font-size: clamp(2.2rem, 12vw, 3.35rem); }
+  .alphabet-specimen-group { margin-block: 1rem; }
+  .alphabet-specimen-attribution, .alphabet-specimen-disclaimer { font-size: .95rem; }
 }
 
 .letter-comparison { gap: 1rem; }
@@ -431,4 +451,8 @@ footer { border-top: 1px solid var(--line); padding: 1.2rem; text-align: center;
   .practice-page { display: block; }
   .worksheet-output { margin: 0; padding: 0; background: white; border: 0; border-radius: 0; }
   [data-worksheet-output] svg { width: 100%; max-width: none; height: auto; margin: 0; border: 0; box-shadow: none; }
+  .alphabet-specimen { break-inside: avoid; page-break-inside: avoid; }
+  .alphabet-specimen-sheet { border: 0; border-radius: 0; break-inside: avoid; }
+  .alphabet-specimen-attribution, .alphabet-specimen-disclaimer { color: #000; }
+  .alphabet-specimen [data-alphabet-status] { display: none; }
 }

@@ -1,0 +1,152 @@
+---
+// SPDX-License-Identifier: Apache-2.0
+import { readFileSync } from "node:fs";
+import { basename, resolve } from "node:path";
+import type { FontRecord, ModelRecord } from "../../tools/content.mjs";
+import { inspectTrueType } from "../../tools/font-metadata.mjs";
+import { alphabetSpecimenForModel, type AlphabetGroupId } from "../lib/alphabet-specimen";
+import { shapeReferenceWord } from "../lib/reference-font-shaping";
+import { withBase } from "../lib/routes";
+import { messages, type Locale } from "../lib/i18n";
+import FontProvenance from "./FontProvenance.astro";
+
+interface Props {
+  lang: Locale;
+  model: ModelRecord;
+  font?: FontRecord;
+}
+
+const { lang, model, font } = Astro.props;
+const copy = messages[lang];
+const registeredFont = font
+  && model.character_repertoire.length > 0
+  && model.reference_fonts.includes(font.id)
+  && font.correspondence.model === model.id
+  && font.files[0]
+  ? font
+  : undefined;
+const metadata = registeredFont
+  ? inspectTrueType(readFileSync(resolve(process.cwd(), registeredFont.files[0])))
+  : undefined;
+const specimen = alphabetSpecimenForModel(model);
+const declaredCharacters = specimen.groups.flatMap((group) => group.characters);
+const groups = metadata
+  ? specimen.groups.map((group) => ({
+    ...group,
+    characters: group.characters.filter((character) => metadata.hasCharacter(character)),
+  })).filter((group) => group.characters.length > 0)
+  : [];
+const unavailableCharacters = metadata
+  ? declaredCharacters.filter((character) => !metadata.hasCharacter(character))
+  : [];
+const renderable = Boolean(registeredFont && metadata && groups.length > 0);
+const family = registeredFont ? `alphabet-${registeredFont.id}` : "";
+const fontUrl = registeredFont
+  ? withBase(`data/v1/assets/fonts/${registeredFont.id}/1-${basename(registeredFont.files[0])}`)
+  : "";
+const requiredFeatures = registeredFont?.shaping?.required_features ?? [];
+const featureSettings = requiredFeatures.map((feature) => `"${feature}" 1`).join(", ");
+const groupLabels: Record<AlphabetGroupId, string> = {
+  uppercase: copy.alphabetUppercase,
+  lowercase: copy.alphabetLowercase,
+  special: copy.alphabetSpecial,
+  numerals: copy.alphabetNumerals,
+  punctuation: copy.alphabetPunctuation,
+  other: copy.alphabetOther,
+};
+---
+{renderable && registeredFont && metadata && (
+  <section
+    class="data-section alphabet-specimen"
+    aria-labelledby={`alphabet-title-${model.id}`}
+    data-alphabet-specimen
+    data-font-id={registeredFont.id}
+    data-font-url={fontUrl}
+    data-font-family={family}
+    data-required-features={JSON.stringify(requiredFeatures)}
+    data-partial-coverage={unavailableCharacters.length > 0 ? "true" : "false"}
+    data-partial-count={unavailableCharacters.length}
+    data-message-unavailable={copy.alphabetUnavailable}
+    data-message-unsupported-features={copy.alphabetUnsupportedFeatures}
+    data-message-partial-coverage={copy.alphabetPartialCoverage}
+    data-state="loading"
+  >
+    <div class="section-heading-row">
+      <h2 id={`alphabet-title-${model.id}`}>{copy.alphabetOverview}</h2>
+      <a class="text-link" href={withBase(`${lang}/models/${model.id}/letters/`)}>{copy.viewRepertoire}</a>
+    </div>
+    <p>{copy.alphabetOverviewDescription}</p>
+    <p data-alphabet-status role="status">{copy.alphabetLoading}</p>
+    {unavailableCharacters.length > 0 && (
+      <p class="alphabet-specimen-coverage">
+        {copy.alphabetPartialCoverage} ({unavailableCharacters.length}: {unavailableCharacters.join(", ")})
+      </p>
+    )}
+    <figure
+      class="alphabet-specimen-sheet"
+      data-alphabet-sheet
+      lang={registeredFont.shaping?.language_tag ?? lang}
+      dir={registeredFont.shaping?.direction ?? "ltr"}
+      hidden
+    >
+      <figcaption class="alphabet-specimen-title">
+        <strong>{model.name[lang] ?? model.name.en ?? model.name.de}</strong>
+      </figcaption>
+      {groups.map((group) => (
+        <section class={`alphabet-specimen-group alphabet-specimen-${group.id}`} data-specimen-group={group.id}>
+          <h3 class="visually-hidden">{groupLabels[group.id]}</h3>
+          <p class="visually-hidden">{groupLabels[group.id]}: {group.characters.join(", ")}</p>
+          <div
+            class="alphabet-specimen-row"
+            aria-hidden="true"
+            style={`font-family: "${family}"; font-feature-settings: ${featureSettings};`}
+          >
+            {group.characters.map((character) => (
+              <span class="alphabet-specimen-glyph" data-specimen-character={character}>
+                {shapeReferenceWord(character, registeredFont)}
+              </span>
+            ))}
+          </div>
+        </section>
+      ))}
+    </figure>
+    <p class="alphabet-specimen-attribution">
+      <strong>{copy.alphabetReferenceFont}:</strong> {registeredFont.name} · {copy.fontDegree[registeredFont.correspondence.degree]} · OpenType: {requiredFeatures.join(", ") || copy.notRecorded}
+    </p>
+    {registeredFont.correspondence.notes && <p>{registeredFont.correspondence.notes}</p>}
+    {registeredFont.correspondence.degree === "visual-only" && <p>{copy.alphabetVisualOnly}</p>}
+    <p class="alphabet-specimen-disclaimer">{copy.alphabetNotOfficial}</p>
+    <FontProvenance lang={lang} font={registeredFont} />
+  </section>
+)}
+<script>
+  import { loadLocalReferenceFont, UnsupportedFontFeaturesError } from "../lib/browser-font-loader";
+
+  for (const specimen of document.querySelectorAll<HTMLElement>("[data-alphabet-specimen]")) {
+    const status = specimen.querySelector<HTMLElement>("[data-alphabet-status]");
+    const sheet = specimen.querySelector<HTMLElement>("[data-alphabet-sheet]");
+    const partial = specimen.dataset.partialCoverage === "true";
+    const fontId = specimen.dataset.fontId!;
+    const family = specimen.dataset.fontFamily!;
+    const url = specimen.dataset.fontUrl!;
+    const requiredFeatures = JSON.parse(specimen.dataset.requiredFeatures ?? "[]") as string[];
+
+    void loadLocalReferenceFont({ fontId, family, urls: [url], requiredFeatures }).then(() => {
+      specimen.dataset.state = partial ? "partial-coverage" : "ready";
+      sheet?.removeAttribute("hidden");
+      if (partial && status) {
+        status.textContent = `${specimen.dataset.messagePartialCoverage} (${specimen.dataset.partialCount})`;
+      } else {
+        status?.setAttribute("hidden", "");
+      }
+    }).catch((error: unknown) => {
+      const unsupportedFeatures = error instanceof UnsupportedFontFeaturesError;
+      specimen.dataset.state = unsupportedFeatures ? "unsupported-features" : "unavailable";
+      if (status) {
+        status.textContent = unsupportedFeatures
+          ? specimen.dataset.messageUnsupportedFeatures ?? "Required OpenType features are unsupported."
+          : specimen.dataset.messageUnavailable ?? "Reference font unavailable.";
+      }
+    });
+  }
+</script>

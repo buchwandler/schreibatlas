@@ -76,6 +76,21 @@ type MessageSet = {
   glyphRecords: string;
   noGlyphRecords: string;
   viewRepertoire: string;
+  alphabetOverview: string;
+  alphabetOverviewDescription: string;
+  alphabetUppercase: string;
+  alphabetLowercase: string;
+  alphabetSpecial: string;
+  alphabetNumerals: string;
+  alphabetPunctuation: string;
+  alphabetOther: string;
+  alphabetReferenceFont: string;
+  alphabetPartialCoverage: string;
+  alphabetUnavailable: string;
+  alphabetUnsupportedFeatures: string;
+  alphabetLoading: string;
+  alphabetNotOfficial: string;
+  alphabetVisualOnly: string;
   sources: string;
   noSources: string;
   sourceAuthor: string;
@@ -474,6 +489,21 @@ export const messages: Record<Locale, MessageSet> = {
     glyphRecords: "Dokumentierte Glyphen",
     noGlyphRecords: "Für dieses Modell gibt es noch keine Glyphendatensätze.",
     viewRepertoire: "Repertoire ansehen",
+    alphabetOverview: "Alphabetübersicht",
+    alphabetOverviewDescription: "Digitale Referenzdarstellung des erfassten Zeichenbestands.",
+    alphabetUppercase: "Großbuchstaben",
+    alphabetLowercase: "Kleinbuchstaben",
+    alphabetSpecial: "Sonderzeichen",
+    alphabetNumerals: "Ziffern",
+    alphabetPunctuation: "Satzzeichen",
+    alphabetOther: "Weitere Zeichen",
+    alphabetReferenceFont: "Referenzschrift",
+    alphabetPartialCoverage: "Einige erfasste Zeichen können mit dieser Referenzschrift nicht dargestellt werden.",
+    alphabetUnavailable: "Die Referenzschrift konnte nicht geladen werden; es wird keine Ersatzschrift verwendet.",
+    alphabetUnsupportedFeatures: "Die erforderlichen OpenType-Funktionen werden nicht unterstützt; die Zeichen bleiben ausgeblendet.",
+    alphabetLoading: "Referenzschrift wird geladen …",
+    alphabetNotOfficial: "Digitale Fontdarstellung. Keine offizielle Alphabettafel und kein Beleg für Schreibbewegung oder Strichfolge.",
+    alphabetVisualOnly: "Diese digitale Schrift ist nur eine visuelle Annäherung und keine autoritative Rekonstruktion der historischen Alphabettafel.",
     sources: "Quellen und Herkunft",
     noSources: "Für diesen Datensatz sind keine Quellen eingetragen.",
     sourceAuthor: "Autorenschaft",
@@ -877,6 +907,21 @@ export const messages: Record<Locale, MessageSet> = {
     glyphRecords: "Documented glyphs",
     noGlyphRecords: "There are no glyph records for this model yet.",
     viewRepertoire: "View repertoire",
+    alphabetOverview: "Alphabet overview",
+    alphabetOverviewDescription: "Digital reference rendering of the recorded character set.",
+    alphabetUppercase: "Uppercase",
+    alphabetLowercase: "Lowercase",
+    alphabetSpecial: "Special characters",
+    alphabetNumerals: "Numerals",
+    alphabetPunctuation: "Punctuation",
+    alphabetOther: "Other characters",
+    alphabetReferenceFont: "Reference font",
+    alphabetPartialCoverage: "Some recorded characters cannot be rendered by this reference font.",
+    alphabetUnavailable: "The reference font could not be loaded; no substitute font is used.",
+    alphabetUnsupportedFeatures: "Required OpenType features are unsupported; the characters remain hidden.",
+    alphabetLoading: "Loading reference font …",
+    alphabetNotOfficial: "Digital font rendering. Not an official alphabet chart or evidence of writing movement or stroke order.",
+    alphabetVisualOnly: "This digital font is only a visual approximation, not an authoritative reconstruction of the historical alphabet chart.",
     sources: "Sources and provenance",
     noSources: "No sources are recorded for this entry.",
     sourceAuthor: "Author",

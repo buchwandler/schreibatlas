@@ -1,6 +1,7 @@
 ---
 // SPDX-License-Identifier: Apache-2.0
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import AlphabetSpecimen from "../../../../components/AlphabetSpecimen.astro";
 import NormalizedGuidelines from "../../../../components/NormalizedGuidelines.astro";
 import BreadcrumbJsonLd from "../../../../components/BreadcrumbJsonLd.astro";
 import SourceList from "../../../../components/SourceList.astro";
@@ -8,7 +9,7 @@ import VerificationBadge from "../../../../components/VerificationBadge.astro";
 import FontProvenance from "../../../../components/FontProvenance.astro";
 import { messages, type Locale } from "../../../../lib/i18n";
 import { withBase } from "../../../../lib/routes";
-import { localizedLetterPaths, localizedModelPaths, loadContent } from "../../../../../tools/content.mjs";
+import { localizedLetterPaths, localizedModelPaths, loadContent, repertoireCharacters } from "../../../../../tools/content.mjs";
 import type { Content, FontRecord, ModelRecord, SourceRecord } from "../../../../../tools/content.mjs";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -32,8 +33,21 @@ const languageNames = model.languages.map((id) => content.languages.find((entry)
 const modelFonts = model.reference_fonts.flatMap((id) => content.fonts.filter((font) => font.id === id)) as FontRecord[];
 const glyphs = content.glyphs.filter((glyph) => glyph.model === model.id);
 const glyphRoutes = localizedLetterPaths([model], content.glyphs).filter((route) => route.lang === lang);
-const fontCoverage = modelFonts.filter((font) => font.files[0]).map((font) => inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))));
+const localFontAssets = modelFonts.flatMap((font) => font.files[0]
+  ? [{ font, metadata: inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))) }]
+  : []);
+const fontCoverage = localFontAssets.map(({ metadata }) => metadata);
 const renderable = glyphRoutes.filter(({ character }) => fontCoverage.some((font) => font.hasCharacter(character))).length;
+const specimenCharacters = repertoireCharacters(model);
+const correspondencePriority: Record<FontRecord["correspondence"]["degree"], number> = {
+  complete: 0,
+  partial: 1,
+  "visual-only": 2,
+  unknown: 3,
+};
+const preferredReferenceFont = localFontAssets
+  .filter(({ font, metadata }) => font.correspondence.model === model.id && specimenCharacters.some((character) => metadata.hasCharacter(character)))
+  .sort((left, right) => correspondencePriority[left.font.correspondence.degree] - correspondencePriority[right.font.correspondence.degree])[0]?.font;
 const connectionRecords = content.connections.filter((entry) => entry.model === model.id);
 const movementCount = content.strokes.filter((entry) => entry.model === model.id && ["source-backed", "reviewed", "verified"].includes(entry.verification)).length;
 const sourceIds = [...new Set([...model.sources, ...glyphs.flatMap((glyph) => glyph.sources), ...modelFonts.flatMap((font) => font.sources)])];
@@ -82,6 +96,10 @@ const breadcrumbItems = [
       {model.demo && <p class="demo-marker">{copy.demoTitle}</p>}
     </header>
 
+
+    {preferredReferenceFont && model.character_repertoire.length > 0 && (
+      <AlphabetSpecimen lang={lang} model={model} font={preferredReferenceFont} />
+    )}
     <section class="data-section" aria-labelledby="identity-title">
       <h2 id="identity-title">{copy.modelDetails}</h2>
       <dl class="metadata-list detail-list">

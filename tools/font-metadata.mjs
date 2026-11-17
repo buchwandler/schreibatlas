@@ -133,5 +133,15 @@ export function fontMetadataErrors(font, bytes) {
   for (const feature of font.shaping?.required_features ?? []) {
     if (!metadata.features.includes(feature)) errors.push(`missing required OpenType feature ${feature}`);
   }
+  const boundary = font.shaping?.word_boundary;
+  if (boundary) {
+    if (boundary.start === boundary.end) errors.push("word-boundary start and end controls must differ");
+    for (const control of [boundary.start, boundary.end]) {
+      const point = Number.parseInt(control.slice(2), 16);
+      if (point <= 0x10ffff && !metadata.hasCharacter(String.fromCodePoint(point))) {
+        errors.push(`missing word-boundary control ${control}`);
+      }
+    }
+  }
   return errors;
 }

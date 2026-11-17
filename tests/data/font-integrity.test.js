@@ -5,9 +5,10 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { loadContent } from "../../tools/content.mjs";
+import { loadContent, repertoireCharacters } from "../../tools/content.mjs";
 import { fontMetadataErrors, inspectTrueType } from "../../tools/font-metadata.mjs";
 
+import { codePointLabelToCharacter, shapeReferenceWord } from "../../src/lib/reference-font-shaping.ts";
 const root = fileURLToPath(new URL("../../", import.meta.url));
 const content = loadContent(root);
 const archiveSha256 = "b33215791baec691dda5b1bac5a57cc50fadc931dc43c09759d77c0c404e72fc";
@@ -19,6 +20,14 @@ const profiles = [
   { model: "de-suetterlin", font: "font-schulschriften-suetterlin", source: "wesu" },
   { model: "de-deutsche-normalschrift", font: "font-schulschriften-dn", source: "wedn" },
 ];
+
+test("reference font word boundaries wrap a single isolated character", () => {
+  const font = { shaping: { word_boundary: { start: "U+00A7", end: "U+00B6" } } };
+  assert.equal(codePointLabelToCharacter("U+00A7"), "§");
+  assert.equal(shapeReferenceWord("A", font), "§A¶");
+  assert.equal(shapeReferenceWord("A", { shaping: {} }), "A");
+  assert.throws(() => shapeReferenceWord("§", font), /reserved/);
+});
 const fontById = new Map(content.fonts.map((font) => [font.id, font]));
 const modelById = new Map(content.models.map((model) => [model.id, model]));
 
@@ -45,6 +54,8 @@ for (const { model: modelId, font: fontId, source } of profiles) {
     const metadata = inspectTrueType(bytes);
     const provenance = JSON.parse(readFileSync(resolve(root, font.derivation.provenance_file), "utf8"));
     const mappingBytes = readFileSync(resolve(root, font.derivation.unicode_mapping));
+    const mapping = JSON.parse(mappingBytes);
+    const model = modelById.get(modelId);
     const tfmBytes = readFileSync(resolve(root, font.derivation.tfm_file));
     const license = readFileSync(resolve(root, font.license_file), "utf8");
 
@@ -70,6 +81,15 @@ for (const { model: modelId, font: fontId, source } of profiles) {
     assert.equal(font.weight, 400);
     assert.equal(font.style, "normal");
     assert.deepEqual(font.shaping.required_features, ["calt", "kern"]);
+    assert.deepEqual(font.shaping.word_boundary, {
+      start: mapping.word_boundary_markers.start.codepoint,
+      end: mapping.word_boundary_markers.end.codepoint,
+    });
+    for (const control of Object.values(font.shaping.word_boundary)) {
+      const character = String.fromCodePoint(Number.parseInt(control.slice(2), 16));
+      assert.equal(metadata.hasCharacter(character), true);
+      assert.equal(repertoireCharacters(model).includes(character), false);
+    }
     assert.deepEqual(fontMetadataErrors(font, bytes), []);
     assert.ok(metadata.hasCharacter(germanCore));
     assert.equal(metadata.hasCharacter("😀"), false);

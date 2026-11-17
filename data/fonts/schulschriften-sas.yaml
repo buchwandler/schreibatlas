@@ -58,6 +58,9 @@ shaping:
   required_features: [calt, kern]
   language_tag: de
   direction: ltr
+  word_boundary:
+    start: U+00A7
+    end: U+00B6
 calibration:
   x_height_em: 0.346
   x_height_method: "TrueType cmap U+0078 -> glyf.yMax / head.unitsPerEm; tools/font-metadata.mjs."

@@ -125,7 +125,7 @@ test("font schema keeps archive identity separate from generated font metadata",
       notes: "A browser-compatible derivative, not an official upstream TTF.",
     },
     integrity: { sha256: "a".repeat(64), bytes: 1024 },
-    shaping: { required_features: ["calt", "kern"], language_tag: "de", direction: "ltr" },
+    shaping: { required_features: ["calt", "kern"], language_tag: "de", direction: "ltr", word_boundary: { start: "U+00A7", end: "U+00B6" } },
     calibration: { x_height_em: 0.34, x_height_method: "TrueType cmap U+0078" },
     correspondence: { model: "demo-round", degree: "partial", notes: "Fixture.", sources: ["src-demo-placeholder"] },
     sources: ["src-demo-placeholder"],
@@ -135,6 +135,9 @@ test("font schema keeps archive identity separate from generated font metadata",
   assert.equal(validate({ ...record, format: "woff2" }), false);
   assert.equal(validate({ ...record, derivation: undefined }), false);
   assert.equal(validate({ ...record, upstream: { ...record.upstream, sha256: "not-a-hash" } }), false);
+  assert.equal(validate({ ...record, shaping: { ...record.shaping, word_boundary: { start: "U+00A7", end: "U+00B6" } } }), true);
+  assert.equal(validate({ ...record, shaping: { ...record.shaping, word_boundary: { start: "U+00a7", end: "U+00B6" } } }), false);
+  assert.equal(validate({ ...record, shaping: { ...record.shaping, word_boundary: { start: "U+00A7", end: "U+00B6", extra: true } } }), false);
 });
 
 test("font x-height calibration requires a mapped model and source", () => {

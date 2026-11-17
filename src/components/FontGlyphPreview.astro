@@ -7,6 +7,7 @@ import { inspectTrueType } from "../../tools/font-metadata.mjs";
 import { withBase } from "../lib/routes";
 import FontProvenance from "./FontProvenance.astro";
 import { messages, type Locale } from "../lib/i18n";
+import { shapeReferenceWord } from "../lib/reference-font-shaping";
 interface Props { lang: Locale; character: string; font?: FontRecord; }
 const { lang, character, font } = Astro.props;
 const copy = messages[lang];
@@ -21,7 +22,7 @@ const features = requiredFeatures.map((feature) => `"${feature}" 1`).join(", ");
     <svg style="display: none" data-font-preview-shape viewBox="-1 -2.5 5 4.5" role="img" aria-label={`${lang === "de" ? "Referenzfont-Darstellung" : "Reference font rendering"}: ${character} · ${font.name}`}>
       <line x1="-1" x2="4" y1="0" y2="0" stroke="currentColor" stroke-width="0.01" opacity="0.4" />
       <line x1="-1" x2="4" y1="-1" y2="-1" stroke="currentColor" stroke-width="0.01" opacity="0.4" />
-      <text x="1.5" y="0" text-anchor="middle" lang={font.shaping?.language_tag ?? lang} direction={font.shaping?.direction ?? "ltr"} style={`font-family: "preview-${font.id}"; font-size: ${1 / font.calibration!.x_height_em}px; font-feature-settings: ${features};`} fill="currentColor">{character}</text>
+      <text x="1.5" y="0" text-anchor="middle" lang={font.shaping?.language_tag ?? lang} direction={font.shaping?.direction ?? "ltr"} style={`font-family: "preview-${font.id}"; font-size: ${1 / font.calibration!.x_height_em}px; font-feature-settings: ${features};`} fill="currentColor">{shapeReferenceWord(character, font)}</text>
     </svg>
     <p data-font-preview-unavailable class="empty-state" role="status">{copy.noVectorOutline} {lang === "de" ? "Referenzfont wird geladen; bei einem Fehler bleibt die Darstellung nicht verfügbar." : "Loading reference font; if loading fails, the rendering remains unavailable."}</p>
     <figcaption>
@@ -35,26 +36,22 @@ const features = requiredFeatures.map((feature) => `"${feature}" 1`).join(", ");
   </figure>
 ) : <p class="empty-state">{copy.noVectorOutline}</p>}
 <script>
-  const fonts = new Map<string, Promise<FontFace>>();
+  import { loadLocalReferenceFont } from "../lib/browser-font-loader";
+
   for (const preview of document.querySelectorAll<HTMLElement>("[data-font-preview]")) {
+    const fontId = preview.dataset.fontId!;
     const family = preview.dataset.fontFamily!;
     const url = preview.dataset.fontUrl!;
     const features = JSON.parse(preview.dataset.fontPreviewFeatures ?? "[]") as string[];
     const unavailable = preview.querySelector<HTMLElement>("[data-font-preview-unavailable]");
     const unavailableMessage = preview.dataset.fontPreviewUnavailableMessage ?? "Reference font unavailable.";
-    const featureSettings = features.map((feature) => `"${feature}" 1`).join(", ");
-    if (featureSettings && !CSS.supports("font-feature-settings", featureSettings)) {
-      if (unavailable) unavailable.textContent = unavailableMessage;
-      continue;
-    }
-    if (!fonts.has(family)) {
-      const face = new FontFace(family, `url("${url}")`);
-      fonts.set(family, face.load().then((loaded) => { document.fonts.add(loaded); return loaded; }));
-    }
-    fonts.get(family)!.then(() => {
+
+    void loadLocalReferenceFont({ fontId, family, urls: [url], requiredFeatures: features }).then(() => {
       preview.querySelector("[data-font-preview-shape]")?.removeAttribute("style");
-      preview.querySelector("[data-font-preview-unavailable]")?.setAttribute("hidden", "");
-    }).catch(() => { if (unavailable) unavailable.textContent = unavailableMessage; });
+      unavailable?.setAttribute("hidden", "");
+    }).catch(() => {
+      if (unavailable) unavailable.textContent = unavailableMessage;
+    });
   }
 </script>
 <style>

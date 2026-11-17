@@ -134,6 +134,16 @@ export function evidenceErrors(records, root) {
     const model = models.get(font.correspondence.model);
     if (model && !model.reference_fonts.includes(font.id)) errors.push(`${name}: corresponding model must reference font "${font.id}" back.`);
     sourceRefs(`${name} correspondence`, font.correspondence.sources);
+    const boundary = font.shaping?.word_boundary;
+    if (boundary) {
+      if (boundary.start === boundary.end) errors.push(`${name}: word-boundary start and end controls must differ.`);
+      for (const control of [boundary.start, boundary.end]) {
+        const point = Number.parseInt(control.slice(2), 16);
+        if (models.get(font.correspondence.model)?.character_repertoire.some((entry) => contains([entry], point))) {
+          errors.push(`${name}: reserved word-boundary control ${control} must not be in the model repertoire.`);
+        }
+      }
+    }
     generatedFontErrors(name, font);
     if (font.integrity) {
       const asset = resolve(root, font.files[0]);

@@ -312,3 +312,12 @@ test("Volksschrift includes at least ten sourced final-form font outlines", () =
     && value.sources.length > 0);
   assert.ok(outlines.length >= 10, `expected at least ten sourced outlines, found ${outlines.length}`);
 });
+
+test("reserved word-boundary controls cannot appear in a model repertoire", (t) => {
+  const root = fixtureRoot(t);
+  const path = "data/models/de-sas/model.yaml";
+  const model = readYaml(root, path);
+  model.character_repertoire.push("U+00A7");
+  writeYaml(root, path, model);
+  assertDiagnostic(root, "reserved word-boundary control U+00A7 must not be in the model repertoire.");
+});

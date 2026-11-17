@@ -177,7 +177,7 @@ export interface FontRecord {
   upstream?: GitFontUpstream | ArchiveFontUpstream;
   derivation?: FontDerivation;
   integrity?: { sha256: string; bytes: number };
-  shaping?: { required_features: string[]; language_tag: string; direction: "ltr" | "rtl" };
+  shaping?: { required_features: string[]; language_tag: string; direction: "ltr" | "rtl"; word_boundary?: { start: string; end: string } };
   calibration?: { x_height_em: number; x_height_method?: string; ascender_em?: number | null; descender_em?: number | null } | null;
   file_urls?: string[];
   correspondence: { model: string | null; degree: "complete" | "partial" | "visual-only" | "unknown"; notes: string | null; scope?: string[]; excludes?: string[]; sources?: string[] };

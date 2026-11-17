@@ -84,7 +84,16 @@
       "properties": {
         "required_features": { "type": "array", "items": { "type": "string", "pattern": "^[A-Za-z0-9]{4}$" }, "uniqueItems": true },
         "language_tag": { "type": "string", "minLength": 1 },
-        "direction": { "enum": ["ltr", "rtl"] }
+        "direction": { "enum": ["ltr", "rtl"] },
+        "word_boundary": {
+          "type": "object",
+          "required": ["start", "end"],
+          "properties": {
+            "start": { "type": "string", "pattern": "^U\\+[0-9A-F]{4,6}$" },
+            "end": { "type": "string", "pattern": "^U\\+[0-9A-F]{4,6}$" }
+          },
+          "additionalProperties": false
+        }
       },
       "additionalProperties": false
     },
