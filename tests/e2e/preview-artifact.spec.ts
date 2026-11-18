@@ -18,7 +18,16 @@ if (process.env.GENERATE_PREVIEW_ARTIFACTS === "true") {
     for (const [name, route] of pages) {
       await page.goto(route);
       await expect(page.locator("h1").first()).toBeVisible();
-      if (route === "de/models/de-sas/") await expect(page.locator("[data-alphabet-specimen]")).toHaveAttribute("data-state", "ready");
+      if (route === "de/models/de-sas/") {
+        const specimen = page.locator("[data-alphabet-specimen]");
+        await expect(specimen).toHaveAttribute("data-state", "ready");
+        for (const group of ["uppercase", "lowercase"]) {
+          await specimen.locator(`[data-specimen-group="${group}"] .alphabet-specimen-row`).screenshot({
+            path: join(outputDirectory, `sas-standard-inclination-${group}.png`),
+            animations: "disabled",
+          });
+        }
+      }
       await page.screenshot({ path: join(outputDirectory, `${name}.png`), fullPage: true, animations: "disabled" });
     }
     await page.setViewportSize({ width: 390, height: 844 });

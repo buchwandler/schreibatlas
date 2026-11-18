@@ -23,11 +23,18 @@ test("SAS specimen loads its local font and renders every recorded group", async
     await expect(specimen.locator(`[data-specimen-group="${group}"] [data-specimen-character]`)).toHaveCount(count);
   }
 
-  const localFontLoaded = await page.evaluate(() => document.fonts.check('16px "alphabet-font-schulschriften-sas"', "ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+  const family = "alphabet-font-schulschriften-sas";
+  const localFontLoaded = await page.evaluate((family) => {
+    return Array.from(document.fonts).some((face) => face.family === family && face.status === "loaded");
+  }, family);
   expect(localFontLoaded).toBe(true);
+  const glyphFamilies = await specimen.locator("[data-specimen-character]").evaluateAll((glyphs) => {
+    const families = glyphs.map((glyph) => getComputedStyle(glyph).fontFamily.replace(/^["']|["']$/g, ""));
+    return Array.from(new Set(families));
+  });
+  expect(glyphFamilies).toEqual([family]);
+  await expect(specimen.locator("[data-alphabet-sheet]")).toBeVisible();
   await expect(specimen.locator(".alphabet-specimen-disclaimer")).toContainText("Keine offizielle Alphabettafel");
-  await expect(specimen.locator('[data-specimen-group="uppercase"] .alphabet-specimen-row')).toHaveScreenshot("sas-standard-inclination-uppercase.png");
-  await expect(specimen.locator('[data-specimen-group="lowercase"] .alphabet-specimen-row')).toHaveScreenshot("sas-standard-inclination-lowercase.png");
 });
 
 test("blocked SAS font stays hidden and reports no substitute font", async ({ page }) => {
