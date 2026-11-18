@@ -34,7 +34,7 @@ function expectError(root, fragment) {
   assert.ok(errors.some((error) => error.includes(fragment)), errors.join("\n"));
 }
 
-test("CTAN models use distinct supported fonts and Grundschrift has no substitute", () => {
+test("CTAN models use distinct supported fonts", () => {
   const { errors, records } = validateDataset();
   assert.deepEqual(errors, []);
   const models = new Map(records.models.map(({ value }) => [value.id, value]));
@@ -57,7 +57,6 @@ test("CTAN models use distinct supported fonts and Grundschrift has no substitut
     assert.notEqual(font.upstream.sha256, font.integrity.sha256);
     assert.deepEqual(font.shaping.required_features, ["calt", "kern"]);
   }
-  assert.deepEqual(models.get("de-grundschrift").reference_fonts, []);
   assert.notEqual(models.get("de-suetterlin").reference_fonts[0], "font-langula-kurrent");
   assert.notEqual(models.get("de-deutsche-normalschrift").reference_fonts[0], "font-volksschrift");
   assert.deepEqual(records.fonts.map(({ value }) => value).filter((font) => font.upstream?.package === "CTAN schulschriften").map((font) => font.id).sort(), [
@@ -69,6 +68,20 @@ test("CTAN models use distinct supported fonts and Grundschrift has no substitut
   ]);
   assert.ok(records.sources.some(({ value }) => value.id === "src-ctan-schulschriften-v5"));
   assert.ok(records.sources.some(({ value }) => value.id === "src-schulschriften-manual-2014"));
+});
+
+test("Grundschrift uses the pinned Urff OpenType font as a visual reference only", () => {
+  const { errors, records } = validateDataset();
+  assert.deepEqual(errors, []);
+  const model = records.models.find(({ value }) => value.id === "de-grundschrift").value;
+  const font = records.fonts.find(({ value }) => value.id === "font-urff-grundschrift").value;
+  assert.deepEqual(model.reference_fonts, [font.id]);
+  assert.equal(model.character_repertoire_complete, false);
+  assert.equal(font.correspondence.model, model.id);
+  assert.equal(font.correspondence.degree, "visual-only");
+  assert.equal(font.license, "CC-BY-3.0");
+  assert.equal(font.format, "opentype");
+  assert.ok(!records.glyphs.some(({ value }) => value.model === model.id));
 });
 
 test("rich model and source metadata validate without changing legacy records", (t) => {

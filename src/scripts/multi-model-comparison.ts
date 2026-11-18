@@ -6,7 +6,7 @@ import { appendFontProvenance, fontFeatureSettings, supportsRequiredFontFeatures
 interface MultiModel {
   id: string; name: string; country: string | null; languages: string[];
   joined: boolean | null; characters: string[]; glyphs: GlyphRecord[]; url: string; capability: string;
-  font?: FontRecord & { url: string; supported: string[]; provenanceUrl?: string };
+  font?: FontRecord & { url: string; supported: string[]; provenanceUrl?: string; licenseUrl?: string };
 }
 const root = document.querySelector<HTMLElement>("[data-multi-comparison]");
 if (root) {
@@ -89,7 +89,13 @@ if (root) {
       } else if (font?.calibration && font.supported.includes(character.value)) {
         const features = font.shaping?.required_features ?? [];
         const featureSettings = fontFeatureSettings(font);
-        target.caption.append(`${de ? "Referenzfont" : "Reference font"}: ${font.name} · ${font.font_version ?? ""} · ${font.correspondence.degree} · ${font.license} · OpenType: ${features.join(", ") || (de ? "Funktionen nicht dokumentiert" : "features not documented")}. `);
+        target.caption.append(`${de ? "Referenzfont" : "Reference font"}: ${font.name} (${font.author}) · ${font.font_version ?? ""} · ${font.correspondence.degree} · ${font.license} · OpenType: ${features.join(", ") || (de ? "Funktionen nicht dokumentiert" : "features not documented")}. `);
+        if (font.licenseUrl) {
+          const license = document.createElement("a");
+          license.href = font.licenseUrl;
+          license.textContent = de ? "Lizenztext" : "License text";
+          target.caption.append(license, ". ");
+        }
         appendFontProvenance(target.caption, font, de ? "de" : "en", font.provenanceUrl);
         if (!supportsRequiredFontFeatures(font)) {
           target.caption.append(de ? "Erforderliche OpenType-Funktionen nicht verfügbar; keine Ersatzschrift wird verwendet." : "Required OpenType features are unavailable; no substitute font is used.");

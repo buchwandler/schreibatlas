@@ -62,4 +62,4 @@ The side-by-side visual comparisons are in `reports/`. CTAN reference renders ap
 
 ## Production use
 
-The connected-text parity gate passed for all five profiles, and the production models and local assets now use these derivatives. Grundschrift intentionally has no reference font. The CTAN package and each derived font remain distinguishable through their separate source, artifact hashes, and provenance records.
+The connected-text parity gate passed for all five profiles, and the production models and local assets now use these derivatives. The CTAN package and each derived font remain distinguishable through their separate source, artifact hashes, and provenance records.

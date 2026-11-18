@@ -71,10 +71,13 @@ test("Kurrent specimen is explicitly identified as a visual approximation", asyn
   await expect(specimen.locator(".alphabet-specimen-disclaimer")).toContainText("Not an official alphabet chart");
 });
 
-test("Grundschrift has no alphabet specimen", async ({ page }) => {
+test("Grundschrift has a visual reference alphabet specimen", async ({ page }) => {
   await page.goto("en/models/de-grundschrift/");
-  await expect(page.locator("[data-alphabet-specimen]")).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: "Alphabet overview" })).toHaveCount(0);
+  const specimen = page.locator("[data-alphabet-specimen]");
+  await expect(specimen).toHaveAttribute("data-state", "ready");
+  await expect(specimen).toHaveAttribute("data-font-id", "font-urff-grundschrift");
+  await expect(specimen.locator("[data-specimen-character]")).toHaveCount(73);
+  await expect(specimen).toContainText("visual approximation");
 });
 
 test("alphabet specimen model pages pass the automated WCAG audit", async ({ page }) => {

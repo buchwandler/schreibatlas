@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { resolve, basename } from "node:path";
 import type { FontRecord } from "../../tools/content.mjs";
-import { inspectTrueType } from "../../tools/font-metadata.mjs";
+import { inspectSfnt } from "../../tools/font-metadata.mjs";
 import { withBase } from "../lib/routes";
 import FontProvenance from "./FontProvenance.astro";
 import { messages, type Locale } from "../lib/i18n";
@@ -11,7 +11,7 @@ import { shapeReferenceWord } from "../lib/reference-font-shaping";
 interface Props { lang: Locale; character: string; font?: FontRecord; }
 const { lang, character, font } = Astro.props;
 const copy = messages[lang];
-const usable = font?.files[0] && font.calibration?.x_height_em && inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))).hasCharacter(character);
+const usable = font?.files[0] && font.calibration?.x_height_em && inspectSfnt(readFileSync(resolve(process.cwd(), font.files[0]))).hasCharacter(character);
 const url = font?.files[0] ? withBase(`data/v1/assets/fonts/${font.id}/1-${basename(font.files[0])}`) : "";
 const license = font?.license_file ? withBase(`data/v1/assets/fonts/${font.id}/${basename(font.license_file)}`) : null;
 const requiredFeatures = font?.shaping?.required_features ?? [];

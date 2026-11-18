@@ -3,7 +3,7 @@
 import { readFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import type { FontRecord, ModelRecord } from "../../tools/content.mjs";
-import { inspectTrueType } from "../../tools/font-metadata.mjs";
+import { inspectSfnt } from "../../tools/font-metadata.mjs";
 import { alphabetSpecimenForModel, type AlphabetGroupId } from "../lib/alphabet-specimen";
 import { shapeReferenceWord } from "../lib/reference-font-shaping";
 import { withBase } from "../lib/routes";
@@ -26,7 +26,7 @@ const registeredFont = font
   ? font
   : undefined;
 const metadata = registeredFont
-  ? inspectTrueType(readFileSync(resolve(process.cwd(), registeredFont.files[0])))
+  ? inspectSfnt(readFileSync(resolve(process.cwd(), registeredFont.files[0])))
   : undefined;
 const specimen = alphabetSpecimenForModel(model);
 const declaredCharacters = specimen.groups.flatMap((group) => group.characters);

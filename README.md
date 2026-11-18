@@ -5,7 +5,7 @@ Schreibatlas is a bilingual, source-backed handwriting reference atlas in develo
 
 ## Corpus and evidence limits
 
-The canonical dataset currently contains one country, one language, eleven model records (eight source-documented German models and three synthetic demos), thirteen source records, eleven glyph outlines, and seven locally packaged reference fonts. LA, SAS, VA, Sütterlin, and Deutsche Normalschrift use pinned, reproducibly generated derivatives of CTAN `schulschriften` v5. Grundschrift has no assigned reference font. Declared browsing inventories remain explicitly incomplete as educational-model inventories. No verified production stroke sequences are available.
+The canonical dataset currently contains one country, one language, eleven model records (eight source-documented German models and three synthetic demos), fourteen source records, eleven glyph outlines, and eight locally packaged reference fonts. LA, SAS, VA, Sütterlin, and Deutsche Normalschrift use pinned, reproducibly generated derivatives of CTAN `schulschriften` v5. Grundschrift uses Christian Urff's Grundschrift Regular as an independent visual reference. Declared browsing inventories remain explicitly incomplete as educational-model inventories. No verified production stroke sequences are available.
 
 The Volksschrift font correspondence is partial. Langula Kurrent is a modern visual-only adaptation, not an authoritative reconstruction of Johann Thomas Loth's 1866 chart. Recorded outlines describe final contours only. They do not establish pen movement, stroke order, or writing instruction. No complete repertoire is claimed.
 

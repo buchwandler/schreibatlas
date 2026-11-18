@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import test from "node:test";
 import { buildData, validateGeneratedUrls } from "../../tools/build-data.mjs";
-import { inspectTrueType } from "../../tools/font-metadata.mjs";
+import { inspectSfnt } from "../../tools/font-metadata.mjs";
 import { draftGlyphRecord } from "./content.test-helper.mjs";
 import { fileURLToPath } from "node:url";
 import { parse, stringify } from "yaml";
@@ -155,7 +155,7 @@ test("generated font exports include pinned archive and derivation provenance", 
 
   const profileRoot = join(root, "tools/fonts/schulschriften");
   const fontBytes = readFileSync(join(profileRoot, "generated/la-prototype.ttf"));
-  const metadata = inspectTrueType(fontBytes);
+  const metadata = inspectSfnt(fontBytes);
   const provenancePath = "tools/fonts/schulschriften/generated/la-prototype.provenance.json";
   const provenance = JSON.parse(readFileSync(join(root, provenancePath), "utf8"));
   const fontAsset = join(root, "assets/fonts/generated.ttf");

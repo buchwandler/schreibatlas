@@ -28,12 +28,19 @@ for (const lang of ["de", "en"]) {
   });
 }
 
-test("Grundschrift and unsupported characters stay unavailable without a substitute", async ({ page }) => {
-  await page.goto("en/models/de-grundschrift/");
-  await expect(page.locator("body")).toContainText("No local digital reference font is currently assigned to this model");
-  await page.goto("en/compare/letters/");
-  await expect(page.locator("[data-multi-stage]")).toContainText("Grundschrift · Rendering unavailable.");
+test("Grundschrift renders the default letter with Urff's local reference font, but not unsupported characters", async ({ page }) => {
+  await page.goto("de/compare/letters/");
+  const figure = page.locator("[data-multi-stage] figure").filter({ has: page.getByRole("link", { name: "Grundschrift", exact: true }) });
+  await expect(figure.locator('text[font-family="multi-font-urff-grundschrift"]')).toHaveText("r");
+  await expect(figure).toContainText("Referenzfont: Grundschrift Regular");
+  await expect(figure).toContainText("CC-BY-3.0");
+  await expect(figure.locator('a[href$="CC-BY-3.0-Urff-Grundschrift.txt"]')).toHaveCount(1);
+  await page.locator("[data-multi-character]").fill("😀");
+  await expect(figure).toContainText("Die Referenzschrift deckt dieses Zeichen nicht ab");
+  await expect(figure.locator("text")).toHaveCount(0);
+});
 
+test("unsupported characters stay unavailable in word comparisons", async ({ page }) => {
   await page.goto("en/compare/words/");
   await page.locator("#word-model-a").selectOption("de-la");
   await page.locator("#word-model-b").selectOption("de-sas");
@@ -81,9 +88,9 @@ test("educational role and model family filters use recorded metadata", async ({
 test("the comparison includes all five CTAN fonts and bounds shared overlays", async ({ page }) => {
   await page.goto("en/compare/letters/");
   const stage = page.locator("[data-multi-stage]");
-  await expect(stage.locator("text")).toHaveCount(5);
-  await expect(stage.locator("text")).toHaveText(["r", "r", "r", "r", "r"]);
-  await expect(stage).toContainText("Grundschrift · Rendering unavailable.");
+  await expect(stage.locator("text")).toHaveCount(6);
+  await expect(stage.locator("text")).toHaveText(["r", "r", "r", "r", "r", "r"]);
+  await expect(stage).toContainText("Reference font: Grundschrift Regular");
   const boxes = await stage.locator("svg").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("viewBox")));
   expect(new Set(boxes).size).toBe(1);
 
@@ -158,9 +165,10 @@ test("all five CTAN models export self-contained font-backed worksheets with pro
   }
 
   await page.locator("[data-model-select]").selectOption("de-grundschrift");
-  await expect(page.locator("[data-worksheet-status]")).toContainText("No substitute font is used");
-  await expect(page.locator("[data-export-svg]")).toBeDisabled();
-  await expect(page.locator("[data-worksheet-output] svg")).toHaveCount(0);
+  await expect(page.locator("[data-export-svg]")).toBeEnabled();
+  await expect(page.locator("[data-worksheet-output] defs style")).toContainText("data:font/otf;base64,");
+  await expect(page.locator("[data-worksheet-output] defs style")).toContainText('format("opentype")');
+  await expect(page.locator("[data-worksheet-output] metadata")).toContainText("Grundschrift von Christian Urff");
   await page.locator("[data-text-input]").fill("😀");
   await page.locator("[data-model-select]").selectOption("de-la");
   await expect(page.locator("[data-export-svg]")).toBeDisabled();

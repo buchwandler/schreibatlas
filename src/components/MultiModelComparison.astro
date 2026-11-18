@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import type { Content } from "../../tools/content.mjs";
 import { repertoireCharacters } from "../../tools/content.mjs";
-import { inspectTrueType } from "../../tools/font-metadata.mjs";
+import { inspectSfnt } from "../../tools/font-metadata.mjs";
 import { readFileSync } from "node:fs";
 import { resolve, basename } from "node:path";
 import { withBase } from "../lib/routes";
@@ -15,7 +15,7 @@ const localized = (text: Record<string, string>) => text[lang] ?? text.en ?? tex
 
 const data = content.models.map((model) => {
   const font = content.fonts.find((font) => font.id === model.reference_fonts[0]);
-  const metadata = font?.files[0] ? inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))) : undefined;
+  const metadata = font?.files[0] ? inspectSfnt(readFileSync(resolve(process.cwd(), font.files[0]))) : undefined;
   const glyphs = content.glyphs.filter((glyph) => glyph.model === model.id);
   const hasVector = glyphs.some((glyph) => Boolean(glyph.outline));
   const hasFont = Boolean(font?.files[0] && font.calibration);
@@ -27,7 +27,13 @@ const data = content.models.map((model) => {
     id: model.id, name: localized(model.name), country: model.country, languages: model.languages,
     joined: model.classification?.joined ?? null, characters: repertoireCharacters(model), glyphs, capability,
     url: withBase(`${lang}/models/${model.id}/`),
-    font: hasFont && font?.files[0] && font.calibration ? { ...font, url: withBase(`data/v1/assets/fonts/${font.id}/1-${basename(font.files[0])}`), provenanceUrl, supported: repertoireCharacters(model).filter((character) => metadata?.hasCharacter(character)) } : undefined,
+    font: hasFont && font?.files[0] && font.calibration ? {
+      ...font,
+      url: withBase(`data/v1/assets/fonts/${font.id}/1-${basename(font.files[0])}`),
+      licenseUrl: font.license_file ? withBase(`data/v1/assets/fonts/${font.id}/${basename(font.license_file)}`) : undefined,
+      provenanceUrl,
+      supported: repertoireCharacters(model).filter((character) => metadata?.hasCharacter(character)),
+    } : undefined,
   };
 });
 const capabilityLabels = {

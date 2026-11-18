@@ -13,7 +13,7 @@ import { localizedLetterPaths, localizedModelPaths, loadContent, repertoireChara
 import type { Content, FontRecord, ModelRecord, SourceRecord } from "../../../../../tools/content.mjs";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { inspectTrueType } from "../../../../../tools/font-metadata.mjs";
+import { inspectSfnt } from "../../../../../tools/font-metadata.mjs";
 import { unicodeCodePoints } from "../../../../../tools/unicode.mjs";
 
 export function getStaticPaths() {
@@ -34,7 +34,7 @@ const modelFonts = model.reference_fonts.flatMap((id) => content.fonts.filter((f
 const glyphs = content.glyphs.filter((glyph) => glyph.model === model.id);
 const glyphRoutes = localizedLetterPaths([model], content.glyphs).filter((route) => route.lang === lang);
 const localFontAssets = modelFonts.flatMap((font) => font.files[0]
-  ? [{ font, metadata: inspectTrueType(readFileSync(resolve(process.cwd(), font.files[0]))) }]
+  ? [{ font, metadata: inspectSfnt(readFileSync(resolve(process.cwd(), font.files[0]))) }]
   : []);
 const fontCoverage = localFontAssets.map(({ metadata }) => metadata);
 const renderable = glyphRoutes.filter(({ character }) => fontCoverage.some((font) => font.hasCharacter(character))).length;

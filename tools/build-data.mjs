@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { glyphRouteSlug } from "./unicode.mjs";
 import { validateDataset } from "./validate-data.mjs";
 import { parseStrokeSvg } from "./stroke-assets.mjs";
-import { inspectTrueType } from "./font-metadata.mjs";
+import { inspectSfnt, isSupportedSfnt } from "./font-metadata.mjs";
 
 const projectRoot = fileURLToPath(new URL("../", import.meta.url));
 
@@ -95,9 +95,7 @@ export function buildData({ root = projectRoot, outputDir = resolve(root, "publi
       return `${apiPrefix}/${assetPath}`;
     });
     const fontBytes = font.files[0] ? readFileSync(resolve(repositoryRoot, font.files[0])) : null;
-    const supported_characters = fontBytes?.length >= 4 && fontBytes.readUInt32BE(0) === 0x00010000
-      ? inspectTrueType(fontBytes).supportedCharacters
-      : [];
+    const supported_characters = isSupportedSfnt(fontBytes) ? inspectSfnt(fontBytes).supportedCharacters : [];
     let license_file_url = null;
     if (font.license_file) {
       const assetPath = `assets/fonts/${font.id}/${basename(font.license_file)}`;

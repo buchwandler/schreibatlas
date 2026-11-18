@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { loadContent, repertoireCharacters } from "../../tools/content.mjs";
-import { fontMetadataErrors, inspectTrueType } from "../../tools/font-metadata.mjs";
+import { fontMetadataErrors, inspectSfnt } from "../../tools/font-metadata.mjs";
 
 import { codePointLabelToCharacter, shapeReferenceWord } from "../../src/lib/reference-font-shaping.ts";
 const root = fileURLToPath(new URL("../../", import.meta.url));
@@ -86,14 +86,13 @@ test("all five CTAN browser derivatives have distinct source-backed model refere
     assert.ok(font.sources.includes("src-ctan-schulschriften-v5"));
     assert.ok(font.sources.includes("src-schulschriften-manual-2014"));
   }
-  assert.deepEqual(modelById.get("de-grundschrift").reference_fonts, []);
 });
 
 for (const { model: modelId, font: fontId, source, driver, shape } of profiles) {
   const font = fontById.get(fontId);
   test(`${font.name}: pinned source, derivation, identity, coverage and calibration`, () => {
     const bytes = readFileSync(resolve(root, font.files[0]));
-    const metadata = inspectTrueType(bytes);
+    const metadata = inspectSfnt(bytes);
     const provenance = JSON.parse(readFileSync(resolve(root, font.derivation.provenance_file), "utf8"));
     const profileId = sourceProfiles.find(({ source_stem }) => source_stem === source).id;
     const parity = JSON.parse(readFileSync(resolve(root, `tools/fonts/schulschriften/reports/${profileId}-font-parity.json`), "utf8"));
@@ -146,7 +145,7 @@ for (const { model: modelId, font: fontId, source, driver, shape } of profiles) 
       assert.equal(metadata.hasCharacter(character), true);
       assert.equal(repertoireCharacters(model).includes(character), false);
     }
-    assert.deepEqual(fontMetadataErrors(font, bytes), []);
+    assert.deepEqual(fontMetadataErrors(font, metadata), []);
     assert.ok(metadata.hasCharacter(germanCore));
     assert.equal(metadata.hasCharacter("😀"), false);
     assert.equal(metadata.features.includes("calt"), true);
@@ -155,7 +154,7 @@ for (const { model: modelId, font: fontId, source, driver, shape } of profiles) 
     assert.equal(metadata.ascenderEm, font.calibration.ascender_em);
     assert.equal(metadata.descenderEm, font.calibration.descender_em);
     assert.match(license, /LPPL Version 1\.3c/);
-    assert.ok(fontMetadataErrors({ ...font, font_version: "wrong", family_name: "wrong", postscript_name: "wrong", shaping: { required_features: ["xxxx"] } }, bytes).length >= 4);
+    assert.ok(fontMetadataErrors({ ...font, font_version: "wrong", family_name: "wrong", postscript_name: "wrong", shaping: { required_features: ["xxxx"] } }, metadata).length >= 4);
     assert.equal(modelById.get(modelId).reference_fonts[0], font.id);
   });
 }

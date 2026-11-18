@@ -34,5 +34,15 @@ For both fonts, retain the copyright and license text on redistribution and obse
 - Browser assets: `assets/fonts/schulschriften-{la,sas,va,suetterlin,dn}/`. These TrueType files are generated derivatives, not TrueType fonts distributed by CTAN.
 - Derivation recipe, Unicode mappings, TFM inputs, toolchain, output hashes, and per-font provenance are recorded under `tools/fonts/schulschriften/` and exported with the versioned font API records.
 - Attribution and redistribution: retain the upstream attribution and complete LPPL text, and follow the license conditions for the source and generated derivatives.
-- Scope: the derivatives represent the five corresponding package fonts. They do not establish official source traces, educational repertoire completeness, stroke order, or writing movement. Grundschrift has no assigned substitute font.
+- Scope: the derivatives represent the five corresponding package fonts. They do not establish official source traces, educational repertoire completeness, stroke order, or writing movement.
+
+## Grundschrift Regular
+
+- Record: `font-urff-grundschrift` (`data/fonts/urff-grundschrift.yaml`).
+- Creator and attribution: Grundschrift von Christian Urff. Copyright © 2016 by Christian Urff.
+- Source: https://github.com/christianurff/grundschrift/releases/tag/v3.0 (commit `0545c85000d24fef9eb939832dc8427afad8ad5d`).
+- License: [Creative Commons Attribution 3.0 Unported (CC-BY-3.0)](https://creativecommons.org/licenses/by/3.0/). Retain attribution and the license on redistribution. The upstream notice and license text are distributed with the font in `licenses/CC-BY-3.0-Urff-Grundschrift.txt`.
+- Bundled file: `assets/fonts/urff-grundschrift/Grundschrift-Regular.otf`. No modifications; calibration metadata is separate.
+- Scope: independent visual reference, not the Grundschulverband's font, an official source trace, or a record of writing movement.
+
 Future third-party material must be listed here with its record ID, name, creator, source URL, original license, bundled files, attribution requirements, and modifications. New font records are checked against this notice during repository validation.

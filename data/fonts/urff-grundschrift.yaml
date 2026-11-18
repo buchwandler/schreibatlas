@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: font-urff-grundschrift
+name: Grundschrift Regular
+author: Christian Urff
+project_url: https://github.com/christianurff/grundschrift
+license: CC-BY-3.0
+files: [assets/fonts/urff-grundschrift/Grundschrift-Regular.otf]
+license_file: licenses/CC-BY-3.0-Urff-Grundschrift.txt
+font_version: "Version 3.000;PS 003.000;hotconv 1.0.88;makeotf.lib2.5.64775"
+family_name: Grundschrift
+postscript_name: Grundschrift-Regular
+format: opentype
+weight: 400
+style: normal
+upstream:
+  repository: https://github.com/christianurff/grundschrift
+  release: v3.0
+  commit: 0545c85000d24fef9eb939832dc8427afad8ad5d
+  source_file: Grundschrift-Regular.otf
+integrity:
+  sha256: 42a785f81da5ebdd5000518067567639160cb6a16988e8f42b4778684f74e363
+  bytes: 18884
+shaping:
+  required_features: [calt]
+  language_tag: de
+  direction: ltr
+calibration:
+  x_height_em: 0.43
+  x_height_method: "OpenType OS/2.sxHeight: 430 units / 1000 units per em."
+  ascender_em: 0.789
+  descender_em: 0.301
+correspondence:
+  model: de-grundschrift
+  degree: visual-only
+  scope: [visual-letterforms]
+  excludes: [authoritative-stroke-order, official-teaching-sequence, exact-source-trace]
+  sources: [src-urff-grundschrift-font]
+  notes: "Christian Urff created this independent typeface for teaching materials. Its forms are a visual reference, not the Grundschulverband's own font, official model outlines, or evidence of writing movement."
+sources: [src-urff-grundschrift-font]

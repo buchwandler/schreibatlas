@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
-// Inspect the static TrueType assets used for local reference rendering.
-export function inspectTrueType(bytes) {
-  if (bytes.readUInt32BE(0) !== 0x00010000) throw new Error("Expected a static TrueType font.");
+// Inspect the static TrueType and OpenType/CFF assets used for local reference rendering.
+export function isSupportedSfnt(bytes) {
+  return bytes?.length >= 4 && [0x00010000, 0x4f54544f].includes(bytes.readUInt32BE(0));
+}
+
+export function inspectSfnt(bytes) {
+  if (!isSupportedSfnt(bytes)) throw new Error("Expected a static TrueType or OpenType/CFF font.");
+  const format = bytes.readUInt32BE(0) === 0x00010000 ? "truetype" : "opentype";
   const tables = new Map();
   for (let index = 0; index < bytes.readUInt16BE(4); index += 1) {
     const offset = 12 + index * 16;
@@ -100,14 +105,21 @@ export function inspectTrueType(bytes) {
     const list = start + bytes.readUInt16BE(start + 6);
     for (let index = 0; index < bytes.readUInt16BE(list); index += 1) features.add(bytes.toString("ascii", list + 2 + index * 6, list + 6 + index * 6));
   }
-  const loca = table("loca");
-  const glyf = table("glyf");
-  const longLoca = bytes.readInt16BE(head + 50) === 1;
-  const glyphOffset = (index) => longLoca ? bytes.readUInt32BE(loca + index * 4) : bytes.readUInt16BE(loca + index * 2) * 2;
-  const xIndex = glyphIndex(0x78);
-  if (!xIndex || glyphOffset(xIndex) === glyphOffset(xIndex + 1)) throw new Error("Font has no measurable lowercase x.");
-  const xHeight = bytes.readInt16BE(glyf + glyphOffset(xIndex) + 8) / em;
+  let xHeightEm;
+  if (format === "truetype") {
+    const loca = table("loca");
+    const glyf = table("glyf");
+    const longLoca = bytes.readInt16BE(head + 50) === 1;
+    const glyphOffset = (index) => longLoca ? bytes.readUInt32BE(loca + index * 4) : bytes.readUInt16BE(loca + index * 2) * 2;
+    const xIndex = glyphIndex(0x78);
+    if (!xIndex || glyphOffset(xIndex) === glyphOffset(xIndex + 1)) throw new Error("Font has no measurable lowercase x.");
+    xHeightEm = bytes.readInt16BE(glyf + glyphOffset(xIndex) + 8) / em;
+  } else {
+    table("CFF ");
+    xHeightEm = bytes.readUInt16BE(os2) >= 2 ? bytes.readInt16BE(os2 + 86) / em : null;
+  }
   return {
+    format,
     family: names.get(16) ?? names.get(1),
     postscriptName: names.get(6),
     version: names.get(5),
@@ -119,7 +131,7 @@ export function inspectTrueType(bytes) {
     italicAngle: bytes.readInt32BE(post + 4) / 65536,
     italic: Boolean(bytes.readUInt16BE(os2 + 62) & 1),
     unitsPerEm: em,
-    xHeightEm: xHeight,
+    xHeightEm,
     ascenderEm: bytes.readInt16BE(os2 + 68) / em,
     descenderEm: Math.abs(bytes.readInt16BE(os2 + 70)) / em,
     features: [...features].sort(),
@@ -128,9 +140,9 @@ export function inspectTrueType(bytes) {
   };
 }
 
-export function fontMetadataErrors(font, bytes) {
-  const metadata = inspectTrueType(bytes);
+export function fontMetadataErrors(font, metadata) {
   const errors = [];
+  if (font.format && metadata.format !== font.format) errors.push("font format mismatch");
   if (font.font_version && metadata.version !== font.font_version) errors.push("font internal version mismatch");
   if (font.family_name && metadata.family !== font.family_name) errors.push("font family name mismatch");
   if (font.postscript_name && metadata.postscriptName !== font.postscript_name) errors.push("font PostScript name mismatch");

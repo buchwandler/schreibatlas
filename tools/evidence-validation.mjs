@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { basename, relative, resolve, sep } from "node:path";
 import { unicodeCodePoints } from "./unicode.mjs";
-import { fontMetadataErrors, inspectTrueType } from "./font-metadata.mjs";
+import { fontMetadataErrors, inspectSfnt } from "./font-metadata.mjs";
 
 export function evidenceErrors(records, root) {
   const errors = [];
@@ -152,9 +152,10 @@ export function evidenceErrors(records, root) {
         if (bytes.length !== font.integrity.bytes) errors.push(`${name}: font integrity byte count mismatch.`);
         if (createHash("sha256").update(bytes).digest("hex") !== font.integrity.sha256) errors.push(`${name}: font integrity SHA-256 mismatch.`);
         try {
-          errors.push(...fontMetadataErrors(font, bytes).map((message) => `${name}: ${message}.`));
-          const metadata = inspectTrueType(bytes);
-          if (font.calibration?.x_height_method?.startsWith("TrueType cmap") && Math.abs(font.calibration.x_height_em - metadata.xHeightEm) > 0.000001) errors.push(`${name}: measured x-height calibration mismatch.`);
+          const metadata = inspectSfnt(bytes);
+          errors.push(...fontMetadataErrors(font, metadata).map((message) => `${name}: ${message}.`));
+          const method = font.calibration?.x_height_method;
+          if ((method?.startsWith("TrueType cmap") || (metadata.format === "opentype" && method?.startsWith("OpenType OS/2.sxHeight"))) && (metadata.xHeightEm === null || Math.abs(font.calibration.x_height_em - metadata.xHeightEm) > 0.000001)) errors.push(`${name}: measured x-height calibration mismatch.`);
           if (model) {
             for (const entry of model.character_repertoire) {
               for (const point of points(entry)) {
@@ -163,7 +164,7 @@ export function evidenceErrors(records, root) {
             }
           }
         } catch (error) {
-          errors.push(`${name}: invalid pinned TrueType font: ${error.message}`);
+          errors.push(`${name}: invalid pinned reference font: ${error.message}`);
         }
       }
     }

@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: CC-BY-SA-4.0
+id: src-urff-grundschrift-font
+kind: font-release
+title: Grundschrift von Christian Urff (v3.0)
+author: [Christian Urff]
+publisher: Christian Urff
+year: 2026
+locator:
+  section: Grundschrift-Regular.otf; LICENSE.md
+url: https://github.com/christianurff/grundschrift/tree/0545c85000d24fef9eb939832dc8427afad8ad5d
+rights:
+  type: licensed
+  license: CC-BY-3.0
+notes: "The unmodified Regular face is redistributed under the license supplied in the pinned release. This independent typeface is distinct from the Grundschulverband downloads."

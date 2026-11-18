@@ -441,7 +441,7 @@ export const messages: Record<Locale, MessageSet> = {
     heroTitle: "Handschriftmodelle offen erkunden",
     heroIntro: "Schreibatlas dokumentiert ein quellenbasiertes, maschinenlesbares Teilkorpus deutscher Handschriftmodelle und Buchstabenformen.",
     demoTitle: "Kleines Teilkorpus, keine vollständigen Standards",
-    demoDescription: "Acht deutsche Schreibmodelle sind quellenbasiert dokumentiert; drei weitere Einträge sind synthetische Demos. Fünf Modelle nutzen lokal gebündelte, aus CTAN-schulschriften abgeleitete Referenzfonts; Grundschrift hat keine digitale Referenzschrift. Elf Buchstabenumrisse sind erfasst. Fonts und Umrisse belegen keine Schreibbewegungen oder vollständigen offiziellen Repertoires.",
+    demoDescription: "Acht deutsche Schreibmodelle sind quellenbasiert dokumentiert; drei weitere Einträge sind synthetische Demos. Fünf Modelle nutzen lokal gebündelte, aus CTAN-schulschriften abgeleitete Referenzfonts; für Grundschrift dient Christian Urffs Schrift als visuelle Referenz. Elf Buchstabenumrisse sind erfasst. Fonts und Umrisse belegen keine Schreibbewegungen oder vollständigen offiziellen Repertoires.",
     pillarsTitle: "Vier miteinander verbundene Bereiche",
     pillars: [
       { title: "Erkunden", description: "Modelle, Repertoires und Buchstaben anhand nachvollziehbarer Quellen dokumentieren." },
@@ -859,7 +859,7 @@ export const messages: Record<Locale, MessageSet> = {
     heroTitle: "Explore handwriting models openly",
     heroIntro: "Schreibatlas documents a source-backed, machine-readable partial corpus of German handwriting models and letterforms.",
     demoTitle: "Small partial corpus, not complete standards",
-    demoDescription: "Eight German handwriting models are documented with sources; three other entries are synthetic demos. Five models use locally bundled derivatives of CTAN schulschriften fonts; Grundschrift has no digital reference font. Eleven letter outlines are recorded. Fonts and outlines do not establish stroke movement or complete official repertoires.",
+    demoDescription: "Eight German handwriting models are documented with sources; three other entries are synthetic demos. Five models use locally bundled derivatives of CTAN schulschriften fonts; Grundschrift uses Christian Urff's font as a visual reference. Eleven letter outlines are recorded. Fonts and outlines do not establish stroke movement or complete official repertoires.",
     pillarsTitle: "Four connected areas",
     pillars: [
       { title: "Explore", description: "Document models, repertoires, and letters with traceable sources." },

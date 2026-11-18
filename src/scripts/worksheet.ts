@@ -209,7 +209,8 @@ async function initializeWorksheet(container: HTMLElement): Promise<void> {
       const bytes = new Uint8Array(await response.arrayBuffer());
       let binary = "";
       for (const byte of bytes) binary += String.fromCharCode(byte);
-      const dataUrl = `data:font/ttf;base64,${btoa(binary)}`;
+      const mime = record.format === "opentype" ? "font/otf" : "font/ttf";
+      const dataUrl = `data:${mime};base64,${btoa(binary)}`;
       const family = `worksheet-${record.id}`;
       const face = await new FontFace(family, `url("${dataUrl}")`).load();
       document.fonts.add(face);
@@ -501,7 +502,7 @@ function createWorksheetSvg(
   if (font) {
     const defs = svgElement("defs");
     const style = svgElement("style");
-    style.textContent = `@font-face { font-family: "${font.family}"; src: url("${font.dataUrl}") format("truetype"); font-weight: 400; font-style: normal; }`;
+    style.textContent = `@font-face { font-family: "${font.family}"; src: url("${font.dataUrl}") format("${font.record.format === "opentype" ? "opentype" : "truetype"}"); font-weight: 400; font-style: normal; }`;
     defs.append(style);
     svg.append(defs);
   }
